@@ -29,13 +29,18 @@ class Login extends CI_Controller
                 $password = $this->input->post('password'); // jangan trim/escape password
                 $remember = (bool) $this->input->post('remember');
 
-                $result = $this->auth->attempt($username, $password, $remember);
-                if ($result['success']) {
-                    redirect('dashboard');
+                try {
+                    $result = $this->auth->attempt($username, $password, $remember);
+                    if ($result['success']) {
+                        redirect('dashboard');
+                    }
+                    $this->session->set_flashdata('danger', $result['message']);
+                } catch (\Throwable $e) {
+                    log_message('error', 'Login attempt exception: ' . $e->getMessage());
+                    $this->session->set_flashdata('danger', 'Error saat login: ' . $e->getMessage());
                 }
-                $this->session->set_flashdata('danger', $result['message']);
             }
-            redirect('login'); // Tambahkan kembali pengalihan ke halaman login setelah gagal
+            redirect('login');
         }
 
         $data = ['title' => 'Login - SIRKBMD'];

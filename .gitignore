@@ -2,9 +2,10 @@
 /application/logs/*
 !/application/logs/.gitkeep
 /application/cache/*
-!/application/cache/.gitkeep
+!/application/cache/sessions/
 /application/cache/sessions/*
 !/application/cache/sessions/.gitkeep
+!/application/cache/.gitkeep
 
 # Uploads (user uploaded documents)
 /uploads/*

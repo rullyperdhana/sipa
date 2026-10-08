@@ -3,7 +3,7 @@
  * SiTraSu — Sistem Tracking Surat Menyurat
  * CodeIgniter 3 Entry Point
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production');
+	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 
 /*
  *---------------------------------------------------------------

@@ -27,7 +27,13 @@ class Auth
         }
 
         // Ambil user
-        $user = $this->CI->db->get_where('users', ['username' => $username])->row();
+        try {
+            $user = $this->CI->db->get_where('users', ['username' => $username])->row();
+        } catch (\Throwable $e) {
+            log_message('error', 'Auth DB error: ' . $e->getMessage());
+            return ['success' => FALSE, 'message' => 'Koneksi database/tabel bermasalah: ' . $e->getMessage()];
+        }
+
         if (!$user) {
             $this->logAttempt($username, FALSE, 'user_not_found');
             return ['success' => FALSE, 'message' => 'Username atau password salah.'];
@@ -55,16 +61,22 @@ class Auth
         // Cek apakah perlu rehash (algoritma berubah)
         if (password_needs_rehash($user->password, PASSWORD_BCRYPT, ['cost' => 10])) {
             $newHash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
-            $this->CI->db->where('id', $user->id)->update('users', ['password' => $newHash]);
+            try {
+                $this->CI->db->where('id', $user->id)->update('users', ['password' => $newHash]);
+            } catch (\Throwable $e) {}
         }
 
         // Reset failed attempts
-        $this->CI->db->where('id', $user->id)->update('users', [
-            'failed_attempts' => 0,
-            'locked_until'    => NULL,
-            'last_login'      => date('Y-m-d H:i:s'),
-            'last_login_ip'   => $this->CI->input->ip_address()
-        ]);
+        try {
+            $this->CI->db->where('id', $user->id)->update('users', [
+                'failed_attempts' => 0,
+                'locked_until'    => NULL,
+                'last_login'      => date('Y-m-d H:i:s'),
+                'last_login_ip'   => $this->CI->input->ip_address()
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Auth update failed: ' . $e->getMessage());
+        }
 
         // Regenerate session ID untuk cegah session fixation
         $this->CI->session->sess_regenerate(FALSE);
@@ -79,14 +91,15 @@ class Auth
             'skpd_id'      => $user->skpd_id ? (int) $user->skpd_id : NULL,
             'is_logged_in' => TRUE,
             'login_time'   => time(),
-            // 'csrf_hash'    => bin2hex(random_bytes(16)) // Dihapus, CI_Security sudah mengelola CSRF
         ];
         $this->CI->session->set_userdata($sessionData);
 
         // Remember-me token (opsional)
         if ($remember) {
             $token = bin2hex(random_bytes(32));
-            $this->CI->db->where('id', $user->id)->update('users', ['remember_token' => password_hash($token, PASSWORD_BCRYPT)]);
+            try {
+                $this->CI->db->where('id', $user->id)->update('users', ['remember_token' => password_hash($token, PASSWORD_BCRYPT)]);
+            } catch (\Throwable $e) {}
             set_cookie([
                 'name'     => 'rkbmd_remember',
                 'value'    => $user->id . ':' . $token,
@@ -102,31 +115,39 @@ class Auth
 
     protected function incrementFailedAttempts($user)
     {
-        $maxAttempts = $this->CI->config->item('max_login_attempts') ?: 5;
-        $lockoutTime = $this->CI->config->item('login_lockout_time') ?: 900;
+        try {
+            $maxAttempts = $this->CI->config->item('max_login_attempts') ?: 5;
+            $lockoutTime = $this->CI->config->item('login_lockout_time') ?: 900;
 
-        $newCount = (int) $user->failed_attempts + 1;
-        $update = ['failed_attempts' => $newCount];
+            $newCount = (int) $user->failed_attempts + 1;
+            $update = ['failed_attempts' => $newCount];
 
-        if ($newCount >= $maxAttempts) {
-            $update['locked_until'] = date('Y-m-d H:i:s', time() + $lockoutTime);
-            $update['failed_attempts'] = 0;
+            if ($newCount >= $maxAttempts) {
+                $update['locked_until'] = date('Y-m-d H:i:s', time() + $lockoutTime);
+                $update['failed_attempts'] = 0;
+            }
+
+            $this->CI->db->where('id', $user->id)->update('users', $update);
+        } catch (\Throwable $e) {
+            log_message('error', 'incrementFailedAttempts error: ' . $e->getMessage());
         }
-
-        $this->CI->db->where('id', $user->id)->update('users', $update);
     }
 
     protected function logAttempt($username, $success, $reason = '')
     {
-        $this->CI->db->insert('log_aktivitas', [
-            'username'    => $username,
-            'aksi'        => $success ? 'login' : 'login_failed',
-            'modul'       => 'auth',
-            'keterangan'  => $reason,
-            'ip_address'  => $this->CI->input->ip_address(),
-            'user_agent'  => substr($this->CI->input->user_agent() ?: '', 0, 255),
-            'created_at'  => date('Y-m-d H:i:s')
-        ]);
+        try {
+            $this->CI->db->insert('log_aktivitas', [
+                'username'    => $username,
+                'aksi'        => $success ? 'login' : 'login_failed',
+                'modul'       => 'auth',
+                'keterangan'  => $reason,
+                'ip_address'  => $this->CI->input->ip_address(),
+                'user_agent'  => substr($this->CI->input->user_agent() ?: '', 0, 255),
+                'created_at'  => date('Y-m-d H:i:s')
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Auth logAttempt error: ' . $e->getMessage());
+        }
     }
 
     public function logout()

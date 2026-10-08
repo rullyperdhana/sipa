@@ -53,7 +53,12 @@ $config['encryption_key']   = 'Rk8mD!2025_Pwk_BPKAD_S3cur3K3y!!';
 $config['sess_driver']            = 'files';
 $config['sess_cookie_name']       = 'rkbmd_session';
 $config['sess_expiration']        = 7200; // 2 jam
-$config['sess_save_path']         = APPPATH . 'cache/sessions';
+
+$sess_dir = APPPATH . 'cache/sessions';
+if (!is_dir($sess_dir)) {
+    @mkdir($sess_dir, 0755, TRUE);
+}
+$config['sess_save_path']         = (is_dir($sess_dir) && is_writable($sess_dir)) ? $sess_dir : sys_get_temp_dir();
 $config['sess_match_ip']          = FALSE;
 $config['sess_time_to_update']    = 300;
 $config['sess_regenerate_destroy'] = FALSE;
