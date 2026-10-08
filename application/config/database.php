@@ -3,12 +3,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 $active_group = 'default';
 $query_builder = TRUE;
+
 $db['default'] = array(
     'dsn'      => '',
     'hostname' => 'localhost',
-    'username' => 'u534149116_sipa',
-    'password' => '*AxK9H8g',
-    'database' => 'u534149116_sipa',
+    'username' => 'sipa_user',
+    'password' => '',
+    'database' => 'sipa_db',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => FALSE,
@@ -24,3 +25,8 @@ $db['default'] = array(
     'failover' => array(),
     'save_queries' => TRUE
 );
+
+// Load konfigurasi lokal di server (file ini di-ignore di git demi keamanan)
+if (file_exists(__DIR__ . '/database.local.php')) {
+    include __DIR__ . '/database.local.php';
+}

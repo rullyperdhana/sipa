@@ -12,9 +12,16 @@
 !/uploads/temp/
 !/uploads/temp/.gitkeep
 
+# Sensitive environment configs
+database.local.php
+application/config/database.local.php
+*.env
+.env
+
 # Deploy archives, DB dumps & OS files
 *.zip
 *.tar.gz
 *.sql
 .DS_Store
 Thumbs.db
+
