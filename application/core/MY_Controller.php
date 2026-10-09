@@ -57,7 +57,7 @@ class Admin_Controller extends Auth_Controller
  */
 class Skpd_Controller extends Auth_Controller
 {
-    protected $allowedRoles = ['skpd', 'admin'];
+    protected $allowedRoles = ['skpd', 'operator_skpd', 'admin'];
 }
 
 /**
@@ -66,4 +66,12 @@ class Skpd_Controller extends Auth_Controller
 class Verifikator_Controller extends Auth_Controller
 {
     protected $allowedRoles = ['verifikator', 'admin'];
+}
+
+/**
+ * Controller khusus Penetap Harga / Pimpinan.
+ */
+class Penetap_Controller extends Auth_Controller
+{
+    protected $allowedRoles = ['penetap', 'pimpinan', 'admin'];
 }

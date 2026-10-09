@@ -145,19 +145,26 @@ if (!function_exists('badge_status')) {
                 $class = 'secondary';
                 break;
             case 'diajukan':
-                $class = 'info';
+                $class = 'info text-dark';
                 break;
             case 'revisi':
-                $class = 'warning';
+            case 'direvisi':
+                $class = 'warning text-dark';
+                $label = 'Direvisi';
                 break;
             case 'diverifikasi':
                 $class = 'primary';
+                $label = 'Diverifikasi';
                 break;
             case 'disetujui':
                 $class = 'success';
                 break;
             case 'ditolak':
                 $class = 'danger';
+                break;
+            case 'ditetapkan':
+                $class = 'success';
+                $label = 'Ditetapkan';
                 break;
         }
 

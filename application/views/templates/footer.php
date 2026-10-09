@@ -16,6 +16,8 @@
 
 <!-- App JS -->
 <script src="<?= base_url('assets/js/app.js') ?>"></script>
+<!-- SSH & SBU Module JS -->
+<script src="<?= base_url('assets/js/ssh_module.js') ?>"></script>
 
 <script>
 window.appConfig = {

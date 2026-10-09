@@ -28,6 +28,22 @@ $route['verifikasi']                       = 'verifikasi/index';
 $route['verifikasi/detail/(:num)']         = 'verifikasi/detail/$1';
 $route['verifikasi/proses/(:num)']         = 'verifikasi/proses/$1';
 
+// ===== Modul Standar Satuan Harga (SSH) & Standar Biaya Umum (SBU) =====
+$route['ssh']                               = 'ssh/index';
+$route['ssh/usulan']                        = 'ssh/usulan';
+$route['ssh/tambah']                        = 'ssh/tambah';
+$route['ssh/edit/(:num)']                   = 'ssh/edit/$1';
+$route['ssh/kirim/(:num)']                  = 'ssh/kirim/$1';
+$route['ssh/hapus/(:num)']                  = 'ssh/hapus/$1';
+$route['ssh/verifikasi']                    = 'ssh/verifikasi';
+$route['ssh/proses-verifikasi/(:num)']      = 'ssh/proses_verifikasi/$1';
+$route['ssh/penetapan']                     = 'ssh/penetapan';
+$route['ssh/proses-penetapan/(:num)']       = 'ssh/proses_penetapan/$1';
+$route['ssh/master_data']                   = 'ssh/master_data';
+$route['ssh/detail/(:num)']                 = 'ssh/detail/$1';
+$route['ssh/download/(:num)']               = 'ssh/download_lampiran/$1';
+$route['ssh/api/transisi']                  = 'ssh/api_transisi_status';
+
 // ===== Master Data =====
 $route['master/skpd']    = 'master/skpd';
 $route['master/barang']  = 'master/barang';

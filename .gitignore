@@ -11,6 +11,8 @@
 /uploads/*
 !/uploads/temp/
 !/uploads/temp/.gitkeep
+!/uploads/ssh_sbu/
+!/uploads/ssh_sbu/.gitkeep
 
 # Sensitive environment configs
 database.local.php
@@ -22,6 +24,7 @@ application/config/database.local.php
 *.zip
 *.tar.gz
 *.sql
+!database/migrations/*.sql
 .DS_Store
 Thumbs.db
 

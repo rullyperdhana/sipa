@@ -68,6 +68,32 @@
         </a>
         <?php endif; ?>
 
+        <!-- Modul SSH & SBU (Standar Satuan Harga & Standar Biaya Umum) -->
+        <div class="nav-section">Standar Harga (SSH/SBU)</div>
+
+        <?php if (in_array($user->role, ['operator_skpd', 'skpd', 'admin'])): ?>
+        <a href="<?= site_url('ssh/usulan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && in_array($this->uri->segment(2), ['usulan', 'tambah', 'edit'])) ? 'active' : '' ?>">
+            <i class="bi bi-file-earmark-plus-fill"></i> <span>Usulan SKPD</span>
+        </a>
+        <?php endif; ?>
+
+        <?php if (in_array($user->role, ['verifikator', 'admin'])): ?>
+        <a href="<?= site_url('ssh/verifikasi') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'verifikasi') ? 'active' : '' ?>">
+            <i class="bi bi-patch-check-fill"></i> <span>Verifikasi Usulan</span>
+        </a>
+        <?php endif; ?>
+
+        <?php if (in_array($user->role, ['penetap', 'pimpinan', 'admin'])): ?>
+        <a href="<?= site_url('ssh/penetapan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'penetapan') ? 'active' : '' ?>">
+            <i class="bi bi-award-fill"></i> <span>Penetapan Harga</span>
+        </a>
+        <?php endif; ?>
+
+        <!-- Master Data SSH/SBU (SEMUA ROLE) -->
+        <a href="<?= site_url('ssh/master_data') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'master_data') ? 'active' : '' ?>">
+            <i class="bi bi-journal-bookmark-fill"></i> <span>Master Data</span>
+        </a>
+
         <div class="nav-section">Laporan</div>
         <a href="<?= site_url('laporan') ?>" class="nav-link <?= $this->uri->segment(1) === 'laporan' ? 'active' : '' ?>">
             <i class="bi bi-file-earmark-bar-graph"></i> <span>Laporan & Rekap</span>
