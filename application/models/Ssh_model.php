@@ -266,6 +266,21 @@ class Ssh_model extends CI_Model
     }
 
     /**
+     * Ambil data usulan berdasarkan ID lengkap dengan data SKPD dan pengusul.
+     */
+    public function getUsulanById($id)
+    {
+        $this->db->select('u.*, s.nama_skpd, s.kode_skpd, usr.nama_lengkap as nama_pengusul, v.nama_lengkap as nama_verifikator, p.nama_lengkap as nama_penetap');
+        $this->db->from($this->table . ' u');
+        $this->db->join('skpd s', 's.id = u.id_skpd', 'left');
+        $this->db->join('users usr', 'usr.id = u.user_id', 'left');
+        $this->db->join('users v', 'v.id = u.verifikator_id', 'left');
+        $this->db->join('users p', 'p.id = u.penetap_id', 'left');
+        $this->db->where('u.id', (int) $id);
+        return $this->db->get()->row();
+    }
+
+    /**
      * Ambil detail usulan dengan validasi RLS individual.
      */
     public function findWithRls($id, $user)

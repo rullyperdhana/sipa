@@ -442,6 +442,45 @@
             });
         });
 
+        // ---------------------------------------------------------------------
+        // AKSI 5: INTEGRASI NOTIFIKASI WHATSAPP KE OPERATOR SKPD
+        // ---------------------------------------------------------------------
+        $(document).on('click', '.btn-kirim-wa-ssh', function (e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const prefix = $(this).data('prefix') || 'ssh';
+            const status = $(this).data('status') || '';
+            let actionType = 'revisi';
+            if (status === 'Diverifikasi') actionType = 'setuju';
+            if (status === 'Ditetapkan') actionType = 'penetapan';
+
+            if (window.SipaWa) {
+                window.SipaWa.open({
+                    module: prefix,
+                    id: id,
+                    action_type: actionType
+                });
+            }
+        });
+
+        $(document).on('click', '#btnWaFromModalRevisi', function (e) {
+            e.preventDefault();
+            const actionUrl = $('#formRevisiUsulan').attr('action') || '';
+            const parts = actionUrl.split('/');
+            const id = parts[parts.length - 1];
+            const prefix = actionUrl.indexOf('/sbu/') !== -1 ? 'sbu' : 'ssh';
+            const catatan = $('#catatan_verifikator').val() || '';
+
+            if (window.SipaWa) {
+                window.SipaWa.open({
+                    module: prefix,
+                    id: id,
+                    action_type: 'revisi',
+                    catatan: catatan
+                });
+            }
+        });
+
     });
 
     // Ekspos ke global window

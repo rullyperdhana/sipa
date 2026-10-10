@@ -9,6 +9,7 @@ class User_model extends CI_Model
     {
         parent::__construct();
         $this->ensureMenuPermissionsColumn();
+        $this->ensureWaColumn();
     }
 
     /**
@@ -22,6 +23,20 @@ class User_model extends CI_Model
             }
         } catch (\Throwable $e) {
             log_message('error', 'ensureMenuPermissionsColumn error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Memastikan kolom no_wa tersedia pada tabel users (safe auto-migration).
+     */
+    public function ensureWaColumn()
+    {
+        try {
+            if (!$this->db->field_exists('no_wa', $this->table)) {
+                $this->db->query("ALTER TABLE `{$this->table}` ADD COLUMN `no_wa` VARCHAR(25) NULL DEFAULT NULL AFTER `email`");
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'ensureWaColumn error: ' . $e->getMessage());
         }
     }
 
@@ -146,4 +161,55 @@ class User_model extends CI_Model
         $user = $this->find($userId);
         return $user && password_verify($password, $user->password);
     }
+
+    /**
+     * Mengambil nomor kontak WhatsApp operator SKPD atau nomor kontak dinas SKPD.
+     */
+    public function getOperatorContactBySkpd($skpdId)
+    {
+        if (empty($skpdId)) return null;
+
+        // 1. Cari user aktif di SKPD ini yang memiliki nomor WA
+        $user = $this->db->select('id, username, nama_lengkap, no_wa')
+            ->from($this->table)
+            ->where('skpd_id', (int) $skpdId)
+            ->where('is_active', 1)
+            ->where("no_wa IS NOT NULL AND no_wa != ''")
+            ->order_by("FIELD(role, 'skpd', 'operator_skpd', 'admin'), id ASC")
+            ->limit(1)
+            ->get()->row();
+
+        if ($user && !empty($user->no_wa)) {
+            return [
+                'nama'   => $user->nama_lengkap ?: $user->username,
+                'no_wa'  => $user->no_wa,
+                'source' => 'user',
+                'user_id'=> (int) $user->id
+            ];
+        }
+
+        // 2. Fallback ke data kontak telepon / pengurus SKPD
+        $skpd = $this->db->select('id, nama_skpd, telepon, nama_pengurus')
+            ->from('skpd')
+            ->where('id', (int) $skpdId)
+            ->limit(1)
+            ->get()->row();
+
+        if ($skpd && !empty($skpd->telepon)) {
+            return [
+                'nama'   => $skpd->nama_pengurus ?: ('Operator ' . $skpd->nama_skpd),
+                'no_wa'  => $skpd->telepon,
+                'source' => 'skpd',
+                'user_id'=> null
+            ];
+        }
+
+        return [
+            'nama'   => $skpd ? ('Operator ' . $skpd->nama_skpd) : 'Operator SKPD',
+            'no_wa'  => '',
+            'source' => 'none',
+            'user_id'=> null
+        ];
+    }
 }
+

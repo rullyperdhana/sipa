@@ -31,7 +31,14 @@
                     <td><?= $i+1 ?></td>
                     <td><strong><?= e($u->username) ?></strong></td>
                     <td><?= e($u->nama_lengkap) ?><?php if ($u->jabatan): ?><br><small class="text-muted"><?= e($u->jabatan) ?></small><?php endif; ?></td>
-                    <td><small><?= e($u->nip ?: '-') ?></small></td>
+                    <td>
+                        <small class="d-block"><?= e($u->nip ?: '-') ?></small>
+                        <?php if (!empty($u->no_wa)): ?>
+                        <a href="https://api.whatsapp.com/send?phone=<?= preg_replace('/[^0-9]/', '', (substr($u->no_wa, 0, 2) === '08' ? '62' . substr($u->no_wa, 1) : $u->no_wa)) ?>" target="_blank" class="badge bg-success-subtle text-success text-decoration-none border mt-1" title="Kirim Pesan WhatsApp">
+                            <i class="bi bi-whatsapp me-1"></i><?= e($u->no_wa) ?>
+                        </a>
+                        <?php endif; ?>
+                    </td>
                     <td><small><?= e($u->nama_skpd ?: '-') ?></small></td>
                     <td><span class="badge bg-<?= ['admin'=>'danger','verifikator'=>'primary','skpd'=>'info','pimpinan'=>'success'][$u->role]??'secondary' ?>"><?= ucfirst(e($u->role)) ?></span></td>
                     <td>
@@ -94,6 +101,7 @@
                                 data-nama="<?= e($u->nama_lengkap) ?>"
                                 data-nip="<?= e($u->nip) ?>"
                                 data-email="<?= e($u->email) ?>"
+                                data-nowa="<?= e($u->no_wa ?? '') ?>"
                                 data-jabatan="<?= e($u->jabatan) ?>"
                                 data-role="<?= e($u->role) ?>"
                                 data-skpd="<?= (int)$u->skpd_id ?>"
@@ -135,6 +143,7 @@
                         <div class="col-md-4"><label class="form-label">Nama Lengkap <span class="text-danger">*</span></label><input type="text" name="nama_lengkap" id="u_nama" class="form-control" required maxlength="150" placeholder="Nama pegawai"></div>
                         <div class="col-md-4"><label class="form-label">NIP</label><input type="text" name="nip" id="u_nip" class="form-control" maxlength="25" placeholder="NIP pegawai"></div>
                         <div class="col-md-4"><label class="form-label">Email</label><input type="email" name="email" id="u_email" class="form-control" maxlength="100" placeholder="email@tapinkab.go.id"></div>
+                        <div class="col-md-4"><label class="form-label"><i class="bi bi-whatsapp text-success me-1"></i>No. WhatsApp</label><input type="text" name="no_wa" id="u_nowa" class="form-control" maxlength="25" placeholder="Contoh: 08123456789"></div>
                         <div class="col-md-4"><label class="form-label">Jabatan</label><input type="text" name="jabatan" id="u_jabatan" class="form-control" maxlength="150" placeholder="Operator / Pengurus Barang"></div>
                         <div class="col-md-4"><label class="form-label">Role <span class="text-danger">*</span></label>
                             <select name="role" id="u_role" class="form-select" required>
@@ -145,13 +154,13 @@
                                 <option value="pimpinan">Pimpinan</option>
                             </select>
                         </div>
-                        <div class="col-md-5"><label class="form-label">SKPD</label>
+                        <div class="col-md-4"><label class="form-label">SKPD</label>
                             <select name="skpd_id" id="u_skpd" class="form-select">
                                 <option value="">-- Pilih SKPD --</option>
                                 <?php foreach ($skpd as $s): ?><option value="<?= (int)$s->id ?>"><?= e($s->kode_skpd) ?> - <?= e($s->nama_skpd) ?></option><?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-3"><label class="form-label">Status</label><select name="is_active" id="u_active" class="form-select"><option value="1">Aktif</option><option value="0">Nonaktif</option></select></div>
+                        <div class="col-md-4"><label class="form-label">Status</label><select name="is_active" id="u_active" class="form-select"><option value="1">Aktif</option><option value="0">Nonaktif</option></select></div>
                     </div>
 
                     <!-- Checklist Hak Akses Menu Berhirarki -->
@@ -329,7 +338,7 @@ function setPresetPermissions(list) {
 function openAddModal(){
     $('#modal-title-user').html('<i class="bi bi-person-plus-fill me-2"></i>Tambah Pengguna');
     $('#user_id').val('');
-    $('#u_username,#u_password,#u_nama,#u_nip,#u_email,#u_jabatan').val('');
+    $('#u_username,#u_password,#u_nama,#u_nip,#u_email,#u_nowa,#u_jabatan').val('');
     $('#u_role').val('skpd');
     $('#u_skpd').val('');
     $('#u_active').val('1');
@@ -435,6 +444,7 @@ window.addEventListener('load', function() {
         $('#u_nama').val(d.nama);
         $('#u_nip').val(d.nip);
         $('#u_email').val(d.email);
+        $('#u_nowa').val(d.nowa || '');
         $('#u_jabatan').val(d.jabatan);
         $('#u_role').val(d.role);
         $('#u_skpd').val(d.skpd);

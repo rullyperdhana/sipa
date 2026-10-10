@@ -2,6 +2,9 @@
     </div><!-- /content-wrapper -->
 </main><!-- /main-wrapper -->
 
+<!-- Global WhatsApp Notification Modal -->
+<?php $this->load->view('templates/wa_modal'); ?>
+
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap JS -->

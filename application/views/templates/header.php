@@ -187,6 +187,9 @@
         <a href="<?= site_url('master/user') ?>" class="nav-link <?= $this->uri->segment(2) === 'user' ? 'active' : '' ?>">
             <i class="bi bi-people-fill"></i> <span>Pengguna</span>
         </a>
+        <a href="<?= site_url('wa/settings') ?>" class="nav-link <?= $this->uri->segment(1) === 'wa' ? 'active' : '' ?>">
+            <i class="bi bi-whatsapp"></i> <span>Integrasi WhatsApp</span>
+        </a>
         <?php endif; ?>
     </nav>
 

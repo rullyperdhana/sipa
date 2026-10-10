@@ -6,9 +6,12 @@
             <h1 class="page-title"><i class="bi bi-check2-square me-2"></i>Verifikasi Usulan</h1>
             <p class="page-subtitle"><strong><?= e($usulan->nomor_usulan) ?></strong> &middot; <?= badge_status($usulan->status) ?></p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="<?= site_url('verifikasi') ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Kembali</a>
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-success btn-kirim-wa" data-module="rkbmd" data-id="<?= $usulan->id ?>" data-action="<?= $usulan->status === 'revisi' ? 'revisi' : ($usulan->status === 'disetujui' ? 'setuju' : 'revisi') ?>" title="Kirim Pemberitahuan WhatsApp ke Operator SKPD">
+                <i class="bi bi-whatsapp me-1"></i>Notifikasi WA
+            </button>
             <a href="<?= site_url("rkbmd/{$usulan->jenis_usulan}/cetak/{$usulan->id}") ?>" target="_blank" class="btn btn-outline-info"><i class="bi bi-printer me-1"></i>Cetak</a>
+            <a href="<?= site_url('verifikasi') ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Kembali</a>
         </div>
     </div>
 </div>
@@ -103,7 +106,7 @@
                 <label class="form-label">Catatan Verifikator</label>
                 <textarea name="catatan" class="form-control" rows="3" id="catatan-verif" placeholder="Isi catatan jika diperlukan (wajib untuk tolak/revisi)..."></textarea>
             </div>
-            <div class="d-flex gap-2 flex-wrap">
+            <div class="d-flex gap-2 flex-wrap align-items-center">
                 <?php if ($usulan->status !== 'disetujui'): ?>
                 <button type="button" class="btn btn-success" onclick="prosesVerif('setuju')">
                     <i class="bi bi-check-circle-fill me-1"></i>Setujui
@@ -122,15 +125,25 @@
                     <i class="bi bi-arrow-counterclockwise me-1"></i>Minta Revisi
                 </button>
                 <?php endif; ?>
+
+                <button type="button" class="btn btn-outline-success ms-auto btn-kirim-wa" data-module="rkbmd" data-id="<?= $usulan->id ?>" data-action="revisi" title="Siapkan draf pesan WhatsApp">
+                    <i class="bi bi-whatsapp me-1"></i>Kirim Notif WA
+                </button>
             </div>
             <input type="hidden" name="aksi" id="aksi-input">
         </form>
     </div>
 </div>
 <?php elseif ($usulan->status === 'disetujui'): ?>
-<div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i><strong>Usulan ini telah disetujui.</strong> <?= $usulan->approved_at ? 'Disetujui pada ' . tanggal_id($usulan->approved_at) : '' ?></div>
+<div class="alert alert-success d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div><i class="bi bi-check-circle-fill me-2"></i><strong>Usulan ini telah disetujui.</strong> <?= $usulan->approved_at ? 'Disetujui pada ' . tanggal_id($usulan->approved_at) : '' ?></div>
+    <button type="button" class="btn btn-sm btn-success btn-kirim-wa" data-module="rkbmd" data-id="<?= $usulan->id ?>" data-action="setuju"><i class="bi bi-whatsapp me-1"></i>Kirim Notifikasi WA</button>
+</div>
 <?php elseif ($usulan->status === 'ditolak'): ?>
-<div class="alert alert-danger"><i class="bi bi-x-circle-fill me-2"></i><strong>Usulan ini telah ditolak.</strong></div>
+<div class="alert alert-danger d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div><i class="bi bi-x-circle-fill me-2"></i><strong>Usulan ini telah ditolak.</strong></div>
+    <button type="button" class="btn btn-sm btn-danger btn-kirim-wa" data-module="rkbmd" data-id="<?= $usulan->id ?>" data-action="tolak"><i class="bi bi-whatsapp me-1"></i>Kirim Notifikasi WA</button>
+</div>
 <?php endif; ?>
 
 <script>
@@ -151,4 +164,18 @@ function prosesVerif(aksi){
         if(r.isConfirmed){ $('#aksi-input').val(aksi); $('#form-verif').submit(); }
     });
 }
+
+$(document).on('click', '.btn-kirim-wa', function() {
+    const mod = $(this).data('module') || 'rkbmd';
+    const id = $(this).data('id');
+    const act = $(this).data('action') || '';
+    const note = $('#catatan-verif').val() || '';
+
+    window.SipaWa.open({
+        module: mod,
+        id: id,
+        action_type: act,
+        catatan: note
+    });
+});
 </script>

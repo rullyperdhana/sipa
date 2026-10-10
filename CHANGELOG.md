@@ -5,6 +5,22 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.6.0] - 2026-10-10
+
+### 🚀 Ditambahkan (Added)
+- **Fitur Notifikasi & Pemberitahuan WhatsApp ke Operator SKPD (`/wa`):**
+  - **Integrasi Langsung pada Verifikasi RKBMD (`/verifikasi/detail`):** Tombol aksi *"Notifikasi WA"* untuk langsung menyiapkan dan mengirim pesan WhatsApp saat usulan memerlukan revisi/perbaikan, disetujui, maupun ditolak.
+  - **Integrasi pada Verifikasi Standar Satuan Harga & Biaya (`/ssh/verifikasi` & `/sbu/verifikasi`):** Tombol icon WhatsApp pada baris tabel antrean serta tombol *"Draf Notif WA"* di modal pengembalian revisi usulan.
+  - **Draf Pesan Resmi Otomatis (WhatsApp Markdown):** Menghasilkan teks resmi berformat indah dengan kop instansi SIPA Kab. Tapin, nama operator dan SKPD, nomor/kode usulan, status usulan, catatan verifikator BPKAD, serta tautan login/detail untuk tindak lanjut cepat.
+  - **Modal Interaktif Notifikasi WhatsApp Global (`templates/wa_modal`):**
+    - Otomatis mendeteksi nomor kontak WhatsApp operator SKPD (fallback ke nomor dinas SKPD).
+    - Menampilkan pratinjau teks pesan yang dapat diedit langsung.
+    - Tombol *Buka WhatsApp Web / App* (`api.whatsapp.com/send`), *Salin Teks*, dan *Kirim via Gateway Otomatis*.
+  - **Field Nomor WhatsApp (`no_wa`) pada Profil Pengguna:** Input nomor WhatsApp pada form Tambah/Edit Pengguna (`/master/user`) dan badge klik langsung chat WA pada tabel pengguna.
+  - **Halaman Pengaturan Integrasi WhatsApp (`/wa/settings`):** Panel konfigurasi bagi Admin untuk memilih mode Direct Click-to-Chat (100% gratis & tanpa server tambahan) atau WhatsApp Gateway API (Fonnte / Generic Webhook), serta panel uji coba kirim pesan langsung.
+
+---
+
 ## [2.5.0] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

@@ -202,8 +202,8 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                             <?= badge_status($row->status_proses) ?>
                         </td>
                         <td class="text-center">
-                            <?php if ($row->status_proses === 'Diajukan'): ?>
                             <div class="btn-group btn-group-sm" role="group">
+                                <?php if ($row->status_proses === 'Diajukan'): ?>
                                 <!-- Tombol Setujui -->
                                 <button type="button" class="btn btn-success btn-setujui-modal" 
                                         data-id="<?= $row->id ?>" 
@@ -223,15 +223,19 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                                         title="Kembalikan usulan ke SKPD dengan catatan perbaikan">
                                     <i class="bi bi-arrow-repeat me-1"></i> Revisi
                                 </button>
+                                <?php endif; ?>
+                                <!-- Tombol WhatsApp -->
+                                <button type="button" class="btn btn-outline-success btn-kirim-wa-ssh" 
+                                        data-id="<?= $row->id ?>" 
+                                        data-prefix="<?= $prefixUrl ?>" 
+                                        data-status="<?= $row->status_proses ?>"
+                                        title="Kirim Pemberitahuan WhatsApp ke Operator SKPD">
+                                    <i class="bi bi-whatsapp"></i>
+                                </button>
                                 <button type="button" class="btn btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Lihat detail">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
-                            <?php else: ?>
-                            <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>">
-                                <i class="bi bi-eye me-1"></i> Detail
-                            </button>
-                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; endif; ?>
@@ -299,9 +303,14 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                         <div class="form-text text-danger">Catatan ini akan tampil di dashboard SKPD sebagai panduan perbaikan.</div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-warning text-dark fw-semibold"><i class="bi bi-send-exclamation me-1"></i> Kirim Catatan Revisi</button>
+                <div class="modal-footer d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-outline-success btn-sm" id="btnWaFromModalRevisi">
+                        <i class="bi bi-whatsapp me-1"></i>Draf Notif WA
+                    </button>
+                    <div>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-warning text-dark fw-semibold"><i class="bi bi-send-exclamation me-1"></i> Kirim Catatan Revisi</button>
+                    </div>
                 </div>
             </form>
         </div>

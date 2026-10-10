@@ -310,6 +310,7 @@ class Master extends Admin_Controller
                 'nama_lengkap'     => $this->input->post('nama_lengkap', TRUE),
                 'nip'              => $this->input->post('nip', TRUE),
                 'email'            => $this->input->post('email', TRUE),
+                'no_wa'            => $this->input->post('no_wa', TRUE),
                 'jabatan'          => $this->input->post('jabatan', TRUE),
                 'role'             => $this->input->post('role', TRUE),
                 'skpd_id'          => (int) $this->input->post('skpd_id') ?: NULL,
