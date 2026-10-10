@@ -257,12 +257,23 @@ class Rkbmd_model extends CI_Model
     /**
      * Submit usulan (SKPD -> Verifikator).
      */
-    public function submit($usulanId)
+    public function submit($usulanId, $user = NULL)
     {
         $usulan = $this->findUsulan($usulanId);
         if (!$usulan) return ['success' => FALSE, 'message' => 'Usulan tidak ditemukan.'];
         if ($usulan->status !== 'draft' && $usulan->status !== 'revisi') {
             return ['success' => FALSE, 'message' => 'Usulan sudah diajukan sebelumnya.'];
+        }
+
+        // Cek batas waktu jadwal RKBMD untuk non-admin
+        if ($user && !in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
+            $ci =& get_instance();
+            if (isset($ci->master_model) && !$ci->master_model->isPeriodeBuka($usulan->tahun_anggaran)) {
+                return [
+                    'success' => FALSE,
+                    'message' => "Jadwal penyusunan RKBMD TA {$usulan->tahun_anggaran} saat ini telah DITUTUP oleh Administrator BPKAD. Usulan tidak dapat diajukan."
+                ];
+            }
         }
 
         $table = $this->getDetailTable($usulan->jenis_usulan);

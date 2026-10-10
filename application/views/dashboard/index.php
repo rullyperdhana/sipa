@@ -116,18 +116,44 @@
 
 <!-- Banner Status Jadwal Pengusulan -->
 <div class="row g-3 mb-4">
+    <!-- Jadwal RKBMD -->
+    <div class="col-md-4">
+        <div class="card dash-card border-start border-4 <?= $isJadwalBukaRkbmd ? 'border-primary' : 'border-warning' ?> py-1 h-100">
+            <div class="card-body py-2.5 px-3 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div class="rounded-3 p-2 d-flex align-items-center justify-content-center <?= $isJadwalBukaRkbmd ? 'bg-primary-subtle text-primary' : 'bg-warning-subtle text-warning' ?>" style="width:38px;height:38px;">
+                        <i class="bi <?= $isJadwalBukaRkbmd ? 'bi-clipboard-check-fill' : 'bi-lock-fill' ?> fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold small">Jadwal RKBMD <?= $tahun ?></div>
+                        <small class="text-muted">
+                            <?= $isJadwalBukaRkbmd ? e($jadwalRkbmd->nama_periode) . ' (s.d ' . date('d M Y', strtotime($jadwalRkbmd->tanggal_selesai)) . ')' : 'Jadwal belum dibuka / telah berakhir.' ?>
+                        </small>
+                    </div>
+                </div>
+                <div>
+                    <?php if ($isJadwalBukaRkbmd): ?>
+                        <span class="badge bg-primary"><i class="bi bi-unlock-fill me-1"></i>DIBUKA</span>
+                    <?php else: ?>
+                        <span class="badge bg-secondary"><i class="bi bi-lock-fill me-1"></i>DITUTUP</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Jadwal SSH -->
-    <div class="col-md-6">
-        <div class="card dash-card border-start border-4 <?= $isJadwalBukaSsh ? 'border-success' : 'border-warning' ?> py-1">
+    <div class="col-md-4">
+        <div class="card dash-card border-start border-4 <?= $isJadwalBukaSsh ? 'border-success' : 'border-warning' ?> py-1 h-100">
             <div class="card-body py-2.5 px-3 d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2.5">
                     <div class="rounded-3 p-2 d-flex align-items-center justify-content-center <?= $isJadwalBukaSsh ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' ?>" style="width:38px;height:38px;">
                         <i class="bi <?= $isJadwalBukaSsh ? 'bi-box-seam-fill' : 'bi-lock-fill' ?> fs-5"></i>
                     </div>
                     <div>
-                        <div class="fw-semibold small">Jadwal Pengusulan SSH <?= $tahun ?></div>
+                        <div class="fw-semibold small">Jadwal SSH <?= $tahun ?></div>
                         <small class="text-muted">
-                            <?= $isJadwalBukaSsh ? e($jadwalSsh->nama_jadwal) . ' (s.d ' . date('d M Y', strtotime($jadwalSsh->tanggal_selesai)) . ')' : 'Jadwal belum dibuka / telah berakhir oleh BPKAD.' ?>
+                            <?= $isJadwalBukaSsh ? e($jadwalSsh->nama_jadwal) . ' (s.d ' . date('d M Y', strtotime($jadwalSsh->tanggal_selesai)) . ')' : 'Jadwal belum dibuka / telah berakhir.' ?>
                         </small>
                     </div>
                 </div>
@@ -143,17 +169,17 @@
     </div>
 
     <!-- Jadwal SBU -->
-    <div class="col-md-6">
-        <div class="card dash-card border-start border-4 <?= $isJadwalBukaSbu ? 'border-info' : 'border-warning' ?> py-1">
+    <div class="col-md-4">
+        <div class="card dash-card border-start border-4 <?= $isJadwalBukaSbu ? 'border-info' : 'border-warning' ?> py-1 h-100">
             <div class="card-body py-2.5 px-3 d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2.5">
                     <div class="rounded-3 p-2 d-flex align-items-center justify-content-center <?= $isJadwalBukaSbu ? 'bg-info-subtle text-info' : 'bg-warning-subtle text-warning' ?>" style="width:38px;height:38px;">
                         <i class="bi <?= $isJadwalBukaSbu ? 'bi-receipt-cutoff' : 'bi-lock-fill' ?> fs-5"></i>
                     </div>
                     <div>
-                        <div class="fw-semibold small">Jadwal Pengusulan SBU <?= $tahun ?></div>
+                        <div class="fw-semibold small">Jadwal SBU <?= $tahun ?></div>
                         <small class="text-muted">
-                            <?= $isJadwalBukaSbu ? e($jadwalSbu->nama_jadwal) . ' (s.d ' . date('d M Y', strtotime($jadwalSbu->tanggal_selesai)) . ')' : 'Jadwal belum dibuka / telah berakhir oleh BPKAD.' ?>
+                            <?= $isJadwalBukaSbu ? e($jadwalSbu->nama_jadwal) . ' (s.d ' . date('d M Y', strtotime($jadwalSbu->tanggal_selesai)) . ')' : 'Jadwal belum dibuka / telah berakhir.' ?>
                         </small>
                     </div>
                 </div>
@@ -179,17 +205,17 @@
         <div class="d-flex flex-wrap gap-2">
             <?php if (in_array($this->currentUser->role, ['operator_skpd', 'skpd', 'admin'])): ?>
                 <?php if (can_access('rkbmd_pengadaan')): ?>
-                <a href="<?= site_url('rkbmd/pengadaan/create') ?>" class="btn btn-sm btn-outline-primary quick-btn">
+                <a href="<?= site_url('rkbmd/pengadaan/create') ?>" class="btn btn-sm btn-outline-primary quick-btn <?= (!$isJadwalBukaRkbmd && !in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE)) ? 'disabled' : '' ?>">
                     <i class="bi bi-plus-circle me-1"></i> Usul RKBMD
                 </a>
                 <?php endif; ?>
                 <?php if (can_access('ssh')): ?>
-                <a href="<?= site_url('ssh/tambah') ?>" class="btn btn-sm btn-outline-success quick-btn <?= (!$isJadwalBukaSsh && $this->currentUser->role !== 'admin') ? 'disabled' : '' ?>">
+                <a href="<?= site_url('ssh/tambah') ?>" class="btn btn-sm btn-outline-success quick-btn <?= (!$isJadwalBukaSsh && !in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE)) ? 'disabled' : '' ?>">
                     <i class="bi bi-plus-circle me-1"></i> Usul SSH Baru
                 </a>
                 <?php endif; ?>
                 <?php if (can_access('sbu')): ?>
-                <a href="<?= site_url('sbu/tambah') ?>" class="btn btn-sm btn-outline-info quick-btn <?= (!$isJadwalBukaSbu && $this->currentUser->role !== 'admin') ? 'disabled' : '' ?>">
+                <a href="<?= site_url('sbu/tambah') ?>" class="btn btn-sm btn-outline-info quick-btn <?= (!$isJadwalBukaSbu && !in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE)) ? 'disabled' : '' ?>">
                     <i class="bi bi-plus-circle me-1"></i> Usul SBU Baru
                 </a>
                 <?php endif; ?>

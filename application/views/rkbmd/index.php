@@ -7,12 +7,43 @@
             <p class="page-subtitle">Kelola usulan RKBMD <?= e(label_jenis($jenis)) ?>.</p>
         </div>
         <?php if (in_array($this->auth->user()->role, ['admin','skpd'])): ?>
-        <a href="<?= site_url("rkbmd/{$jenis}/create") ?>" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i> Buat Usulan Baru
-        </a>
+            <?php if (!empty($isPeriodeBuka) || in_array($this->auth->user()->role, ['admin', 'pimpinan'], TRUE)): ?>
+            <a href="<?= site_url("rkbmd/{$jenis}/create") ?>" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Buat Usulan Baru
+            </a>
+            <?php else: ?>
+            <button type="button" class="btn btn-secondary shadow-sm" disabled title="Jadwal penyusunan RKBMD TA <?= (int)($thAktif ?? 2027) ?> sedang DITUTUP oleh Administrator BPKAD">
+                <i class="bi bi-lock-fill me-1"></i> Menunggu Jadwal Dibuka
+            </button>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Banner Status Jadwal Pengusulan RKBMD -->
+<?php if (!empty($isPeriodeBuka) && !empty($periodeAktif)): ?>
+<div class="alert alert-success border-success shadow-sm d-flex justify-content-between align-items-center mb-3 py-2 px-3">
+    <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-broadcast fs-5 text-success"></i>
+        <div>
+            <strong>Jadwal Penyusunan RKBMD Aktif:</strong> <?= e($periodeAktif->nama_periode ?? "RKBMD TA {$thAktif}") ?> (TA <?= (int)($thAktif ?? 2027) ?>)
+            <span class="text-muted small ms-2">&bull; Periode: <strong><?= date('d M Y', strtotime($periodeAktif->tanggal_mulai)) ?> s/d <?= date('d M Y', strtotime($periodeAktif->tanggal_selesai)) ?></strong></span>
+        </div>
+    </div>
+    <span class="badge bg-success py-1.5 px-2.5"><i class="bi bi-unlock-fill me-1"></i>JADWAL DIBUKA</span>
+</div>
+<?php else: ?>
+<div class="alert alert-warning border-warning shadow-sm d-flex justify-content-between align-items-center mb-3 py-2 px-3">
+    <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-clock-history fs-5 text-warning"></i>
+        <div>
+            <strong>Jadwal Penyusunan RKBMD Ditutup:</strong> Pengusulan RKBMD untuk <strong>Tahun Anggaran <?= (int)($thAktif ?? 2027) ?></strong> saat ini belum dibuka atau telah berakhir.
+            <div class="text-muted small">Operator SKPD tidak dapat membuat usulan baru atau mengubah usulan pada tahun anggaran ini hingga jadwal resmi dibuka oleh BPKAD.</div>
+        </div>
+    </div>
+    <span class="badge bg-danger py-1.5 px-2.5"><i class="bi bi-lock-fill me-1"></i>JADWAL DITUTUP</span>
+</div>
+<?php endif; ?>
 
 <!-- Filter -->
 <div class="card mb-3">
@@ -86,7 +117,14 @@
                             <div class="btn-group btn-group-sm">
                                 <a href="<?= site_url("rkbmd/{$jenis}/detail/{$u->id}") ?>" class="btn btn-outline-secondary" title="Lihat Detail"><i class="bi bi-eye"></i></a>
                                 <?php if (in_array($u->status,['draft','revisi']) && in_array($this->auth->user()->role,['admin','skpd'])): ?>
-                                <a href="<?= site_url("rkbmd/{$jenis}/edit/{$u->id}") ?>" class="btn btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <?php $isItemJadwalBuka = in_array($this->auth->user()->role, ['admin', 'pimpinan'], TRUE) || $this->master_model->isPeriodeBuka($u->tahun_anggaran); ?>
+                                    <?php if ($isItemJadwalBuka): ?>
+                                    <a href="<?= site_url("rkbmd/{$jenis}/edit/{$u->id}") ?>" class="btn btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <?php else: ?>
+                                    <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Jadwal penyusunan RKBMD TA <?= (int)$u->tahun_anggaran ?> telah DITUTUP oleh BPKAD">
+                                        <button class="btn btn-outline-secondary" disabled><i class="bi bi-lock-fill"></i></button>
+                                    </span>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                                 <a href="<?= site_url("rkbmd/{$jenis}/cetak/{$u->id}") ?>" target="_blank" class="btn btn-outline-info" title="Cetak PDF"><i class="bi bi-printer"></i></a>
                                 <a href="<?= site_url("rkbmd/{$jenis}/excel/{$u->id}") ?>" class="btn btn-outline-success" title="Download Excel"><i class="bi bi-file-earmark-excel"></i></a>

@@ -214,11 +214,38 @@ class Master_model extends CI_Model
         return $this->db->order_by('tahun', 'DESC')->get('rkbmd_periode')->result();
     }
 
-    public function getActivePeriode()
+    public function getActivePeriode($tahun = NULL)
     {
-        return $this->db->where('status', 'open')
-            ->order_by('tahun', 'DESC')
-            ->get('rkbmd_periode')->result();
+        $today = date('Y-m-d');
+        $this->db->where('status', 'open');
+        $this->db->where('tanggal_mulai <=', $today);
+        $this->db->where('tanggal_selesai >=', $today);
+        if ($tahun) {
+            $this->db->where('tahun', (int)$tahun);
+        }
+        return $this->db->order_by('tahun', 'DESC')->get('rkbmd_periode')->result();
+    }
+
+    public function getPeriodeAktif($tahun = NULL)
+    {
+        if ($tahun === NULL && function_exists('get_tahun_anggaran')) {
+            $tahun = get_tahun_anggaran();
+        }
+
+        $today = date('Y-m-d');
+        $this->db->from('rkbmd_periode');
+        $this->db->where('status', 'open');
+        $this->db->where('tanggal_mulai <=', $today);
+        $this->db->where('tanggal_selesai >=', $today);
+        if ($tahun) {
+            $this->db->where('tahun', (int)$tahun);
+        }
+        return $this->db->order_by('tahun', 'DESC')->get()->row();
+    }
+
+    public function isPeriodeBuka($tahun = NULL)
+    {
+        return !empty($this->getPeriodeAktif($tahun));
     }
 
     public function findPeriode($id)

@@ -75,12 +75,19 @@ class Rkbmd extends Auth_Controller
             $filter['tahun'] = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : null;
         }
 
+        $thAktif = !empty($filter['tahun']) ? (int)$filter['tahun'] : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027);
+        $periodeAktif = $this->master_model->getPeriodeAktif($thAktif);
+        $isPeriodeBuka = !empty($periodeAktif);
+
         $data = [
-            'title'   => 'Daftar Usulan ' . label_jenis($jenis),
-            'jenis'   => $jenis,
-            'usulan'  => $this->rkbmd_model->getUsulan($filter),
-            'filter'  => $filter,
-            'periode' => $this->master_model->getAllPeriode()
+            'title'         => 'Daftar Usulan ' . label_jenis($jenis),
+            'jenis'         => $jenis,
+            'usulan'        => $this->rkbmd_model->getUsulan($filter),
+            'filter'        => $filter,
+            'periode'       => $this->master_model->getAllPeriode(),
+            'thAktif'       => $thAktif,
+            'periodeAktif'  => $periodeAktif,
+            'isPeriodeBuka' => $isPeriodeBuka
         ];
 
         $this->load->view('templates/header', $data);
@@ -100,6 +107,16 @@ class Rkbmd extends Auth_Controller
             show_error('Verifikator tidak dapat membuat usulan.', 403);
         }
 
+        $thAktif = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027;
+        $isPeriodeBuka = $this->master_model->isPeriodeBuka($thAktif);
+
+        // Security / Schedule Guard: Operator SKPD dilarang bypass jadwal yang ditutup!
+        if (!in_array($user->role, ['admin', 'pimpinan'], TRUE) && !$isPeriodeBuka) {
+            $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal penyusunan RKBMD <strong>TA {$thAktif}</strong> saat ini sedang <strong>DITUTUP</strong> oleh Administrator BPKAD.");
+            redirect("rkbmd/{$jenis}");
+            return;
+        }
+
         if ($this->input->method() === 'post') {
             $this->form_validation->set_rules('skpd_id', 'SKPD', 'required|integer');
             $this->form_validation->set_rules('periode_id', 'Periode', 'required|integer');
@@ -108,6 +125,17 @@ class Rkbmd extends Auth_Controller
             $this->form_validation->set_rules('keterangan', 'Keterangan', 'trim|max_length[500]');
 
             if ($this->form_validation->run() === TRUE) {
+                $thInput = (int) $this->input->post('tahun_anggaran');
+
+                // Validasi ketat jadwal tahun yang di-submit via POST
+                if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
+                    if (!$this->master_model->isPeriodeBuka($thInput)) {
+                        $this->session->set_flashdata('danger', "Akses Ditolak: Penyusunan usulan RKBMD untuk <strong>Tahun Anggaran {$thInput}</strong> sedang DITUTUP oleh Administrator BPKAD.");
+                        redirect("rkbmd/{$jenis}");
+                        return;
+                    }
+                }
+
                 $skpdId = (int) $this->input->post('skpd_id');
                 if ($user->role === 'skpd') $skpdId = (int) $user->skpd_id;
 
@@ -115,7 +143,7 @@ class Rkbmd extends Auth_Controller
                     'jenis_usulan'   => $jenis,
                     'skpd_id'        => $skpdId,
                     'periode_id'     => (int) $this->input->post('periode_id'),
-                    'tahun_anggaran' => (int) $this->input->post('tahun_anggaran'),
+                    'tahun_anggaran' => $thInput,
                     'tanggal_usulan' => $this->input->post('tanggal_usulan', TRUE),
                     'keterangan'     => $this->input->post('keterangan', TRUE),
                     'is_nihil'       => $this->input->post('is_nihil') ? 1 : 0
@@ -132,10 +160,12 @@ class Rkbmd extends Auth_Controller
         }
 
         $data = [
-            'title'   => 'Buat Usulan ' . label_jenis($jenis),
-            'jenis'   => $jenis,
-            'skpd'    => $this->master_model->getAllSkpd(),
-            'periode' => $this->master_model->getActivePeriode()
+            'title'        => 'Buat Usulan ' . label_jenis($jenis),
+            'jenis'        => $jenis,
+            'skpd'         => $this->master_model->getAllSkpd(),
+            'periode'      => $this->master_model->getActivePeriode($thAktif),
+            'thAktif'      => $thAktif,
+            'periodeAktif' => $this->master_model->getPeriodeAktif($thAktif)
         ];
 
         $this->load->view('templates/header', $data);
@@ -154,6 +184,16 @@ class Rkbmd extends Auth_Controller
 
         if ($usulan->jenis_usulan !== $jenis) {
             redirect("rkbmd/{$usulan->jenis_usulan}/edit/{$id}");
+        }
+
+        // Security / Schedule Guard: Operator SKPD dilarang mengubah usulan pada jadwal yang ditutup
+        $user = $this->currentUser;
+        if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
+            if (!$this->master_model->isPeriodeBuka($usulan->tahun_anggaran)) {
+                $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal penyusunan RKBMD <strong>TA {$usulan->tahun_anggaran}</strong> saat ini sedang <strong>DITUTUP</strong> oleh Administrator BPKAD. Usulan tidak dapat diubah.");
+                redirect("rkbmd/{$jenis}/detail/{$id}");
+                return;
+            }
         }
 
         // Handle aksi: tambah/update/hapus detail, submit, update header
@@ -202,6 +242,16 @@ class Rkbmd extends Auth_Controller
         $jenis = $this->validateJenis($jenis);
         $usulan = $this->rkbmd_model->findUsulan($id);
         $this->authorizeUsulan($usulan, TRUE);
+
+        // Security / Schedule Guard: Operator SKPD dilarang upload excel jika jadwal tutup
+        $user = $this->currentUser;
+        if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
+            if (!$this->master_model->isPeriodeBuka($usulan->tahun_anggaran)) {
+                $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal penyusunan RKBMD <strong>TA {$usulan->tahun_anggaran}</strong> saat ini sedang <strong>DITUTUP</strong> oleh Administrator BPKAD. Berkas Excel tidak dapat diunggah.");
+                redirect("rkbmd/{$jenis}/detail/{$id}");
+                return;
+            }
+        }
 
         // Check if can edit
         if (!in_array($usulan->status, ['draft', 'revisi']) ||
@@ -643,7 +693,7 @@ class Rkbmd extends Auth_Controller
 
     private function _handleSubmit($usulanId)
     {
-        $result = $this->rkbmd_model->submit($usulanId);
+        $result = $this->rkbmd_model->submit($usulanId, $this->currentUser);
         $this->session->set_flashdata($result['success'] ? 'success' : 'danger', $result['message']);
     }
 }

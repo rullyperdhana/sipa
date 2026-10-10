@@ -67,7 +67,9 @@ class Dashboard extends Auth_Controller
             }
         }
 
-        // 4. Status Jadwal Pengusulan Aktif (SSH & SBU)
+        // 4. Status Jadwal Pengusulan Aktif (RKBMD, SSH, SBU)
+        $jadwalRkbmd = $this->master_model->getPeriodeAktif($tahun);
+        $isJadwalBukaRkbmd = !empty($jadwalRkbmd);
         $jadwalSsh = $this->ssh_model->getJadwalAktif('SSH', $tahun);
         $isJadwalBukaSsh = !empty($jadwalSsh);
         $jadwalSbu = $this->ssh_model->getJadwalAktif('SBU', $tahun);
@@ -163,6 +165,8 @@ class Dashboard extends Auth_Controller
             'rekap'                => $rekap,
             'rekapStandar'         => $rekapStandar,
             'executiveKpi'         => $executiveKpi,
+            'jadwalRkbmd'          => $jadwalRkbmd,
+            'isJadwalBukaRkbmd'    => $isJadwalBukaRkbmd,
             'jadwalSsh'            => $jadwalSsh,
             'isJadwalBukaSsh'      => $isJadwalBukaSsh,
             'jadwalSbu'            => $jadwalSbu,

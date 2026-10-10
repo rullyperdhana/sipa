@@ -320,8 +320,18 @@ class Ssh_model extends CI_Model
      */
     public function insertUsulan($data, $user)
     {
-        $tahun = !empty($data['tahun_anggaran']) ? (int)$data['tahun_anggaran'] : (int)date('Y');
+        $tahun = !empty($data['tahun_anggaran']) ? (int)$data['tahun_anggaran'] : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : (int)date('Y'));
         $tipe = in_array($data['tipe'], ['SSH', 'SBU'], TRUE) ? $data['tipe'] : 'SSH';
+
+        // Security / Schedule Guard: Operator SKPD dilarang membuat usulan saat jadwal ditutup
+        if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
+            if (!$this->isJadwalBuka($tipe, $tahun)) {
+                return [
+                    'success' => FALSE,
+                    'message' => "Akses Ditolak: Jadwal pengusulan {$tipe} TA {$tahun} saat ini DITUTUP oleh Administrator BPKAD. Usulan tidak dapat dibuat."
+                ];
+            }
+        }
 
         // Auto generate kode usulan: misal SSH-2026-0001
         $kodeUsulan = $this->generateKodeUsulan($tipe, $tahun);
@@ -390,6 +400,17 @@ class Ssh_model extends CI_Model
             ];
         }
 
+        // Security / Schedule Guard: Operator SKPD dilarang update usulan saat jadwal ditutup
+        if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
+            $thUsulan = !empty($existing->tahun_anggaran) ? (int)$existing->tahun_anggaran : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027);
+            if (!$this->isJadwalBuka($existing->tipe, $thUsulan)) {
+                return [
+                    'success' => FALSE, 
+                    'message' => "Akses Ditolak: Jadwal pengusulan {$existing->tipe} TA {$thUsulan} saat ini DITUTUP oleh Administrator BPKAD. Usulan tidak dapat diubah."
+                ];
+            }
+        }
+
         $updateData = [
             'master_standar_id' => !empty($data['master_standar_id']) ? (int)$data['master_standar_id'] : $existing->master_standar_id,
             'tipe'              => in_array($data['tipe'], ['SSH', 'SBU'], TRUE) ? $data['tipe'] : $existing->tipe,
@@ -447,6 +468,17 @@ class Ssh_model extends CI_Model
                 'success' => FALSE, 
                 'message' => "Usulan tidak dapat dikirim karena berstatus '{$existing->status_proses}'."
             ];
+        }
+
+        // Security / Schedule Guard: Operator SKPD dilarang kirim usulan saat jadwal ditutup
+        if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
+            $thUsulan = !empty($existing->tahun_anggaran) ? (int)$existing->tahun_anggaran : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027);
+            if (!$this->isJadwalBuka($existing->tipe, $thUsulan)) {
+                return [
+                    'success' => FALSE, 
+                    'message' => "Akses Ditolak: Jadwal pengusulan {$existing->tipe} TA {$thUsulan} saat ini DITUTUP oleh Administrator BPKAD. Usulan tidak dapat diajukan."
+                ];
+            }
         }
 
         $statusSebelum = $existing->status_proses;
@@ -868,6 +900,10 @@ class Ssh_model extends CI_Model
      */
     public function getJadwalAktif($tipe = NULL, $tahun = NULL)
     {
+        if ($tahun === NULL && function_exists('get_tahun_anggaran')) {
+            $tahun = get_tahun_anggaran();
+        }
+
         $today = date('Y-m-d');
         $this->db->from($this->table_jadwal);
         $this->db->where('status', 'buka');
@@ -889,6 +925,9 @@ class Ssh_model extends CI_Model
 
     public function isJadwalBuka($tipe = 'SSH', $tahun = NULL)
     {
+        if ($tahun === NULL && function_exists('get_tahun_anggaran')) {
+            $tahun = get_tahun_anggaran();
+        }
         $jadwal = $this->getJadwalAktif($tipe, $tahun);
         return !empty($jadwal);
     }

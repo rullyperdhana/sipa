@@ -258,6 +258,10 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                             <div class="btn-group btn-group-sm" role="group">
                                 <!-- Tombol Kirim Usulan jika Draft atau Direvisi -->
                                 <?php if (in_array($row->status_proses, ['Draft', 'Direvisi'])): ?>
+                                <?php 
+                                $isItemBuka = in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE) || $this->ssh_model->isJadwalBuka($row->tipe, (int)$row->tahun_anggaran);
+                                ?>
+                                <?php if ($isItemBuka): ?>
                                 <button type="button" class="btn btn-success btn-kirim-usulan" 
                                         data-id="<?= $row->id ?>" 
                                         data-kode="<?= e($row->kode_usulan) ?>"
@@ -269,6 +273,11 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                                 <a href="<?= site_url("{$prefixUrl}/edit/{$row->id}") ?>" class="btn btn-outline-primary" title="Edit usulan">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
+                                <?php else: ?>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Jadwal pengusulan <?= $row->tipe ?> TA <?= (int)$row->tahun_anggaran ?> telah DITUTUP oleh BPKAD">
+                                    <button class="btn btn-secondary" disabled><i class="bi bi-lock-fill"></i></button>
+                                </span>
+                                <?php endif; ?>
                                 <?php if ($row->status_proses === 'Draft'): ?>
                                 <a href="<?= site_url("{$prefixUrl}/hapus/{$row->id}") ?>" class="btn btn-outline-danger btn-hapus-usulan" 
                                    data-confirm="Hapus usulan <?= e($row->kode_usulan) ?>?" title="Hapus draft">
