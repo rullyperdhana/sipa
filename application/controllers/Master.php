@@ -116,13 +116,26 @@ class Master extends Admin_Controller
             }
 
             $id = (int) $this->input->post('id');
+            $kode = trim($this->input->post('kode_barang', TRUE));
+
+            // Validasi apakah kode_barang sudah digunakan oleh data lain
+            $check = $this->db->where('kode_barang', $kode);
+            if ($id) {
+                $check->where('id !=', $id);
+            }
+            $existing = $check->get('barang')->row();
+            if ($existing) {
+                $this->session->set_flashdata('danger', "Kode barang '<strong>" . htmlspecialchars($kode) . "</strong>' sudah digunakan oleh: \"<strong>" . htmlspecialchars($existing->nama_barang) . "</strong>\" (ID #{$existing->id}). Silakan gunakan kode barang yang berbeda.");
+                return;
+            }
+
             $data = [
-                'kode_barang'   => $this->input->post('kode_barang', TRUE),
-                'nama_barang'   => $this->input->post('nama_barang', TRUE),
-                'satuan'        => $this->input->post('satuan', TRUE),
+                'kode_barang'   => $kode,
+                'nama_barang'   => trim($this->input->post('nama_barang', TRUE)),
+                'satuan'        => trim($this->input->post('satuan', TRUE)) ?: 'Unit',
                 'kategori'      => $this->input->post('kategori', TRUE),
                 'harga_standar' => (float) str_replace(['.', ','], ['', '.'], $this->input->post('harga_standar')),
-                'keterangan'    => $this->input->post('keterangan', TRUE),
+                'keterangan'    => trim($this->input->post('keterangan', TRUE)),
                 'is_active'     => (int) $this->input->post('is_active')
             ];
             $this->master_model->saveBarang($data, $id ?: NULL);
@@ -395,6 +408,18 @@ class Master extends Admin_Controller
 
             $id = (int) $this->input->post('id');
             $kode = trim($this->input->post('kode_akun', TRUE));
+
+            // Validasi apakah kode_akun sudah digunakan oleh akun lain
+            $check = $this->db->where('kode_akun', $kode);
+            if ($id) {
+                $check->where('id !=', $id);
+            }
+            $existing = $check->get('ref_akun_belanja')->row();
+            if ($existing) {
+                $this->session->set_flashdata('danger', "Kode rekening '<strong>" . htmlspecialchars($kode) . "</strong>' sudah digunakan oleh: \"<strong>" . htmlspecialchars($existing->nama_akun) . "</strong>\" (ID #{$existing->id}). Silakan gunakan kode rekening yang berbeda.");
+                return;
+            }
+
             $dots = substr_count($kode, '.');
             $level = $dots + 1;
 
