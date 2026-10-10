@@ -98,6 +98,10 @@ $route['profile']           = 'user/profile';
 $route['profile/update']    = 'user/update_profile';
 $route['profile/password']  = 'user/change_password';
 
+// ===== Dokumentasi & Pembaruan Sistem (Admin Only) =====
+$route['dokumentasi']         = 'dokumentasi/index';
+$route['dokumentasi/(:any)']  = 'dokumentasi/$1';
+
 // ===== AJAX Endpoints =====
 $route['ajax/barang/search']              = 'ajax/search_barang';
 $route['ajax/bmd/search']                 = 'ajax/search_bmd';

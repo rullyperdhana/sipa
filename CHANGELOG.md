@@ -15,6 +15,12 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - **Kartu Rekap Statistik & Filter:** Menambahkan kartu ringkasan antrean *"Ditolak"* berwarna merah pada header antrean verifikasi serta dashboard usulan SKPD, lengkap dengan opsi filter status *"Ditolak"*.
   - **Transparansi Alasan Penolakan untuk SKPD:** Tampilan baris usulan pada dashboard SKPD dan detail item otomatis memunculkan banner alert merah berisi alasan penolakan dari BPKAD.
   - **Integrasi Notifikasi WhatsApp Kedinasan (`standar_tolak`):** Verifikator dapat mengirim draf notifikasi penolakan resmi secara instan ke nomor WhatsApp operator SKPD pengusul.
+- **Modul Dokumentasi & Pembaruan Sistem di Dalam Aplikasi (`/dokumentasi`):**
+  - **Akses Khusus Administrator (Role: admin):** Menyediakan halaman dokumentasi terpadu yang dapat diakses langsung oleh admin melalui menu sidebar *"Dokumentasi & Update"* atau mengklik badge versi pada sidebar footer.
+  - **Riwayat Rilis & Changelog Interaktif:** Mem-parse file `CHANGELOG.md` secara otomatis ke dalam antarmuka timeline visual modern dengan filter pencarian instan berdasarkan keyword rilis.
+  - **Panduan Fitur & Alur Modul Kedinasan:** Panduan interaktif alur 6 status usulan SSH/SBU, 5 instrumen perencanaan RKBMD, master katalog 2027, dan notifikasi WhatsApp.
+  - **Panel Diagnostik & Status Server:** Menampilkan informasi runtime server lengkap meliputi versi PHP, versi MySQL, status environment (`production`/`development`), batas memori, izin direktori upload (`/uploads`), dan rekap total data sistem.
+  - **Tampilan Manual Teknis (README):** Menampilkan dokumentasi manual teknis arsitektur sistem secara rapi di dalam dashboard dengan dukungan cetak halaman (*print-friendly*).
 
 ---
 

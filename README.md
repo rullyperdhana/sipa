@@ -145,6 +145,13 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Resolusi Otomatis Berbasis Tahun pada Master Model:** Method `findSkpd($id, $tahun)` dan `getAllSkpd($activeOnly, $tahun)` otomatis mengambil nomenklatur resmi pada tahun bersangkutan (fallback ke master pokok jika belum ada aturan khusus).
 - **Modal Interaktif di Master SKPD (`/master/skpd`):** Tombol aksi *"Riwayat & Nomenklatur Per Tahun"* dengan modal interaktif untuk menambah, melihat, mengedit, dan menghapus aturan nomenklatur per tahun anggaran.
 
+### 16. Modul Dokumentasi & Pembaruan Sistem di Aplikasi (`/dokumentasi`)
+- **Akses Khusus Administrator (Role: admin):** Halaman dokumentasi terpadu yang dapat diakses langsung oleh admin melalui menu sidebar *"Dokumentasi & Update"* atau mengklik badge versi pada sidebar footer.
+- **Log Rilis & Changelog Interaktif:** Otomatis membaca riwayat rilis dari `CHANGELOG.md` dengan visual timeline modern dan fitur pencarian keyword cepat.
+- **Panduan Alur Modul Kedinasan:** Rangkuman alur 6 status usulan SSH & SBU (termasuk status *Ditolak*), 5 instrumen perencanaan RKBMD, penjadwalan BPKAD, dan notifikasi WhatsApp.
+- **Panel Diagnostik & Status Server:** Menampilkan runtime PHP, versi MySQL, batas memori, izin direktori upload (`/uploads`), dan rekap total data sistem.
+- **Tampilan Manual Teknis (README):** Menampilkan dokumentasi manual teknis arsitektur sistem secara rapi di dalam dashboard dengan dukungan cetak halaman (*print-friendly*).
+
 ---
 
 ## 👥 Matriks Hak Akses Pengguna (RBAC & RLS)

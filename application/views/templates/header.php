@@ -190,11 +190,24 @@
         <a href="<?= site_url('wa/settings') ?>" class="nav-link <?= $this->uri->segment(1) === 'wa' ? 'active' : '' ?>">
             <i class="bi bi-whatsapp"></i> <span>Integrasi WhatsApp</span>
         </a>
+        <a href="<?= site_url('dokumentasi') ?>" class="nav-link <?= $this->uri->segment(1) === 'dokumentasi' ? 'active' : '' ?>">
+            <i class="bi bi-journal-code"></i> <span>Dokumentasi & Update</span>
+        </a>
         <?php endif; ?>
     </nav>
 
     <div class="sidebar-footer">
+        <?php if (!empty($user) && $user->role === 'admin'): ?>
+        <a href="<?= site_url('dokumentasi') ?>" class="text-decoration-none text-muted" title="Buka Catatan Rilis & Dokumentasi Sistem">
+            <small class="d-inline-flex align-items-center gap-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-0.5">v<?= $this->config->item('app_version') ?></span>
+                <span>&copy; BPKAD <?= date('Y') ?></span>
+                <i class="bi bi-info-circle ms-0.5"></i>
+            </small>
+        </a>
+        <?php else: ?>
         <small>v<?= $this->config->item('app_version') ?> &copy; BPKAD <?= date('Y') ?></small>
+        <?php endif; ?>
     </div>
 </aside>
 
