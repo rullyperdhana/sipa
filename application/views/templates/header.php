@@ -210,6 +210,44 @@
         </div>
 
         <div class="topbar-actions">
+            <!-- Pemilih Tahun Periode Anggaran Global -->
+            <?php 
+            $currYear = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027;
+            $allYears = function_exists('get_daftar_tahun_anggaran') ? get_daftar_tahun_anggaran() : [2028, 2027, 2026, 2025];
+            ?>
+            <div class="dropdown me-1">
+                <button class="btn btn-sm btn-outline-primary dropdown-toggle d-flex align-items-center gap-1.5 px-2.5 py-1 rounded-pill fw-bold" 
+                        type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Tahun Anggaran Aktif: Klik untuk beralih tahun">
+                    <i class="bi bi-calendar2-check-fill text-primary"></i>
+                    <span>TA <?= (int) $currYear ?></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" style="min-width: 220px;">
+                    <li class="dropdown-header text-uppercase small fw-bold text-muted px-3 d-flex align-items-center justify-content-between">
+                        <span>Pilih Tahun Anggaran</span>
+                        <span class="badge bg-primary text-white font-monospace" style="font-size:10px;">TA <?= (int)$currYear ?></span>
+                    </li>
+                    <li><hr class="dropdown-divider my-1"></li>
+                    <?php foreach ($allYears as $y): ?>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 <?= ($y === $currYear) ? 'active fw-bold' : '' ?>" 
+                           href="<?= site_url('switch-year/' . $y) ?>">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-<?= ($y === $currYear) ? 'check-circle-fill' : 'circle' ?>"></i>
+                                <span>Tahun <?= $y ?></span>
+                            </div>
+                            <?php if ($y == 2027): ?>
+                                <span class="badge bg-warning text-dark font-monospace" style="font-size:10px;">Perencanaan</span>
+                            <?php elseif ($y == (int)date('Y')): ?>
+                                <span class="badge bg-info-subtle text-info border font-monospace" style="font-size:10px;">Berjalan</span>
+                            <?php elseif ($y < (int)date('Y')): ?>
+                                <span class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size:10px;">Arsip</span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+
             <!-- Notifikasi -->
             <div class="dropdown">
                 <button class="btn btn-link position-relative" data-bs-toggle="dropdown" aria-label="Notifikasi">

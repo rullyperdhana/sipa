@@ -155,7 +155,7 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                         <div class="col-md-4">
                             <label for="tahun_anggaran" class="form-label fw-semibold">Tahun Anggaran <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="tahun_anggaran" name="tahun_anggaran" 
-                                   value="<?= $isEdit ? $item->tahun_anggaran : (!empty($jadwalAktif) ? (int)$jadwalAktif->tahun_anggaran : 2027) ?>" min="2020" max="2099" required>
+                                   value="<?= $isEdit ? $item->tahun_anggaran : (!empty($jadwalAktif) ? (int)$jadwalAktif->tahun_anggaran : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027)) ?>" min="2020" max="2099" required>
                             <div class="form-text small text-muted">Tahun anggaran pelaksanaan usulan.</div>
                         </div>
                     </div>

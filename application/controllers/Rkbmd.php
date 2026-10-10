@@ -69,8 +69,11 @@ class Rkbmd extends Auth_Controller
         $filter = ['jenis' => $jenis];
         if ($user->role === 'skpd') $filter['skpd_id'] = $user->skpd_id;
         if ($q = $this->input->get('q', TRUE))           $filter['q'] = $q;
-        if ($s = $this->input->get('status', TRUE))      $filter['status'] = $s;
-        if ($t = (int) $this->input->get('tahun'))       $filter['tahun'] = $t;
+        if ($this->input->get('tahun') !== NULL) {
+            if ($t = (int) $this->input->get('tahun')) $filter['tahun'] = $t;
+        } else {
+            $filter['tahun'] = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : null;
+        }
 
         $data = [
             'title'   => 'Daftar Usulan ' . label_jenis($jenis),

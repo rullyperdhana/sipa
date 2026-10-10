@@ -59,7 +59,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Tahun Anggaran <span class="text-danger">*</span></label>
-                            <input type="number" name="tahun_anggaran" class="form-control" min="2020" max="2099" value="<?= set_value('tahun_anggaran', date('Y')+1) ?>" required>
+                            <input type="number" name="tahun_anggaran" class="form-control" min="2020" max="2099" value="<?= set_value('tahun_anggaran', function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : (date('Y')+1)) ?>" required>
                         </div>
                     </div>
 

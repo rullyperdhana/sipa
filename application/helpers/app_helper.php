@@ -261,3 +261,91 @@ if (!function_exists('set_setting')) {
         return false;
     }
 }
+
+/**
+ * Mengambil tahun anggaran aktif dari session atau menentukan default berdasarkan jadwal aktif / tahun perencanaan.
+ */
+if (!function_exists('get_tahun_anggaran')) {
+    function get_tahun_anggaran() {
+        $CI =& get_instance();
+        $th = (int) $CI->session->userdata('tahun_anggaran');
+        if ($th >= 2020 && $th <= 2099) {
+            return $th;
+        }
+
+        // Cari jadwal SSH/SBU aktif saat ini
+        $defaultTh = null;
+        try {
+            if ($CI->db->table_exists('standar_harga_jadwal')) {
+                $now = date('Y-m-d');
+                $jadwal = $CI->db->where('status', 'buka')
+                    ->where('tanggal_mulai <=', $now)
+                    ->where('tanggal_selesai >=', $now)
+                    ->order_by('tahun_anggaran', 'DESC')
+                    ->get('standar_harga_jadwal')->row();
+                if ($jadwal && !empty($jadwal->tahun_anggaran)) {
+                    $defaultTh = (int) $jadwal->tahun_anggaran;
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        if (!$defaultTh) {
+            // Default ke tahun perencanaan (misal 2027 atau date('Y') + 1)
+            $defaultTh = (int) date('Y') >= 2026 ? 2027 : ((int) date('Y') + 1);
+        }
+
+        $CI->session->set_userdata('tahun_anggaran', $defaultTh);
+        return $defaultTh;
+    }
+}
+
+/**
+ * Menyimpan / beralih tahun anggaran aktif pada session.
+ */
+if (!function_exists('set_tahun_anggaran')) {
+    function set_tahun_anggaran($tahun) {
+        $CI =& get_instance();
+        $th = (int) $tahun;
+        if ($th >= 2020 && $th <= 2099) {
+            $CI->session->set_userdata('tahun_anggaran', $th);
+            return $th;
+        }
+        return get_tahun_anggaran();
+    }
+}
+
+/**
+ * Mengambil daftar tahun anggaran yang tersedia di sistem untuk dropdown login & switcher.
+ */
+if (!function_exists('get_daftar_tahun_anggaran')) {
+    function get_daftar_tahun_anggaran() {
+        $CI =& get_instance();
+        $curYear = (int) date('Y');
+        $years = [$curYear + 2, $curYear + 1, $curYear, $curYear - 1]; // e.g. 2028, 2027, 2026, 2025
+
+        try {
+            if ($CI->db->table_exists('standar_harga_jadwal')) {
+                $rows = $CI->db->distinct()->select('tahun_anggaran')->get('standar_harga_jadwal')->result();
+                foreach ($rows as $r) {
+                    if (!empty($r->tahun_anggaran)) $years[] = (int) $r->tahun_anggaran;
+                }
+            }
+            if ($CI->db->table_exists('rkbmd_periode')) {
+                $rows = $CI->db->distinct()->select('tahun')->get('rkbmd_periode')->result();
+                foreach ($rows as $r) {
+                    if (!empty($r->tahun)) $years[] = (int) $r->tahun;
+                }
+            }
+            if ($CI->db->table_exists('ref_standar_harga')) {
+                $rows = $CI->db->distinct()->select('tahun_anggaran')->get('ref_standar_harga')->result();
+                foreach ($rows as $r) {
+                    if (!empty($r->tahun_anggaran)) $years[] = (int) $r->tahun_anggaran;
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        $years = array_unique(array_filter($years, function($y) { return $y >= 2020 && $y <= 2099; }));
+        rsort($years, SORT_NUMERIC);
+        return array_values($years);
+    }
+}

@@ -4,20 +4,68 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Master_model extends CI_Model
 {
     // ===== SKPD =====
-    public function getAllSkpd($activeOnly = TRUE)
+    public function getAllSkpd($activeOnly = TRUE, $tahun = NULL)
     {
-        if ($activeOnly) $this->db->where('is_active', 1);
-        return $this->db->order_by('nama_skpd', 'ASC')->get('skpd')->result();
+        if ($activeOnly) $this->db->where('s.is_active', 1);
+
+        if ($tahun === NULL && function_exists('get_tahun_anggaran')) {
+            $tahun = get_tahun_anggaran();
+        }
+
+        if (!empty($tahun) && $this->db->table_exists('skpd_nomenklatur')) {
+            $this->db->select("s.*, 
+                COALESCE(n.nama_skpd, s.nama_skpd) AS nama_skpd,
+                COALESCE(n.kode_skpd, s.kode_skpd) AS kode_skpd,
+                COALESCE(n.kepala_skpd, s.kepala_skpd) AS kepala_skpd,
+                COALESCE(n.nip_kepala, s.nip_kepala) AS nip_kepala,
+                COALESCE(n.jabatan_kepala, s.jabatan_kepala) AS jabatan_kepala,
+                COALESCE(n.nama_pengurus, s.nama_pengurus) AS nama_pengurus,
+                COALESCE(n.nip_pengurus, s.nip_pengurus) AS nip_pengurus,
+                n.tahun_anggaran AS nomenklatur_tahun,
+                n.keterangan AS nomenklatur_keterangan");
+            $this->db->from('skpd s');
+            $this->db->join('skpd_nomenklatur n', 'n.skpd_id = s.id AND n.tahun_anggaran = ' . (int)$tahun, 'left');
+            return $this->db->order_by('nama_skpd', 'ASC')->get()->result();
+        }
+
+        return $this->db->order_by('nama_skpd', 'ASC')->get('skpd s')->result();
     }
 
-    public function findSkpd($id)
+    public function findSkpd($id, $tahun = NULL)
     {
-        return $this->db->get_where('skpd', ['id' => (int) $id])->row();
+        $skpd = $this->db->get_where('skpd', ['id' => (int) $id])->row();
+        if (!$skpd) return NULL;
+
+        if ($tahun === NULL && function_exists('get_tahun_anggaran')) {
+            $tahun = get_tahun_anggaran();
+        }
+
+        if (!empty($tahun) && $this->db->table_exists('skpd_nomenklatur')) {
+            $nomenklatur = $this->db->get_where('skpd_nomenklatur', [
+                'skpd_id'        => (int) $id,
+                'tahun_anggaran' => (int) $tahun
+            ])->row();
+
+            if ($nomenklatur) {
+                if (!empty($nomenklatur->nama_skpd))     $skpd->nama_skpd     = $nomenklatur->nama_skpd;
+                if (!empty($nomenklatur->kode_skpd))     $skpd->kode_skpd     = $nomenklatur->kode_skpd;
+                if (!empty($nomenklatur->kepala_skpd))   $skpd->kepala_skpd   = $nomenklatur->kepala_skpd;
+                if (!empty($nomenklatur->nip_kepala))    $skpd->nip_kepala    = $nomenklatur->nip_kepala;
+                if (!empty($nomenklatur->jabatan_kepala))$skpd->jabatan_kepala= $nomenklatur->jabatan_kepala;
+                if (!empty($nomenklatur->nama_pengurus)) $skpd->nama_pengurus = $nomenklatur->nama_pengurus;
+                if (!empty($nomenklatur->nip_pengurus))  $skpd->nip_pengurus  = $nomenklatur->nip_pengurus;
+                $skpd->nomenklatur_tahun = (int) $tahun;
+                $skpd->nomenklatur_keterangan = $nomenklatur->keterangan ?? '';
+                $skpd->is_nomenklatur_custom = TRUE;
+            }
+        }
+
+        return $skpd;
     }
 
-    public function getSkpdById($id)
+    public function getSkpdById($id, $tahun = NULL)
     {
-        return $this->findSkpd($id);
+        return $this->findSkpd($id, $tahun);
     }
 
     public function saveSkpd($data, $id = NULL)
@@ -32,6 +80,46 @@ class Master_model extends CI_Model
     public function deleteSkpd($id)
     {
         return $this->db->where('id', (int) $id)->delete('skpd');
+    }
+
+    // ===== NOMENKLATUR SKPD PER TAHUN =====
+    public function getNomenklaturListBySkpd($skpdId)
+    {
+        return $this->db->where('skpd_id', (int)$skpdId)
+            ->order_by('tahun_anggaran', 'DESC')
+            ->get('skpd_nomenklatur')->result();
+    }
+
+    public function findNomenklatur($id)
+    {
+        return $this->db->get_where('skpd_nomenklatur', ['id' => (int)$id])->row();
+    }
+
+    public function saveNomenklatur($data, $id = NULL)
+    {
+        if ($id) {
+            $this->db->where('id', (int)$id)->update('skpd_nomenklatur', $data);
+            return (int)$id;
+        }
+
+        // Cek apakah sudah ada untuk skpd_id dan tahun_anggaran
+        $existing = $this->db->get_where('skpd_nomenklatur', [
+            'skpd_id'        => (int)$data['skpd_id'],
+            'tahun_anggaran' => (int)$data['tahun_anggaran']
+        ])->row();
+
+        if ($existing) {
+            $this->db->where('id', (int)$existing->id)->update('skpd_nomenklatur', $data);
+            return (int)$existing->id;
+        }
+
+        $this->db->insert('skpd_nomenklatur', $data);
+        return (int)$this->db->insert_id();
+    }
+
+    public function deleteNomenklatur($id)
+    {
+        return $this->db->where('id', (int)$id)->delete('skpd_nomenklatur');
     }
 
     // ===== BARANG =====

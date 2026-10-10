@@ -59,7 +59,55 @@ class Master extends Admin_Controller
             $this->master_model->deleteSkpd($id);
             $this->logger->record('delete', 'skpd', "Hapus SKPD ID #{$id}");
             $this->session->set_flashdata('success', 'SKPD berhasil dihapus.');
+        } elseif ($action === 'save_nomenklatur') {
+            $this->form_validation->set_rules('skpd_id', 'ID SKPD', 'required|integer');
+            $this->form_validation->set_rules('tahun_anggaran', 'Tahun Anggaran', 'required|integer');
+            $this->form_validation->set_rules('nama_skpd', 'Nama SKPD Nomenklatur', 'required|max_length[255]');
+            if ($this->form_validation->run() === FALSE) {
+                $this->session->set_flashdata('danger', validation_errors());
+                return;
+            }
+
+            $id = (int) $this->input->post('nomenklatur_id');
+            $data = [
+                'skpd_id'        => (int) $this->input->post('skpd_id'),
+                'tahun_anggaran' => (int) $this->input->post('tahun_anggaran'),
+                'nama_skpd'      => $this->input->post('nama_skpd', TRUE),
+                'kode_skpd'      => $this->input->post('kode_skpd', TRUE),
+                'kepala_skpd'    => $this->input->post('kepala_skpd', TRUE),
+                'nip_kepala'     => $this->input->post('nip_kepala', TRUE),
+                'jabatan_kepala' => $this->input->post('jabatan_kepala', TRUE),
+                'nama_pengurus'  => $this->input->post('nama_pengurus', TRUE),
+                'nip_pengurus'   => $this->input->post('nip_pengurus', TRUE),
+                'keterangan'     => $this->input->post('keterangan', TRUE)
+            ];
+            $this->master_model->saveNomenklatur($data, $id ?: NULL);
+            $this->logger->record($id ? 'update' : 'create', 'skpd_nomenklatur', "Nomenklatur TA {$data['tahun_anggaran']} SKPD #{$data['skpd_id']}: {$data['nama_skpd']}");
+            $this->session->set_flashdata('success', "Nomenklatur TA {$data['tahun_anggaran']} berhasil disimpan.");
+        } elseif ($action === 'delete_nomenklatur') {
+            $id = (int) $this->input->post('nomenklatur_id');
+            $this->master_model->deleteNomenklatur($id);
+            $this->logger->record('delete', 'skpd_nomenklatur', "Hapus Nomenklatur ID #{$id}");
+            $this->session->set_flashdata('success', 'Nomenklatur tahun anggaran berhasil dihapus.');
         }
+    }
+
+    public function ajax_nomenklatur($skpdId)
+    {
+        $skpdId = (int) $skpdId;
+        $skpd = $this->master_model->findSkpd($skpdId);
+        if (!$skpd) {
+            return $this->output->set_content_type('application/json')
+                ->set_output(json_encode(['status' => false, 'message' => 'SKPD tidak ditemukan']));
+        }
+
+        $list = $this->master_model->getNomenklaturListBySkpd($skpdId);
+        return $this->output->set_content_type('application/json')
+            ->set_output(json_encode([
+                'status' => true,
+                'skpd'   => $skpd,
+                'list'   => $list
+            ]));
     }
 
     // ==================== BARANG ====================

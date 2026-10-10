@@ -201,6 +201,25 @@ body {
                 </button>
             </div>
 
+            <div class="form-floating mb-3">
+                <select name="tahun_anggaran" id="tahun_anggaran" class="form-select fw-semibold text-primary" required>
+                    <?php 
+                    $years = !empty($available_years) ? $available_years : [2028, 2027, 2026, 2025];
+                    $curSel = !empty($selected_year) ? (int)$selected_year : 2027;
+                    foreach ($years as $y): 
+                        $tag = '';
+                        if ($y == 2027) $tag = ' (Perencanaan)';
+                        elseif ($y == (int)date('Y')) $tag = ' (Berjalan)';
+                        elseif ($y < (int)date('Y')) $tag = ' (Arsip)';
+                    ?>
+                        <option value="<?= $y ?>" <?= ($y === $curSel) ? 'selected' : '' ?>>
+                            TA <?= $y ?><?= $tag ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="tahun_anggaran"><i class="bi bi-calendar2-range-fill me-2 text-primary"></i>Tahun Anggaran Periode</label>
+            </div>
+
             <?php if (!empty($show_captcha)): ?>
             <div class="form-floating mb-3">
                 <input type="number" name="captcha" id="captcha" class="form-control border-warning" placeholder="Jawaban Keamanan" required autocomplete="off">

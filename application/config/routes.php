@@ -7,8 +7,9 @@ $route['404_override']       = 'errors/page_not_found';
 $route['translate_uri_dashes'] = FALSE;
 
 // ===== Authentication =====
-$route['login']  = 'login/index';
-$route['logout'] = 'login/logout';
+$route['login']              = 'login/index';
+$route['logout']             = 'login/logout';
+$route['switch-year/(:num)'] = 'login/switch_year/$1';
 
 // ===== Dashboard =====
 $route['dashboard'] = 'dashboard/index';
@@ -71,8 +72,9 @@ $route['sbu/download/(:num)/(:num)']        = 'sbu/download_lampiran/$1/$2';
 $route['sbu/api/transisi']                  = 'sbu/api_transisi_status';
 
 // ===== Master Data =====
-$route['master/skpd']         = 'master/skpd';
-$route['master/barang']       = 'master/barang';
+$route['master/skpd/nomenklatur/(:num)'] = 'master/ajax_nomenklatur/$1';
+$route['master/skpd']                    = 'master/skpd';
+$route['master/barang']                  = 'master/barang';
 $route['master/periode']      = 'master/periode';
 $route['master/user']         = 'master/user';
 $route['master/akun_belanja'] = 'master/akun_belanja';

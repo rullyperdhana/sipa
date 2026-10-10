@@ -48,10 +48,18 @@ class Login extends MY_Controller
                 $username = $this->input->post('username', TRUE);
                 $password = $this->input->post('password'); // jangan trim/escape password
                 $remember = (bool) $this->input->post('remember');
+                $tahunAnggaran = (int) $this->input->post('tahun_anggaran');
 
                 try {
                     $result = $this->auth->attempt($username, $password, $remember);
                     if ($result['success']) {
+                        // Set tahun anggaran aktif
+                        if ($tahunAnggaran >= 2020 && $tahunAnggaran <= 2099) {
+                            set_tahun_anggaran($tahunAnggaran);
+                        } else {
+                            get_tahun_anggaran();
+                        }
+
                         // Reset fails
                         $this->session->unset_userdata(['login_fails', 'login_captcha_ans']);
                         redirect('dashboard');
@@ -79,15 +87,42 @@ class Login extends MY_Controller
         }
 
         $regEnabled = function_exists('get_setting') ? get_setting('registration_enabled', '1') : '1';
+        $availableYears = get_daftar_tahun_anggaran();
+        $selectedYear   = get_tahun_anggaran();
 
         $data = [
             'title'                => 'Login - SIPA Kabupaten Tapin',
             'show_captcha'         => $showCaptcha,
             'captcha_question'     => $captchaQuestion,
-            'registration_enabled' => ($regEnabled === '1')
+            'registration_enabled' => ($regEnabled === '1'),
+            'available_years'      => $availableYears,
+            'selected_year'        => $selectedYear,
         ];
         $this->load->view('auth/login', $data);
         return;
+    }
+
+    /**
+     * Beralih tahun anggaran aktif tanpa logout.
+     */
+    public function switch_year($tahun = null)
+    {
+        if (!$this->auth->check()) {
+            redirect('login');
+        }
+
+        $tahun = (int) $tahun;
+        if ($tahun >= 2020 && $tahun <= 2099) {
+            set_tahun_anggaran($tahun);
+            $this->session->set_flashdata('info', "Tahun Anggaran aktif berhasil dialihkan ke <strong>TA {$tahun}</strong>.");
+        }
+
+        $ref = $this->input->server('HTTP_REFERER');
+        if (!empty($ref) && strpos($ref, site_url()) === 0 && strpos($ref, 'switch-year') === FALSE) {
+            redirect($ref);
+        } else {
+            redirect('dashboard');
+        }
     }
 
     public function logout()

@@ -12,7 +12,7 @@ class Dashboard extends Auth_Controller
     public function index()
     {
         $user = $this->currentUser;
-        $tahun = (int) ($this->input->get('tahun') ?: date('Y'));
+        $tahun = (int) ($this->input->get('tahun') ?: get_tahun_anggaran());
         $periodeId = (int) $this->input->get('periode_id');
         $jenis = $this->input->get('jenis') ?: 'pengadaan';
         $skpdId = $this->input->get('skpd_id');

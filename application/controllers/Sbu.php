@@ -52,7 +52,7 @@ class Sbu extends Auth_Controller
             'tipe'          => $this->tipe,
             'status_proses' => $this->input->get('status', TRUE),
             'kategori'      => $this->input->get('kategori', TRUE),
-            'tahun'         => $this->input->get('tahun', TRUE),
+            'tahun'         => ($this->input->get('tahun') !== NULL) ? $this->input->get('tahun', TRUE) : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : null),
             'q'             => $this->input->get('q', TRUE)
         ];
 

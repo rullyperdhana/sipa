@@ -22,7 +22,7 @@ class Laporan extends Auth_Controller
 
     public function index()
     {
-        $tahun  = (int) ($this->input->get('tahun') ?: date('Y'));
+        $tahun  = (int) ($this->input->get('tahun') ?: get_tahun_anggaran());
         $skpdId = (int) $this->input->get('skpd_id');
         $status = $this->input->get('status', TRUE);
         $q      = $this->input->get('q', TRUE);
@@ -247,7 +247,7 @@ class Laporan extends Auth_Controller
      */
     public function cetak()
     {
-        $tahun  = (int) ($this->input->get('tahun') ?: date('Y'));
+        $tahun  = (int) ($this->input->get('tahun') ?: get_tahun_anggaran());
         $skpdId = (int) $this->input->get('skpd_id');
         $modul  = $this->input->get('modul', TRUE) ?: 'rkbmd';
 
@@ -261,7 +261,7 @@ class Laporan extends Auth_Controller
         $kpi = $this->laporan_model->getExecutiveKpi($tahun, $skpdId);
         $skpdInfo = NULL;
         if (!empty($skpdId)) {
-            $skpdInfo = $this->master_model->findSkpd($skpdId);
+            $skpdInfo = $this->master_model->findSkpd($skpdId, $tahun);
         }
 
         $data = [
