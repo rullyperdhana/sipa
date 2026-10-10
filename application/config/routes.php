@@ -80,7 +80,9 @@ $route['master/akun']         = 'master/akun_belanja';
 
 // ===== Laporan =====
 $route['laporan']                     = 'laporan/index';
+$route['laporan/cetak']               = 'laporan/cetak';
 $route['laporan/rekap/(:any)']        = 'laporan/rekap/$1';
+$route['laporan/export/(:any)']        = 'laporan/export/$1';
 $route['laporan/export/(:any)/(:any)'] = 'laporan/export/$1/$2';
 
 // ===== Profile & Settings =====

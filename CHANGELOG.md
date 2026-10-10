@@ -5,6 +5,25 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.3.0] - 2026-10-10
+
+### 🚀 Ditambahkan (Added)
+- **Pusat Laporan & Dashboard Eksekutif SIPA (`/laporan`):**
+  - **4 Kartu KPI Eksekutif Utama:** Menampilkan Total Usulan Masuk (RKBMD + Standar Harga), Total Pagu Diusulkan (Rp), Realisasi Disetujui/Ditetapkan (Rp) dengan indikator persentase *Approval Rate*, serta Kepatuhan Partisipasi SKPD lengkap dengan progress bar.
+  - **Visualisasi Grafik Interaktif Modern (Chart.js):**
+    - *Bar Chart:* Alokasi dan distribusi pagu anggaran per 5 jenis usulan RKBMD (Pengadaan, Pemeliharaan, Pemanfaatan, Pemindahtanganan, Penghapusan).
+    - *Donut Chart:* Komposisi persentase status seluruh usulan gabungan (Disetujui/Ditetapkan, Menunggu Verifikasi, Draft, Direvisi/Ditolak).
+  - **Sistem Tabulasi Terpadu (Multi-Tab Interface):**
+    - **Tab 1: Rekapitulasi RKBMD:** 5 kartu instrumen seimbang dan tabel usulan RKBMD interaktif.
+    - **Tab 2: Rekapitulasi Standar Harga (SSH & SBU):** Kartu komparasi SSH vs SBU (status dan pagu) beserta tabel rincian usulan standar harga dan tautan bukti survey.
+    - **Tab 3: Matriks Kepatuhan SKPD:** Monitoring komprehensif 66 SKPD se-Kabupaten Tapin dengan status kepatuhan (*Lengkap*, *Sebagian*, *Belum Ada Usulan*).
+  - **Fitur Ekspor & Cetak Laporan Resmi:**
+    - Ekspor Spreadsheet Excel/CSV per modul (`/laporan/export/rkbmd/excel`, `/laporan/export/ssh_sbu/excel`, `/laporan/export/kepatuhan/excel`).
+    - Halaman cetak laporan resmi ber-kop Pemerintah Kabupaten Tapin & BPKAD (`/laporan/cetak`) siap ditandatangani Kepala BPKAD.
+  - **Peningkatan Filter & UX:** Filter Tahun Anggaran, SKPD, Status Usulan, Kata Kunci, dan tombol *Reset Filter* satu klik.
+
+---
+
 ## [2.2.0] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

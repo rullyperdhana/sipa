@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BPKAD
 
-[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -94,6 +94,19 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
   - **Layar Desktop ($\ge 992\text{px}$):** Tombol hamburger melipat sidebar (*sidebar collapse*) dan memperluas canvas konten ke lebar penuh (*full-width*). Status tersimpan di `localStorage` (anti-FOUC).
   - **Layar Mobile ($< 992\text{px}$):** Sidebar berfungsi sebagai drawer samping (*off-canvas*) dengan latar belakang redup (*backdrop blur*), tombol tutup `X`, dan dukungan tombol `Escape`.
 - **Auto DataTables Column Adjust:** Penyesuaian lebar kolom tabel otomatis saat sidebar dilipat/dibuka.
+
+### 10. Pusat Laporan & Dashboard Eksekutif SIPA (`/laporan`)
+- **4 Kartu KPI Eksekutif:** Ringkasan makro Total Usulan Terdata (RKBMD + Standar Harga), Total Pagu Diusulkan (Rp), Realisasi Nilai Disetujui/Ditetapkan (Rp) dengan indikator persentase *Approval Rate*, dan Tingkat Partisipasi SKPD aktif.
+- **Visualisasi Interaktif (Chart.js):**
+  - *Distribusi Pagu Anggaran RKBMD:* Diagram batang alokasi dana per instrumen perencanaan.
+  - *Proporsi Status Seluruh Usulan:* Diagram lingkaran persentase usulan Disetujui/Ditetapkan, Menunggu Verifikasi, Draft, dan Direvisi/Ditolak.
+- **Navigasi Multi-Tab Terpadu:**
+  - **Tab 1: Rekapitulasi RKBMD:** 5 kartu instrumen seimbang (Pengadaan, Pemeliharaan, Pemanfaatan, Pemindahtanganan, Penghapusan) dan tabel usulan interaktif.
+  - **Tab 2: Rekapitulasi Standar Harga (SSH & SBU):** Kartu komparasi SSH vs SBU dan tabel usulan standar harga lengkap dengan tombol unduh dokumen survey pasar.
+  - **Tab 3: Matriks Kepatuhan SKPD:** Monitoring partisipasi dan kepatuhan 66 SKPD se-Kabupaten Tapin dengan status (*Lengkap*, *Sebagian*, *Belum Ada Usulan*).
+- **Ekspor & Cetak Laporan Resmi:**
+  - Ekspor Spreadsheet Excel/CSV per modul (`/laporan/export/{modul}/excel`).
+  - Lembar cetak laporan resmi ber-kop Pemerintah Kabupaten Tapin & BPKAD (`/laporan/cetak`) siap ditandatangani Kepala BPKAD.
 
 ---
 
