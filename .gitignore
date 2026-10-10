@@ -21,11 +21,15 @@ application/config/database.local.php
 *.env
 .env
 
-# Deploy archives, DB dumps & OS files
+# Deploy archives, DB dumps, spreadsheets & OS files
 *.zip
 *.tar.gz
 *.sql
 !database/migrations/*.sql
+*.xlsx
+*.xls
+*.csv
+!vendor/**
 .DS_Store
 Thumbs.db
 
