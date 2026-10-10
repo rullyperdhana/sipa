@@ -1,16 +1,30 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
+<?php
+$tipe = $tipe ?? 'SSH';
+$isSbu = ($tipe === 'SBU');
+$prefixUrl = $prefixUrl ?? strtolower($tipe);
+$modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
+?>
+
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1 class="page-title"><i class="bi bi-award-fill text-primary me-2"></i>Penetapan Standar Harga (SSH & SBU)</h1>
-        <p class="page-subtitle text-muted mb-0">Pengesahan dan penetapan akhir standar harga yang telah diverifikasi BPKAD menjadi Master Data resmi daerah.</p>
+        <h1 class="page-title">
+            <i class="bi <?= $isSbu ? 'bi-shield-check text-info' : 'bi-award-fill text-primary' ?> me-2"></i>
+            Penetapan <?= $modTitle ?>
+        </h1>
+        <p class="page-subtitle text-muted mb-0">
+            <?= $isSbu 
+                ? 'Pengesahan dan penetapan akhir standar biaya honorarium, jasa, dan sewa yang telah diverifikasi menjadi Master Data resmi.' 
+                : 'Pengesahan dan penetapan akhir standar satuan harga barang yang telah diverifikasi menjadi Master Data resmi.' ?>
+        </p>
     </div>
 </div>
 
 <!-- Card Filter & Search -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
-        <form method="get" action="<?= site_url('ssh/penetapan') ?>" class="row g-2 align-items-end">
+        <form method="get" action="<?= site_url("{$prefixUrl}/penetapan") ?>" class="row g-2 align-items-end">
             <div class="col-md-3">
                 <label class="form-label small fw-semibold text-muted mb-1">Status Usulan</label>
                 <select class="form-select form-select-sm" name="status">
@@ -30,23 +44,24 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-2">
-                <label class="form-label small fw-semibold text-muted mb-1">Tipe</label>
-                <select class="form-select form-select-sm" name="tipe">
-                    <option value="">Semua</option>
-                    <option value="SSH" <?= ($filter['tipe'] ?? '') === 'SSH' ? 'selected' : '' ?>>SSH</option>
-                    <option value="SBU" <?= ($filter['tipe'] ?? '') === 'SBU' ? 'selected' : '' ?>>SBU</option>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted mb-1">Kategori <?= $tipe ?></label>
+                <select class="form-select form-select-sm" name="kategori">
+                    <option value="">Semua Kategori</option>
+                    <?php foreach ($kategori as $kat): ?>
+                    <option value="<?= e($kat) ?>" <?= ($filter['kategori'] ?? '') === $kat ? 'selected' : '' ?>><?= e($kat) ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="col-md-2">
                 <label class="form-label small fw-semibold text-muted mb-1">Cari Keyword</label>
                 <input type="text" name="q" class="form-control form-control-sm" value="<?= e($filter['q'] ?? '') ?>" placeholder="Uraian, spesifikasi...">
             </div>
-            <div class="col-md-2 d-flex gap-1">
-                <button type="submit" class="btn btn-sm btn-primary flex-fill">
-                    <i class="bi bi-funnel me-1"></i> Filter
+            <div class="col-md-1 d-flex gap-1">
+                <button type="submit" class="btn btn-sm <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> w-100" title="Filter">
+                    <i class="bi bi-funnel"></i>
                 </button>
-                <a href="<?= site_url('ssh/penetapan') ?>" class="btn btn-sm btn-outline-secondary" title="Reset filter">
+                <a href="<?= site_url("{$prefixUrl}/penetapan") ?>" class="btn btn-sm btn-outline-secondary" title="Reset filter">
                     <i class="bi bi-arrow-clockwise"></i>
                 </a>
             </div>
@@ -57,7 +72,10 @@
 <!-- Tabel Penetapan -->
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h6 class="card-title mb-0 fw-bold"><i class="bi bi-check2-all me-2 text-primary"></i>Daftar Usulan Diverifikasi untuk Ditetapkan</h6>
+        <h6 class="card-title mb-0 fw-bold">
+            <i class="bi bi-check2-all me-2 <?= $isSbu ? 'text-info' : 'text-primary' ?>"></i>
+            Daftar Usulan <?= $tipe ?> Diverifikasi untuk Ditetapkan
+        </h6>
         <span class="badge bg-success"><?= count($list) ?> Item</span>
     </div>
     <div class="card-body p-0">
@@ -68,7 +86,7 @@
                         <th width="40" class="text-center">#</th>
                         <th>Kode Usulan</th>
                         <th>SKPD Pengusul</th>
-                        <th>Uraian & Spesifikasi</th>
+                        <th><?= $isSbu ? 'Uraian Biaya / Ketentuan' : 'Uraian Barang & Spesifikasi' ?></th>
                         <th class="text-center">Satuan</th>
                         <th class="text-end">Harga Usulan</th>
                         <th class="text-end">Harga Hasil Verifikasi</th>
@@ -82,7 +100,7 @@
                     <tr>
                         <td colspan="10" class="text-center py-5 text-muted">
                             <i class="bi bi-folder-check fs-1 d-block mb-2 text-secondary"></i>
-                            <span class="fw-semibold">Tidak ada usulan berstatus 'Diverifikasi' yang menunggu penetapan saat ini.</span>
+                            <span class="fw-semibold">Tidak ada usulan <?= $tipe ?> berstatus 'Diverifikasi' yang menunggu penetapan saat ini.</span>
                         </td>
                     </tr>
                     <?php else: foreach ($list as $idx => $row): ?>
@@ -90,7 +108,7 @@
                         <td class="text-center text-muted small"><?= $idx + 1 ?></td>
                         <td>
                             <strong class="font-monospace text-dark"><?= e($row->kode_usulan) ?></strong>
-                            <div class="small text-muted"><?= e($row->tipe) ?> &bull; <?= e($row->kategori) ?></div>
+                            <div class="small text-muted"><?= e($row->kategori) ?></div>
                         </td>
                         <td>
                             <strong class="text-dark d-block"><?= e($row->nama_skpd) ?></strong>
@@ -119,21 +137,21 @@
                         </td>
                         <td class="text-center">
                             <?php if ($row->status_proses === 'Diverifikasi'): ?>
-                            <form action="<?= site_url('ssh/proses-penetapan/' . $row->id) ?>" method="post" class="d-inline form-tetapkan-usulan" 
+                            <form action="<?= site_url("{$prefixUrl}/proses-penetapan/{$row->id}") ?>" method="post" class="d-inline form-tetapkan-usulan" 
                                   data-kode="<?= e($row->kode_usulan) ?>" data-uraian="<?= e($row->uraian) ?>">
                                 <?= csrf_input() ?>
-                                <button type="submit" class="btn btn-sm btn-primary shadow-sm" title="Tetapkan dan kunci standar harga resmi">
+                                <button type="submit" class="btn btn-sm <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> shadow-sm" title="Tetapkan dan kunci standar harga resmi">
                                     <i class="bi bi-shield-check me-1"></i> Tetapkan
                                 </button>
                             </form>
-                            <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" title="Detail">
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Detail">
                                 <i class="bi bi-eye"></i>
                             </button>
                             <?php else: ?>
                             <span class="badge bg-success-subtle text-success border border-success-subtle">
                                 <i class="bi bi-lock-fill me-1"></i> Terkunci
                             </span>
-                            <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh ms-1" data-id="<?= $row->id ?>">
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh ms-1" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>">
                                 <i class="bi bi-eye"></i>
                             </button>
                             <?php endif; ?>
@@ -151,7 +169,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold"><i class="bi bi-info-circle-fill text-primary me-2"></i>Detail Usulan Standar Harga</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-info-circle-fill text-primary me-2"></i>Detail Usulan <?= $modTitle ?></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="modalDetailBody">

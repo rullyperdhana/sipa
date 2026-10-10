@@ -1,23 +1,33 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
 <?php
+$tipe = $tipe ?? ($item->tipe ?? 'SSH');
+$isSbu = ($tipe === 'SBU');
+$prefixUrl = $prefixUrl ?? strtolower($tipe);
 $isEdit = !empty($item);
-$pageTitle = $isEdit ? 'Edit Usulan SSH & SBU' : 'Tambah Usulan SSH & SBU';
-$actionUrl = $isEdit ? site_url('ssh/edit/' . $item->id) : site_url('ssh/tambah');
+$modName = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
+$pageTitle = ($isEdit ? 'Edit Usulan ' : 'Tambah Usulan ') . $modName;
+$actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$prefixUrl}/tambah");
 ?>
 
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="page-title">
-            <i class="bi bi-pencil-square text-primary me-2"></i><?= $pageTitle ?>
+            <i class="bi <?= $isSbu ? 'bi-receipt-cutoff text-info' : 'bi-box-seam-fill text-primary' ?> me-2"></i><?= $pageTitle ?>
         </h1>
         <p class="page-subtitle text-muted mb-0">
-            <?= $isEdit ? 'Perbaiki rincian item usulan ' . e($item->kode_usulan) : 'Input rincian item Standar Satuan Harga atau Standar Biaya Umum baru untuk SKPD Anda.' ?>
+            <?php if ($isEdit): ?>
+                Perbaiki rincian item usulan <strong><?= e($item->kode_usulan) ?></strong>.
+            <?php else: ?>
+                <?= $isSbu 
+                    ? 'Input usulan standar honorarium, jasa tenaga ahli, sewa, dan biaya operasional non-fisik untuk SKPD Anda.' 
+                    : 'Input rincian item harga satuan barang atau material fisik baru untuk SKPD Anda.' ?>
+            <?php endif; ?>
         </p>
     </div>
     <div>
-        <a href="<?= site_url('ssh/usulan') ?>" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
+        <a href="<?= site_url("{$prefixUrl}/usulan") ?>" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Usulan <?= $tipe ?>
         </a>
     </div>
 </div>
@@ -38,84 +48,86 @@ $actionUrl = $isEdit ? site_url('ssh/edit/' . $item->id) : site_url('ssh/tambah'
 <div class="row">
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3 border-bottom">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
                 <h6 class="card-title mb-0 fw-bold text-dark">
-                    <i class="bi bi-ui-checks-grid me-2 text-primary"></i>Formulir Data Usulan
+                    <i class="bi bi-ui-checks-grid me-2 <?= $isSbu ? 'text-info' : 'text-primary' ?>"></i>
+                    Formulir Input <?= $isSbu ? 'Biaya / Honorarium / Jasa (SBU)' : 'Barang & Material Fisik (SSH)' ?>
                 </h6>
+                <span class="badge <?= $isSbu ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-primary-subtle text-primary border border-primary-subtle' ?> py-2 px-3">
+                    Modul: <?= $tipe ?>
+                </span>
             </div>
             <div class="card-body p-4">
                 <form action="<?= $actionUrl ?>" method="post" enctype="multipart/form-data" id="formSshUsulan" novalidate>
                     <?= csrf_input() ?>
+                    <!-- Hidden Tipe Otomatis Sesuai Modul -->
+                    <input type="hidden" name="tipe" value="<?= $tipe ?>">
 
                     <div class="row g-3 mb-3">
-                        <!-- Tipe Standar -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Tipe Standar <span class="text-danger">*</span></label>
-                            <div class="d-flex gap-3 mt-1">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="tipe" id="tipeSSH" value="SSH" 
-                                           <?= ($isEdit ? $item->tipe : 'SSH') === 'SSH' ? 'checked' : '' ?> required>
-                                    <label class="form-check-label" for="tipeSSH">
-                                        <strong>SSH</strong> (Standar Satuan Harga Barang/Jasa)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="tipe" id="tipeSBU" value="SBU" 
-                                           <?= ($isEdit ? $item->tipe : '') === 'SBU' ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="tipeSBU">
-                                        <strong>SBU</strong> (Standar Biaya Umum / Honor / Sewa)
-                                    </label>
-                                </div>
-                            </div>
+                        <!-- Kategori -->
+                        <div class="col-md-8">
+                            <label for="kategori" class="form-label fw-semibold">
+                                Kategori <?= $isSbu ? 'Biaya / Jasa' : 'Barang' ?> <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="kategori" name="kategori" required>
+                                <option value="">-- Pilih Kategori <?= $tipe ?> --</option>
+                                <?php foreach ($kategori as $kat): ?>
+                                <option value="<?= e($kat) ?>" <?= ($isEdit && $item->kategori === $kat) ? 'selected' : '' ?>>
+                                    <?= e($kat) ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="invalid-feedback">Pilih salah satu kategori item.</div>
                         </div>
 
                         <!-- Tahun Anggaran -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="tahun_anggaran" class="form-label fw-semibold">Tahun Anggaran <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="tahun_anggaran" name="tahun_anggaran" 
                                    value="<?= $isEdit ? $item->tahun_anggaran : date('Y') ?>" min="2020" max="2099" required>
                         </div>
                     </div>
 
-                    <!-- Kategori -->
-                    <div class="mb-3">
-                        <label for="kategori" class="form-label fw-semibold">Kategori Item <span class="text-danger">*</span></label>
-                        <select class="form-select" id="kategori" name="kategori" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            <?php foreach ($kategori as $kat): ?>
-                            <option value="<?= e($kat) ?>" <?= ($isEdit && $item->kategori === $kat) ? 'selected' : '' ?>>
-                                <?= e($kat) ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <div class="invalid-feedback">Pilih salah satu kategori item.</div>
-                    </div>
-
                     <!-- Uraian Item -->
                     <div class="mb-3">
-                        <label for="uraian" class="form-label fw-semibold">Uraian / Nama Item <span class="text-danger">*</span></label>
+                        <label for="uraian" class="form-label fw-semibold">
+                            <?= $isSbu ? 'Uraian Biaya / Nama Honorarium / Jasa' : 'Nama Barang / Uraian Item Fisik' ?> 
+                            <span class="text-danger">*</span>
+                        </label>
                         <input type="text" class="form-control form-control-lg" id="uraian" name="uraian" 
                                value="<?= $isEdit ? e($item->uraian) : '' ?>" 
-                               placeholder="Contoh: Kertas HVS A4 80gr, Laptop Pengadaan ASN, Honorarium Narasumber..." required minlength="3">
-                        <div class="form-text">Tuliskan nama barang atau jasa secara jelas dan terstandarisasi.</div>
+                               placeholder="<?= $isSbu ? 'Contoh: Honorarium Narasumber Pakar/Praktisi, Tenaga Ahli Programmer Senior, Sewa Gedung Pertemuan...' : 'Contoh: Kertas HVS A4 80gr, Laptop Pengadaan Standar ASN, Semen Portland Komposit 50 Kg...' ?>" 
+                               required minlength="3">
+                        <div class="form-text">
+                            <?= $isSbu 
+                                ? 'Tuliskan nama pos biaya, kualifikasi tenaga ahli, atau jenis jasa secara terstandarisasi.' 
+                                : 'Tuliskan nama barang fisik secara jelas dan terstandarisasi.' ?>
+                        </div>
                         <div class="invalid-feedback">Uraian wajib diisi minimal 3 karakter.</div>
                     </div>
 
                     <!-- Spesifikasi -->
                     <div class="mb-3">
-                        <label for="spesifikasi" class="form-label fw-semibold">Spesifikasi Teknis / Keterangan Lengkap <span class="text-danger">*</span></label>
+                        <label for="spesifikasi" class="form-label fw-semibold">
+                            <?= $isSbu ? 'Ketentuan, Kualifikasi & Dasar Perhitungan Teknis' : 'Spesifikasi Teknis & Merek Lengkap' ?> 
+                            <span class="text-danger">*</span>
+                        </label>
                         <textarea class="form-control" id="spesifikasi" name="spesifikasi" rows="4" 
-                                  placeholder="Rincian merek, tipe, kapasitas, bahan, ukuran, sertifikasi, kualifikasi, atau spesifikasi teknis lainnya..." required><?= $isEdit ? e($item->spesifikasi) : '' ?></textarea>
-                        <div class="form-text">Spesifikasi yang rinci mempercepat persetujuan oleh tim verifikator BPKAD.</div>
+                                  placeholder="<?= $isSbu ? 'Tingkat pendidikan minimal, sertifikasi keahlian, durasi/jam kerja, kapasitas tempat, dasar regulasi PMK/Perbup terkait...' : 'Rincian merek, tipe, kapasitas, dimensi, daya listrik, bahan, standar SNI, atau detail teknis barang...' ?>" 
+                                  required><?= $isEdit ? e($item->spesifikasi) : '' ?></textarea>
+                        <div class="form-text">Rincian spesifikasi teknis yang jelas mempermudah dan mempercepat persetujuan verifikator BPKAD.</div>
                         <div class="invalid-feedback">Spesifikasi teknis wajib diisi.</div>
                     </div>
 
                     <div class="row g-3 mb-3">
                         <!-- Satuan -->
                         <div class="col-md-6">
-                            <label for="satuan" class="form-label fw-semibold">Satuan <span class="text-danger">*</span></label>
+                            <label for="satuan" class="form-label fw-semibold">
+                                Satuan <?= $isSbu ? '(Waktu / Orang / Kegiatan)' : '(Unit / Fisik)' ?> <span class="text-danger">*</span>
+                            </label>
                             <input list="listSatuan" class="form-control" id="satuan" name="satuan" 
-                                   value="<?= $isEdit ? e($item->satuan) : 'Unit' ?>" placeholder="Pilih atau ketik satuan..." required>
+                                   value="<?= $isEdit ? e($item->satuan) : ($isSbu ? 'Orang/Bulan (OB)' : 'Unit') ?>" 
+                                   placeholder="Pilih atau ketik satuan..." required>
                             <datalist id="listSatuan">
                                 <?php foreach ($satuan as $sat): ?>
                                 <option value="<?= e($sat) ?>">
@@ -126,10 +138,12 @@ $actionUrl = $isEdit ? site_url('ssh/edit/' . $item->id) : site_url('ssh/tambah'
 
                         <!-- Harga Usulan -->
                         <div class="col-md-6">
-                            <label for="harga_usulan" class="form-label fw-semibold">Harga Usulan (Rp) <span class="text-danger">*</span></label>
+                            <label for="harga_usulan" class="form-label fw-semibold">
+                                <?= $isSbu ? 'Besaran Biaya / Tarif Usulan (Rp)' : 'Harga Satuan Usulan (Rp)' ?> <span class="text-danger">*</span>
+                            </label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light fw-bold text-muted">Rp</span>
-                                <input type="text" class="form-control form-control-lg fw-bold text-primary" id="harga_usulan" name="harga_usulan" 
+                                <input type="text" class="form-control form-control-lg fw-bold <?= $isSbu ? 'text-info' : 'text-primary' ?>" id="harga_usulan" name="harga_usulan" 
                                        value="<?= $isEdit ? number_format($item->harga_usulan, 0, ',', '.') : '' ?>" 
                                        placeholder="0" required data-format-rupiah>
                             </div>
@@ -141,14 +155,16 @@ $actionUrl = $isEdit ? site_url('ssh/edit/' . $item->id) : site_url('ssh/tambah'
                     <!-- Upload File Pendukung -->
                     <div class="mb-4">
                         <label for="file_lampiran" class="form-label fw-semibold">
-                            Upload Bukti Pendukung / Survey Harga 
+                            <?= $isSbu ? 'Upload Bukti / Telaahan Staf / Regulasi Acuan' : 'Upload Bukti Survey Harga Pasar / Brosur Resmi' ?>
                             <small class="text-muted fw-normal">(Opsional / Dianjurkan)</small>
                         </label>
                         <input class="form-control" type="file" id="file_lampiran" name="file_lampiran" 
                                accept=".pdf,.jpg,.jpeg,.png,.docx,.doc,.xlsx,.xls">
                         <div class="form-text">
                             Format yang didukung: <strong>PDF, JPG, PNG, DOCX, XLSX</strong> (Maksimal 5MB).<br>
-                            Lampirkan hasil survey harga pasar, brosur resmi distributor, atau screenshot e-katalog LKPP.
+                            <?= $isSbu 
+                                ? 'Lampirkan nota dinas telaahan staf, SK/regulasi tarif yang berlaku, atau perbandingan standar biaya masukan.' 
+                                : 'Lampirkan hasil survey harga pasar minimal 3 toko/distributor, brosur resmi distributor, atau screenshot e-katalog LKPP.' ?>
                         </div>
 
                         <?php if ($isEdit && !empty($item->file_lampiran)): ?>
@@ -157,7 +173,7 @@ $actionUrl = $isEdit ? site_url('ssh/edit/' . $item->id) : site_url('ssh/tambah'
                                 <i class="bi bi-paperclip text-primary me-1"></i>
                                 <strong>File Saat Ini:</strong> <?= e($item->file_nama_asli ?: $item->file_lampiran) ?>
                             </div>
-                            <a href="<?= site_url('ssh/download/' . $item->id) ?>" class="btn btn-sm btn-outline-primary py-0">
+                            <a href="<?= site_url("{$prefixUrl}/download/{$item->id}") ?>" class="btn btn-sm btn-outline-primary py-0">
                                 <i class="bi bi-download"></i> Unduh
                             </a>
                         </div>
@@ -167,9 +183,9 @@ $actionUrl = $isEdit ? site_url('ssh/edit/' . $item->id) : site_url('ssh/tambah'
                     <hr class="my-4">
 
                     <div class="d-flex justify-content-between align-items-center">
-                        <a href="<?= site_url('ssh/usulan') ?>" class="btn btn-light">Batal</a>
+                        <a href="<?= site_url("{$prefixUrl}/usulan") ?>" class="btn btn-light">Batal</a>
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary px-4 fw-semibold" id="btnSimpanUsulan">
+                            <button type="submit" class="btn <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> px-4 fw-semibold" id="btnSimpanUsulan">
                                 <i class="bi bi-floppy-fill me-1"></i> <?= $isEdit ? 'Simpan Perubahan' : 'Simpan sebagai Draft' ?>
                             </button>
                         </div>
@@ -183,23 +199,37 @@ $actionUrl = $isEdit ? site_url('ssh/edit/' . $item->id) : site_url('ssh/tambah'
     <div class="col-lg-4 mt-4 mt-lg-0">
         <div class="card border-0 shadow-sm bg-light">
             <div class="card-body">
-                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-info-circle-fill text-primary me-2"></i>Panduan Pengusulan</h6>
+                <h6 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-info-circle-fill <?= $isSbu ? 'text-info' : 'text-primary' ?> me-2"></i>
+                    Panduan Pengusulan <?= $tipe ?>
+                </h6>
                 <ul class="list-unstyled small text-muted mb-0 d-flex flex-column gap-2">
+                    <?php if ($isSbu): ?>
                     <li class="d-flex gap-2">
                         <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
-                        <span><strong>SSH</strong> digunakan untuk standar harga barang fisik, perlengkapan kantor, material bangunan, dan mesin.</span>
+                        <span><strong>SBU</strong> menstandarisasi biaya operasional dan belanja non-fisik: honorarium tim/narasumber, konsultan perorangan, uang harian perjadin, sewa gedung, dsb.</span>
                     </li>
                     <li class="d-flex gap-2">
                         <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
-                        <span><strong>SBU</strong> digunakan untuk honorarium panitia/narasumber, konsultan perorangan, sewa gedung, dan jasa lainnya.</span>
+                        <span>Satuan umum pada SBU meliputi <strong>OB</strong> (Orang/Bulan), <strong>OH</strong> (Orang/Hari), <strong>OJ</strong> (Orang/Jam), atau per <strong>Kegiatan</strong>.</span>
                     </li>
+                    <?php else: ?>
+                    <li class="d-flex gap-2">
+                        <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
+                        <span><strong>SSH</strong> menstandarisasi harga satuan barang fisik, perlengkapan kantor, alat kesehatan, material bangunan, mesin, dan kendaraan.</span>
+                    </li>
+                    <li class="d-flex gap-2">
+                        <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
+                        <span>Satuan umum pada SSH meliputi <strong>Unit</strong>, <strong>Buah</strong>, <strong>Rim</strong>, <strong>Dus</strong>, <strong>Sak</strong>, <strong>Meter</strong>, dsb.</span>
+                    </li>
+                    <?php endif; ?>
                     <li class="d-flex gap-2">
                         <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-1"></i>
                         <span>Data baru akan disimpan dengan status <strong>Draft</strong>. Anda dapat memeriksanya kembali sebelum menekan tombol <strong>Kirim Usulan</strong>.</span>
                     </li>
                     <li class="d-flex gap-2">
                         <i class="bi bi-shield-lock-fill text-primary flex-shrink-0 mt-1"></i>
-                        <span><strong>Kebijakan RLS:</strong> SKPD hanya dapat mengedit usulan saat berstatus <em>Draft</em> atau <em>Direvisi</em>. Setelah dikirim (status <em>Diajukan</em>), data akan terkunci dari pengeditan.</span>
+                        <span><strong>Kebijakan RLS:</strong> SKPD hanya dapat mengedit usulan saat berstatus <em>Draft</em> atau <em>Direvisi</em>. Setelah dikirim (status <em>Diajukan</em>), data terkunci.</span>
                     </li>
                 </ul>
             </div>

@@ -28,7 +28,7 @@ $route['verifikasi']                       = 'verifikasi/index';
 $route['verifikasi/detail/(:num)']         = 'verifikasi/detail/$1';
 $route['verifikasi/proses/(:num)']         = 'verifikasi/proses/$1';
 
-// ===== Modul Standar Satuan Harga (SSH) & Standar Biaya Umum (SBU) =====
+// ===== Modul Standar Satuan Harga (SSH) =====
 $route['ssh']                               = 'ssh/index';
 $route['ssh/usulan']                        = 'ssh/usulan';
 $route['ssh/tambah']                        = 'ssh/tambah';
@@ -43,6 +43,22 @@ $route['ssh/master_data']                   = 'ssh/master_data';
 $route['ssh/detail/(:num)']                 = 'ssh/detail/$1';
 $route['ssh/download/(:num)']               = 'ssh/download_lampiran/$1';
 $route['ssh/api/transisi']                  = 'ssh/api_transisi_status';
+
+// ===== Modul Standar Biaya Umum (SBU) =====
+$route['sbu']                               = 'sbu/index';
+$route['sbu/usulan']                        = 'sbu/usulan';
+$route['sbu/tambah']                        = 'sbu/tambah';
+$route['sbu/edit/(:num)']                   = 'sbu/edit/$1';
+$route['sbu/kirim/(:num)']                  = 'sbu/kirim/$1';
+$route['sbu/hapus/(:num)']                  = 'sbu/hapus/$1';
+$route['sbu/verifikasi']                    = 'sbu/verifikasi';
+$route['sbu/proses-verifikasi/(:num)']      = 'sbu/proses_verifikasi/$1';
+$route['sbu/penetapan']                     = 'sbu/penetapan';
+$route['sbu/proses-penetapan/(:num)']       = 'sbu/proses_penetapan/$1';
+$route['sbu/master_data']                   = 'sbu/master_data';
+$route['sbu/detail/(:num)']                 = 'sbu/detail/$1';
+$route['sbu/download/(:num)']               = 'sbu/download_lampiran/$1';
+$route['sbu/api/transisi']                  = 'sbu/api_transisi_status';
 
 // ===== Master Data =====
 $route['master/skpd']    = 'master/skpd';

@@ -68,30 +68,54 @@
         </a>
         <?php endif; ?>
 
-        <!-- Modul SSH & SBU (Standar Satuan Harga & Standar Biaya Umum) -->
-        <div class="nav-section">Standar Harga (SSH/SBU)</div>
+        <!-- ========== MODUL 1: STANDAR SATUAN HARGA (SSH) ========== -->
+        <div class="nav-section">Standar Satuan Harga (SSH)</div>
 
         <?php if (in_array($user->role, ['operator_skpd', 'skpd', 'admin'])): ?>
         <a href="<?= site_url('ssh/usulan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && in_array($this->uri->segment(2), ['usulan', 'tambah', 'edit'])) ? 'active' : '' ?>">
-            <i class="bi bi-file-earmark-plus-fill"></i> <span>Usulan SKPD</span>
+            <i class="bi bi-box-seam-fill"></i> <span>Usulan SSH</span>
         </a>
         <?php endif; ?>
 
         <?php if (in_array($user->role, ['verifikator', 'admin'])): ?>
         <a href="<?= site_url('ssh/verifikasi') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'verifikasi') ? 'active' : '' ?>">
-            <i class="bi bi-patch-check-fill"></i> <span>Verifikasi Usulan</span>
+            <i class="bi bi-patch-check-fill"></i> <span>Verifikasi SSH</span>
         </a>
         <?php endif; ?>
 
         <?php if (in_array($user->role, ['penetap', 'pimpinan', 'admin'])): ?>
         <a href="<?= site_url('ssh/penetapan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'penetapan') ? 'active' : '' ?>">
-            <i class="bi bi-award-fill"></i> <span>Penetapan Harga</span>
+            <i class="bi bi-award-fill"></i> <span>Penetapan SSH</span>
         </a>
         <?php endif; ?>
 
-        <!-- Master Data SSH/SBU (SEMUA ROLE) -->
         <a href="<?= site_url('ssh/master_data') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'master_data') ? 'active' : '' ?>">
-            <i class="bi bi-journal-bookmark-fill"></i> <span>Master Data</span>
+            <i class="bi bi-journal-check"></i> <span>Master Data SSH</span>
+        </a>
+
+        <!-- ========== MODUL 2: STANDAR BIAYA UMUM (SBU) ========== -->
+        <div class="nav-section">Standar Biaya Umum (SBU)</div>
+
+        <?php if (in_array($user->role, ['operator_skpd', 'skpd', 'admin'])): ?>
+        <a href="<?= site_url('sbu/usulan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && in_array($this->uri->segment(2), ['usulan', 'tambah', 'edit'])) ? 'active' : '' ?>">
+            <i class="bi bi-receipt-cutoff"></i> <span>Usulan SBU</span>
+        </a>
+        <?php endif; ?>
+
+        <?php if (in_array($user->role, ['verifikator', 'admin'])): ?>
+        <a href="<?= site_url('sbu/verifikasi') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'verifikasi') ? 'active' : '' ?>">
+            <i class="bi bi-check2-circle"></i> <span>Verifikasi SBU</span>
+        </a>
+        <?php endif; ?>
+
+        <?php if (in_array($user->role, ['penetap', 'pimpinan', 'admin'])): ?>
+        <a href="<?= site_url('sbu/penetapan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'penetapan') ? 'active' : '' ?>">
+            <i class="bi bi-shield-check"></i> <span>Penetapan SBU</span>
+        </a>
+        <?php endif; ?>
+
+        <a href="<?= site_url('sbu/master_data') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'master_data') ? 'active' : '' ?>">
+            <i class="bi bi-journal-bookmark-fill"></i> <span>Master Data SBU</span>
         </a>
 
         <div class="nav-section">Laporan</div>

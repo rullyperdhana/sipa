@@ -544,30 +544,69 @@ class Ssh_model extends CI_Model
     // 4. HELPER STATISTIK & KATEGORI
     // =========================================================================
 
-    public function getKategoriList()
+    public function getKategoriList($tipe = NULL)
+    {
+        if ($tipe === 'SSH') return $this->getKategoriSsh();
+        if ($tipe === 'SBU') return $this->getKategoriSbu();
+        return array_merge($this->getKategoriSsh(), $this->getKategoriSbu());
+    }
+
+    public function getKategoriSsh()
     {
         return [
-            'Alat Tulis Kantor',
-            'Bahan Bangunan & Material',
+            'Alat Tulis Kantor (ATK) & Kertas',
             'Peralatan Komputer & Elektronik',
+            'Bahan Bangunan & Material Konstruksi',
             'Kendaraan & Alat Angkutan',
             'Alat Kedokteran & Kesehatan',
-            'Alat Laboratorium',
+            'Obat-obatan & Perbekalan Medis',
+            'Alat Laboratorium & Penelitian',
             'Buku & Bahan Pustaka',
-            'Honorarium & Jasa Tenaga Ahli',
-            'Jasa Konsultansi',
-            'Sewa Gedung & Perlengkapan',
-            'Pemeliharaan Sarana & Prasarana',
+            'Peralatan Listrik & Mekanikal',
+            'Perlengkapan Rumah Tangga & Kantor',
+            'Bibit, Pupuk & Perlengkapan Pertanian',
             'Lainnya'
         ];
     }
 
-    public function getSatuanList()
+    public function getKategoriSbu()
+    {
+        return [
+            'Honorarium Narasumber / Pakar / Praktisi',
+            'Honorarium Panitia Pelaksana / Tim Kerja',
+            'Honorarium Rohaniwan / Pembaca Doa',
+            'Jasa Tenaga Ahli / Konsultansi',
+            'Jasa Tenaga Non-ASN / Kebersihan / Keamanan',
+            'Biaya Perjalanan Dinas (Uang Harian / Uang Saku)',
+            'Biaya Transportasi & Akomodasi',
+            'Sewa Gedung / Ruang Pertemuan',
+            'Sewa Kendaraan Operasional',
+            'Konsumsi Rapat & Jamuan Acara',
+            'Publikasi, Dokumentasi & Sosialisasi',
+            'Lainnya'
+        ];
+    }
+
+    public function getSatuanList($tipe = NULL)
+    {
+        if ($tipe === 'SSH') return $this->getSatuanSsh();
+        if ($tipe === 'SBU') return $this->getSatuanSbu();
+        return array_merge($this->getSatuanSsh(), $this->getSatuanSbu());
+    }
+
+    public function getSatuanSsh()
     {
         return [
             'Unit', 'Buah', 'Rim', 'Dus', 'Kotak', 'Paket', 'Set',
-            'Meter', 'M2', 'M3', 'Kg', 'Ton', 'Liter', 'Sak',
-            'Orang/Bulan', 'Orang/Hari', 'Orang/Jam', 'Kegiatan', 'Titik', 'Bulan', 'Tahun'
+            'Lembar', 'Rol', 'Meter', 'M2', 'M3', 'Kg', 'Ton', 'Liter', 'Sak', 'Batang', 'Kaleng', 'Botol'
+        ];
+    }
+
+    public function getSatuanSbu()
+    {
+        return [
+            'Orang/Bulan (OB)', 'Orang/Hari (OH)', 'Orang/Jam (OJ)', 'Orang/Tahun (OT)',
+            'Orang/Kegiatan (OK)', 'Orang/Paket (OP)', 'Jam', 'Hari', 'Bulan', 'Tahun', 'Kegiatan', 'Kali', 'Titik', 'Hari/Orang'
         ];
     }
 
@@ -589,12 +628,12 @@ class Ssh_model extends CI_Model
         return $prefix . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
     }
 
-    public function getSummaryCounts($user)
+    public function getSummaryCounts($user, $tipe = NULL)
     {
         $role = $user->role;
         $skpdId = (int) $user->skpd_id;
 
-        $query = $this->db->select("
+        $this->db->select("
             COUNT(CASE WHEN status_proses = 'Draft' THEN 1 END) as draft,
             COUNT(CASE WHEN status_proses = 'Diajukan' THEN 1 END) as diajukan,
             COUNT(CASE WHEN status_proses = 'Direvisi' THEN 1 END) as direvisi,
@@ -604,9 +643,13 @@ class Ssh_model extends CI_Model
         ");
 
         if (in_array($role, ['operator_skpd', 'skpd'], TRUE)) {
-            $query->where('id_skpd', $skpdId);
+            $this->db->where('id_skpd', $skpdId);
         }
 
-        return $query->get($this->table)->row();
+        if (!empty($tipe)) {
+            $this->db->where('tipe', $tipe);
+        }
+
+        return $this->db->get($this->table)->row();
     }
 }

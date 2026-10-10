@@ -1,17 +1,31 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
+<?php
+$tipe = $tipe ?? 'SSH';
+$isSbu = ($tipe === 'SBU');
+$prefixUrl = $prefixUrl ?? strtolower($tipe);
+$modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
+?>
+
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1 class="page-title"><i class="bi bi-patch-check-fill text-primary me-2"></i>Verifikasi Usulan SSH & SBU</h1>
-        <p class="page-subtitle text-muted mb-0">Verifikasi dan telaah usulan standar satuan harga dari seluruh SKPD sebelum diajukan ke penetapan.</p>
+        <h1 class="page-title">
+            <i class="bi <?= $isSbu ? 'bi-check2-circle text-info' : 'bi-patch-check-fill text-primary' ?> me-2"></i>
+            Verifikasi Usulan <?= $modTitle ?>
+        </h1>
+        <p class="page-subtitle text-muted mb-0">
+            <?= $isSbu 
+                ? 'Verifikasi dan telaah usulan standar honorarium, jasa tenaga ahli, dan sewa dari seluruh SKPD sebelum diajukan ke penetapan.' 
+                : 'Verifikasi dan telaah usulan standar harga satuan barang dan material fisik dari seluruh SKPD sebelum diajukan ke penetapan.' ?>
+        </p>
     </div>
 </div>
 
 <!-- Card Filter & Search -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
-        <form method="get" action="<?= site_url('ssh/verifikasi') ?>" class="row g-2 align-items-end">
-            <div class="col-md-2">
+        <form method="get" action="<?= site_url("{$prefixUrl}/verifikasi") ?>" class="row g-2 align-items-end">
+            <div class="col-md-3">
                 <label class="form-label small fw-semibold text-muted mb-1">Status Usulan</label>
                 <select class="form-select form-select-sm" name="status">
                     <option value="Diajukan" <?= ($filter['status_proses'] ?? '') === 'Diajukan' ? 'selected' : '' ?>>Menunggu Verifikasi (Diajukan)</option>
@@ -32,22 +46,23 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label small fw-semibold text-muted mb-1">Tipe</label>
-                <select class="form-select form-select-sm" name="tipe">
-                    <option value="">Semua Tipe</option>
-                    <option value="SSH" <?= ($filter['tipe'] ?? '') === 'SSH' ? 'selected' : '' ?>>SSH</option>
-                    <option value="SBU" <?= ($filter['tipe'] ?? '') === 'SBU' ? 'selected' : '' ?>>SBU</option>
+                <label class="form-label small fw-semibold text-muted mb-1">Kategori <?= $tipe ?></label>
+                <select class="form-select form-select-sm" name="kategori">
+                    <option value="">Semua Kategori</option>
+                    <?php foreach ($kategori as $kat): ?>
+                    <option value="<?= e($kat) ?>" <?= ($filter['kategori'] ?? '') === $kat ? 'selected' : '' ?>><?= e($kat) ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label small fw-semibold text-muted mb-1">Cari Keyword</label>
-                <input type="text" name="q" class="form-control form-control-sm" value="<?= e($filter['q'] ?? '') ?>" placeholder="Kode usulan, uraian barang...">
+                <input type="text" name="q" class="form-control form-control-sm" value="<?= e($filter['q'] ?? '') ?>" placeholder="Kode usulan, uraian...">
             </div>
             <div class="col-md-2 d-flex gap-1">
-                <button type="submit" class="btn btn-sm btn-primary flex-fill">
+                <button type="submit" class="btn btn-sm <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> flex-fill">
                     <i class="bi bi-funnel me-1"></i> Filter
                 </button>
-                <a href="<?= site_url('ssh/verifikasi') ?>" class="btn btn-sm btn-outline-secondary" title="Reset filter">
+                <a href="<?= site_url("{$prefixUrl}/verifikasi") ?>" class="btn btn-sm btn-outline-secondary" title="Reset filter">
                     <i class="bi bi-arrow-clockwise"></i>
                 </a>
             </div>
@@ -58,8 +73,11 @@
 <!-- Tabel Antrean Verifikasi -->
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h6 class="card-title mb-0 fw-bold"><i class="bi bi-list-check me-2 text-primary"></i>Antrean Usulan untuk Diverifikasi</h6>
-        <span class="badge bg-primary"><?= count($list) ?> Usulan</span>
+        <h6 class="card-title mb-0 fw-bold">
+            <i class="bi bi-list-check me-2 <?= $isSbu ? 'text-info' : 'text-primary' ?>"></i>
+            Antrean Usulan <?= $tipe ?> untuk Diverifikasi
+        </h6>
+        <span class="badge <?= $isSbu ? 'bg-info' : 'bg-primary' ?>"><?= count($list) ?> Usulan</span>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -69,7 +87,7 @@
                         <th width="40" class="text-center">#</th>
                         <th>Kode Usulan</th>
                         <th>SKPD Pengusul</th>
-                        <th>Uraian & Spesifikasi</th>
+                        <th><?= $isSbu ? 'Uraian Biaya / Ketentuan' : 'Uraian Barang & Spesifikasi' ?></th>
                         <th class="text-center">Satuan</th>
                         <th class="text-end">Harga Usulan</th>
                         <th class="text-center">Lampiran</th>
@@ -82,7 +100,7 @@
                     <tr>
                         <td colspan="9" class="text-center py-5 text-muted">
                             <i class="bi bi-check-circle fs-1 d-block mb-2 text-success"></i>
-                            <span class="fw-semibold">Tidak ada usulan yang menunggu verifikasi saat ini.</span>
+                            <span class="fw-semibold">Tidak ada usulan <?= $tipe ?> yang menunggu verifikasi saat ini.</span>
                         </td>
                     </tr>
                     <?php else: foreach ($list as $idx => $row): ?>
@@ -90,10 +108,7 @@
                         <td class="text-center text-muted small"><?= $idx + 1 ?></td>
                         <td>
                             <strong class="font-monospace text-dark"><?= e($row->kode_usulan) ?></strong>
-                            <div class="small">
-                                <span class="badge bg-secondary-subtle text-secondary border"><?= e($row->tipe) ?></span>
-                                <span class="text-muted ms-1"><?= e($row->kategori) ?></span>
-                            </div>
+                            <div class="small text-muted"><?= e($row->kategori) ?></div>
                         </td>
                         <td>
                             <strong class="text-dark d-block"><?= e($row->nama_skpd) ?></strong>
@@ -113,7 +128,7 @@
                         </td>
                         <td class="text-center">
                             <?php if (!empty($row->file_lampiran)): ?>
-                            <a href="<?= site_url('ssh/download/' . $row->id) ?>" class="btn btn-sm btn-outline-primary" title="<?= e($row->file_nama_asli ?: 'Unduh Dokumen') ?>">
+                            <a href="<?= site_url("{$prefixUrl}/download/{$row->id}") ?>" class="btn btn-sm btn-outline-primary" title="<?= e($row->file_nama_asli ?: 'Unduh Dokumen') ?>">
                                 <i class="bi bi-paperclip"></i>
                             </a>
                             <?php else: ?>
@@ -132,6 +147,7 @@
                                         data-kode="<?= e($row->kode_usulan) ?>"
                                         data-uraian="<?= e($row->uraian) ?>"
                                         data-harga="<?= (float)$row->harga_usulan ?>"
+                                        data-prefix="<?= $prefixUrl ?>"
                                         title="Setujui usulan dan teruskan ke penetapan">
                                     <i class="bi bi-check-lg me-1"></i> Setujui
                                 </button>
@@ -140,15 +156,16 @@
                                         data-id="<?= $row->id ?>" 
                                         data-kode="<?= e($row->kode_usulan) ?>"
                                         data-uraian="<?= e($row->uraian) ?>"
+                                        data-prefix="<?= $prefixUrl ?>"
                                         title="Kembalikan usulan ke SKPD dengan catatan perbaikan">
                                     <i class="bi bi-arrow-repeat me-1"></i> Revisi
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" title="Lihat detail">
+                                <button type="button" class="btn btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Lihat detail">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
                             <?php else: ?>
-                            <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>">
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>">
                                 <i class="bi bi-eye me-1"></i> Detail
                             </button>
                             <?php endif; ?>
@@ -166,14 +183,14 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title fw-bold" id="modalSetujuiLabel"><i class="bi bi-check-circle-fill me-2"></i>Setujui Usulan Standar Harga</h5>
+                <h5 class="modal-title fw-bold" id="modalSetujuiLabel"><i class="bi bi-check-circle-fill me-2"></i>Setujui Usulan <?= $tipe ?></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formSetujuiUsulan" method="post" action="">
                 <?= csrf_input() ?>
                 <input type="hidden" name="aksi" value="setujui">
                 <div class="modal-body">
-                    <p class="mb-2">Anda akan menyetujui usulan <strong id="setujuiKode"></strong> (<span id="setujuiUraian"></span>) untuk diteruskan ke tahap <strong>Penetapan Harga</strong>.</p>
+                    <p class="mb-2">Anda akan menyetujui usulan <strong id="setujuiKode"></strong> (<span id="setujuiUraian"></span>) untuk diteruskan ke tahap <strong>Penetapan <?= $tipe ?></strong>.</p>
                     
                     <div class="mb-3">
                         <label for="setujuiHarga" class="form-label fw-semibold">Harga yang Disetujui / Ditetapkan (Rp)</label>
@@ -203,7 +220,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title fw-bold" id="modalRevisiLabel"><i class="bi bi-arrow-repeat me-2"></i>Kembalikan untuk Revisi</h5>
+                <h5 class="modal-title fw-bold" id="modalRevisiLabel"><i class="bi bi-arrow-repeat me-2"></i>Kembalikan Usulan <?= $tipe ?> untuk Revisi</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formRevisiUsulan" method="post" action="">
@@ -215,7 +232,7 @@
                     <div class="mb-3">
                         <label for="catatan_verifikator" class="form-label fw-semibold">Catatan Verifikator / Alasan Pengembalian <span class="text-danger">*</span></label>
                         <textarea class="form-control border-warning" id="catatan_verifikator" name="catatan_verifikator" rows="4" 
-                                  placeholder="Tuliskan secara jelas instruksi perbaikan (contoh: Lampirkan bukti survey harga distributor resmi, lengkapi spesifikasi teknis, sesuaikan satuan, dll)..." required></textarea>
+                                  placeholder="<?= $isSbu ? 'Tuliskan catatan perbaikan (contoh: Lampirkan nota dinas telaahan staf, sesuaikan kualifikasi narasumber, sesuaikan dengan tarif PMK/Perbup)...' : 'Tuliskan catatan perbaikan (contoh: Lampirkan bukti survey harga 3 distributor resmi, lengkapi spesifikasi teknis barang, sesuaikan satuan)...' ?>" required></textarea>
                         <div class="form-text text-danger">Catatan ini akan tampil di dashboard SKPD sebagai panduan perbaikan.</div>
                     </div>
                 </div>
@@ -233,7 +250,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold"><i class="bi bi-info-circle-fill text-primary me-2"></i>Detail Usulan Standar Harga</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-info-circle-fill text-primary me-2"></i>Detail Usulan <?= $modTitle ?></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="modalDetailBody">

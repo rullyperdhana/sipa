@@ -1,13 +1,27 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
+<?php
+$tipe = $tipe ?? 'SSH';
+$isSbu = ($tipe === 'SBU');
+$prefixUrl = $prefixUrl ?? strtolower($tipe);
+$modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
+?>
+
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1 class="page-title"><i class="bi bi-journal-bookmark-fill text-primary me-2"></i>Master Data Standar Satuan Harga (SSH & SBU)</h1>
-        <p class="page-subtitle text-muted mb-0">Katalog resmi Standar Satuan Harga dan Standar Biaya Umum Pemerintah Kabupaten yang telah berstatus Ditetapkan (Read-Only).</p>
+        <h1 class="page-title">
+            <i class="bi <?= $isSbu ? 'bi-journal-bookmark-fill text-info' : 'bi-journal-check text-primary' ?> me-2"></i>
+            Master Data <?= $modTitle ?>
+        </h1>
+        <p class="page-subtitle text-muted mb-0">
+            <?= $isSbu 
+                ? 'Katalog resmi Standar Biaya Umum (Honorarium, Jasa, Sewa & Tarif) Pemerintah Kabupaten yang telah berstatus Ditetapkan (Read-Only).' 
+                : 'Katalog resmi Standar Satuan Harga (Barang, Peralatan & Material Fisik) Pemerintah Kabupaten yang telah berstatus Ditetapkan (Read-Only).' ?>
+        </p>
     </div>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-outline-primary" onclick="window.print()">
-            <i class="bi bi-printer me-1"></i> Cetak Katalog
+            <i class="bi bi-printer me-1"></i> Cetak Katalog <?= $tipe ?>
         </button>
     </div>
 </div>
@@ -15,10 +29,10 @@
 <!-- Card Filter & Search -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
-        <form method="get" action="<?= site_url('ssh/master_data') ?>" class="row g-2 align-items-end">
+        <form method="get" action="<?= site_url("{$prefixUrl}/master_data") ?>" class="row g-2 align-items-end">
             <!-- Filter Kategori -->
-            <div class="col-md-3">
-                <label class="form-label small fw-semibold text-muted mb-1">Filter Kategori</label>
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold text-muted mb-1">Filter Kategori <?= $tipe ?></label>
                 <select class="form-select form-select-sm" name="kategori">
                     <option value="">Semua Kategori</option>
                     <?php foreach ($kategori as $kat): ?>
@@ -42,19 +56,9 @@
                 </select>
             </div>
 
-            <!-- Filter Tipe -->
-            <div class="col-md-2">
-                <label class="form-label small fw-semibold text-muted mb-1">Tipe</label>
-                <select class="form-select form-select-sm" name="tipe">
-                    <option value="">Semua (SSH & SBU)</option>
-                    <option value="SSH" <?= ($filter['tipe'] ?? '') === 'SSH' ? 'selected' : '' ?>>SSH</option>
-                    <option value="SBU" <?= ($filter['tipe'] ?? '') === 'SBU' ? 'selected' : '' ?>>SBU</option>
-                </select>
-            </div>
-
             <!-- Pencarian (Search) -->
-            <div class="col-md-3">
-                <label class="form-label small fw-semibold text-muted mb-1">Pencarian Barang / Spesifikasi</label>
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold text-muted mb-1">Pencarian <?= $isSbu ? 'Biaya / Jasa' : 'Barang' ?></label>
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
                     <input type="text" name="q" class="form-control" value="<?= e($filter['q'] ?? '') ?>" placeholder="Ketik kata kunci pencarian...">
@@ -63,10 +67,10 @@
 
             <!-- Tombol Filter & Reset -->
             <div class="col-md-1 d-flex gap-1">
-                <button type="submit" class="btn btn-sm btn-primary w-100" title="Terapkan Filter">
+                <button type="submit" class="btn btn-sm <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> w-100" title="Terapkan Filter">
                     <i class="bi bi-funnel"></i>
                 </button>
-                <a href="<?= site_url('ssh/master_data') ?>" class="btn btn-sm btn-outline-secondary" title="Reset Filter">
+                <a href="<?= site_url("{$prefixUrl}/master_data") ?>" class="btn btn-sm btn-outline-secondary" title="Reset Filter">
                     <i class="bi bi-arrow-clockwise"></i>
                 </a>
             </div>
@@ -78,7 +82,10 @@
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <div>
-            <h6 class="card-title mb-0 fw-bold"><i class="bi bi-table me-2 text-primary"></i>Katalog Standar Harga Resmi</h6>
+            <h6 class="card-title mb-0 fw-bold">
+                <i class="bi bi-table me-2 <?= $isSbu ? 'text-info' : 'text-primary' ?>"></i>
+                Katalog Resmi <?= $modTitle ?>
+            </h6>
             <small class="text-muted">Data bersifat read-only untuk pedoman penyusunan anggaran seluruh perangkat daerah.</small>
         </div>
         <span class="badge bg-success py-2 px-3"><i class="bi bi-check-circle me-1"></i><?= count($list) ?> Item Ditetapkan</span>
@@ -90,12 +97,11 @@
                     <tr>
                         <th width="40" class="text-center">#</th>
                         <th>Kode Standar</th>
-                        <th>Tipe</th>
                         <th>Kategori</th>
-                        <th>Uraian Barang / Jasa</th>
-                        <th>Spesifikasi Teknis</th>
+                        <th><?= $isSbu ? 'Uraian Biaya / Honor / Jasa' : 'Uraian Barang Fisik' ?></th>
+                        <th><?= $isSbu ? 'Ketentuan & Kualifikasi' : 'Spesifikasi Teknis' ?></th>
                         <th class="text-center">Satuan</th>
-                        <th class="text-end">Harga Ditetapkan (Rp)</th>
+                        <th class="text-end"><?= $isSbu ? 'Tarif Ditetapkan (Rp)' : 'Harga Ditetapkan (Rp)' ?></th>
                         <th>SKPD Pengusul</th>
                         <th class="text-center" width="90">Detail</th>
                     </tr>
@@ -103,9 +109,9 @@
                 <tbody>
                     <?php if (empty($list)): ?>
                     <tr>
-                        <td colspan="10" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <i class="bi bi-journal-x fs-1 d-block mb-2 text-secondary"></i>
-                            <span class="fw-semibold">Tidak ada data standar harga yang sesuai dengan kriteria pencarian/filter.</span>
+                            <span class="fw-semibold">Tidak ada data <?= $tipe ?> yang sesuai dengan kriteria pencarian/filter.</span>
                         </td>
                     </tr>
                     <?php else: foreach ($list as $idx => $row): ?>
@@ -114,11 +120,6 @@
                         <td>
                             <strong class="font-monospace text-dark"><?= e($row->kode_usulan) ?></strong>
                             <div class="small text-muted">TA <?= (int)$row->tahun_anggaran ?></div>
-                        </td>
-                        <td>
-                            <span class="badge <?= $row->tipe === 'SSH' ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-info-subtle text-info border border-info-subtle' ?>">
-                                <?= e($row->tipe) ?>
-                            </span>
                         </td>
                         <td>
                             <span class="badge bg-light text-secondary border"><?= e($row->kategori) ?></span>
@@ -141,7 +142,7 @@
                             <?= e($row->nama_skpd) ?>
                         </td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-sm btn-outline-primary btn-detail-ssh" data-id="<?= $row->id ?>" title="Lihat detail spesifikasi">
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Lihat detail spesifikasi">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </td>
@@ -158,7 +159,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold"><i class="bi bi-info-circle-fill text-primary me-2"></i>Detail Standar Satuan Harga Resmi</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-info-circle-fill text-primary me-2"></i>Detail <?= $modTitle ?></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="modalDetailBody">

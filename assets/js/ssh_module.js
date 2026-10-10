@@ -29,7 +29,8 @@
          * @returns {Promise}
          */
         changeStatus: function (id, targetStatus, extraData = {}) {
-            const url = (window.appConfig ? window.appConfig.baseUrl : '/') + 'ssh/api/transisi';
+            const prefix = extraData.prefix || 'ssh';
+            const url = (window.appConfig ? window.appConfig.baseUrl : '/') + prefix + '/api/transisi';
             const csrfName = window.appConfig ? window.appConfig.csrfName : 'csrf_test_name';
             const csrfHash = window.appConfig ? window.appConfig.csrfHash : '';
 
@@ -64,10 +65,11 @@
         /**
          * Ambil detail data usulan & riwayat audit log
          * @param {number} id
+         * @param {string} prefix
          * @returns {Promise}
          */
-        getDetail: function (id) {
-            const url = (window.appConfig ? window.appConfig.baseUrl : '/') + 'ssh/detail/' + id;
+        getDetail: function (id, prefix = 'ssh') {
+            const url = (window.appConfig ? window.appConfig.baseUrl : '/') + prefix + '/detail/' + id;
             return $.getJSON(url);
         }
     };
@@ -235,9 +237,10 @@
             const id = $(this).data('id');
             const kode = $(this).data('kode');
             const uraian = $(this).data('uraian');
+            const prefix = $(this).data('prefix') || 'ssh';
 
             const confirmAction = function () {
-                SshModule.api.changeStatus(id, 'Diajukan')
+                SshModule.api.changeStatus(id, 'Diajukan', { prefix: prefix })
                     .done(function (res) {
                         if (res.success) {
                             Swal.fire({
@@ -289,8 +292,9 @@
             const kode = $(this).data('kode');
             const uraian = $(this).data('uraian');
             const harga = $(this).data('harga');
+            const prefix = $(this).data('prefix') || 'ssh';
 
-            $('#formSetujuiUsulan').attr('action', (window.appConfig ? window.appConfig.baseUrl : '/') + 'ssh/proses-verifikasi/' + id);
+            $('#formSetujuiUsulan').attr('action', (window.appConfig ? window.appConfig.baseUrl : '/') + prefix + '/proses-verifikasi/' + id);
             $('#setujuiKode').text(kode);
             $('#setujuiUraian').text(uraian);
             $('#setujuiHarga').val(SshModule.helpers.formatRupiah(harga));
@@ -305,8 +309,9 @@
             const id = $(this).data('id');
             const kode = $(this).data('kode');
             const uraian = $(this).data('uraian');
+            const prefix = $(this).data('prefix') || 'ssh';
 
-            $('#formRevisiUsulan').attr('action', (window.appConfig ? window.appConfig.baseUrl : '/') + 'ssh/proses-verifikasi/' + id);
+            $('#formRevisiUsulan').attr('action', (window.appConfig ? window.appConfig.baseUrl : '/') + prefix + '/proses-verifikasi/' + id);
             $('#revisiKode').text(kode);
             $('#revisiUraian').text(uraian);
             $('#catatan_verifikator').val('');
@@ -347,6 +352,7 @@
         // ---------------------------------------------------------------------
         $(document).on('click', '.btn-detail-ssh', function () {
             const id = $(this).data('id');
+            const prefix = $(this).data('prefix') || 'ssh';
             const modalEl = document.getElementById('modalDetailSsh');
             const $modalBody = $('#modalDetailBody');
 
@@ -355,7 +361,7 @@
             $modalBody.html('<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>');
             modal.show();
 
-            SshModule.api.getDetail(id).done(function (data) {
+            SshModule.api.getDetail(id, prefix).done(function (data) {
                 const item = data.item;
                 const logs = data.logs || [];
 

@@ -2,14 +2,14 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Controller Ssh
- * Modul Standar Satuan Harga (SSH) untuk standarisasi harga satuan barang & material fisik.
+ * Controller Sbu
+ * Modul Standar Biaya Umum (SBU) untuk standarisasi honorarium, jasa, sewa, dan tarif belanja non-fisik.
  */
-class Ssh extends Auth_Controller
+class Sbu extends Auth_Controller
 {
-    protected $tipe = 'SSH';
-    protected $prefixUrl = 'ssh';
-    protected $moduleTitle = 'Standar Satuan Harga (SSH)';
+    protected $tipe = 'SBU';
+    protected $prefixUrl = 'sbu';
+    protected $moduleTitle = 'Standar Biaya Umum (SBU)';
 
     public function __construct()
     {
@@ -26,13 +26,13 @@ class Ssh extends Auth_Controller
     {
         $role = $this->currentUser->role;
         if (in_array($role, ['operator_skpd', 'skpd'], TRUE)) {
-            redirect('ssh/usulan');
+            redirect('sbu/usulan');
         } elseif ($role === 'verifikator') {
-            redirect('ssh/verifikasi');
+            redirect('sbu/verifikasi');
         } elseif (in_array($role, ['penetap', 'pimpinan'], TRUE)) {
-            redirect('ssh/penetapan');
+            redirect('sbu/penetapan');
         } else {
-            redirect('ssh/master_data');
+            redirect('sbu/master_data');
         }
     }
 
@@ -45,7 +45,7 @@ class Ssh extends Auth_Controller
         $this->_restrictRoles(['operator_skpd', 'skpd', 'admin']);
 
         $filter = [
-            'tipe'          => 'SSH',
+            'tipe'          => 'SBU',
             'status_proses' => $this->input->get('status', TRUE),
             'kategori'      => $this->input->get('kategori', TRUE),
             'tahun'         => $this->input->get('tahun', TRUE),
@@ -65,7 +65,7 @@ class Ssh extends Auth_Controller
             'list'        => $this->ssh_model->getUsulanBySkpd($skpdId, $filter),
             'summary'     => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
             'filter'      => $filter,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
+            'kategori'    => $this->ssh_model->getKategoriSbu(),
             'skpdList'    => ($this->currentUser->role === 'admin') ? $this->master_model->getAllSkpd() : []
         ];
 
@@ -75,7 +75,7 @@ class Ssh extends Auth_Controller
     }
 
     /**
-     * Form CRUD: Tambah Usulan SSH Baru
+     * Form CRUD: Tambah Usulan SBU Baru
      */
     public function tambah()
     {
@@ -83,22 +83,22 @@ class Ssh extends Auth_Controller
 
         if ($this->input->method() === 'post') {
             $post = $this->input->post();
-            $post['tipe'] = 'SSH';
+            $post['tipe'] = 'SBU';
 
             $validation = $this->ssh_service->validateInput($post);
             if (!$validation['isValid']) {
                 $this->session->set_flashdata('danger', implode('<br>', $validation['errors']));
-                redirect('ssh/tambah');
+                redirect('sbu/tambah');
             }
 
             $uploadResult = $this->ssh_service->handleFileUpload('file_lampiran');
             if (isset($uploadResult['error'])) {
                 $this->session->set_flashdata('danger', 'Gagal upload file: ' . $uploadResult['error']);
-                redirect('ssh/tambah');
+                redirect('sbu/tambah');
             }
 
             $postData = $validation['cleanData'];
-            $postData['tipe'] = 'SSH';
+            $postData['tipe'] = 'SBU';
             if ($uploadResult['hasFile']) {
                 $postData['file_lampiran']  = $uploadResult['fileName'];
                 $postData['file_nama_asli'] = $uploadResult['origName'];
@@ -106,11 +106,11 @@ class Ssh extends Auth_Controller
 
             $result = $this->ssh_model->insertUsulan($postData, $this->currentUser);
             if ($result['success']) {
-                $this->session->set_flashdata('success', "Usulan SSH <strong>{$result['kode_usulan']}</strong> berhasil dibuat dengan status <strong>Draft</strong>.");
-                redirect('ssh/usulan');
+                $this->session->set_flashdata('success', "Usulan SBU <strong>{$result['kode_usulan']}</strong> berhasil dibuat dengan status <strong>Draft</strong>.");
+                redirect('sbu/usulan');
             } else {
                 $this->session->set_flashdata('danger', 'Gagal menyimpan usulan.');
-                redirect('ssh/tambah');
+                redirect('sbu/tambah');
             }
         }
 
@@ -119,8 +119,8 @@ class Ssh extends Auth_Controller
             'tipe'        => $this->tipe,
             'prefixUrl'   => $this->prefixUrl,
             'moduleTitle' => $this->moduleTitle,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
-            'satuan'      => $this->ssh_model->getSatuanSsh()
+            'kategori'    => $this->ssh_model->getKategoriSbu(),
+            'satuan'      => $this->ssh_model->getSatuanSbu()
         ];
 
         $this->load->view('templates/header', $data);
@@ -129,41 +129,41 @@ class Ssh extends Auth_Controller
     }
 
     /**
-     * Form CRUD: Edit Usulan SSH
+     * Form CRUD: Edit Usulan SBU
      */
     public function edit($id)
     {
         $this->_restrictRoles(['operator_skpd', 'skpd', 'admin']);
 
         $item = $this->ssh_model->findWithRls($id, $this->currentUser);
-        if (!$item || $item->tipe !== 'SSH') {
-            $this->session->set_flashdata('danger', 'Data usulan SSH tidak ditemukan atau Anda tidak memiliki hak akses.');
-            redirect('ssh/usulan');
+        if (!$item || $item->tipe !== 'SBU') {
+            $this->session->set_flashdata('danger', 'Data usulan SBU tidak ditemukan atau Anda tidak memiliki hak akses.');
+            redirect('sbu/usulan');
         }
 
         if (!in_array($item->status_proses, ['Draft', 'Direvisi'], TRUE)) {
             $this->session->set_flashdata('danger', "Usulan berstatus '{$item->status_proses}' tidak dapat diedit karena sudah terkunci.");
-            redirect('ssh/usulan');
+            redirect('sbu/usulan');
         }
 
         if ($this->input->method() === 'post') {
             $post = $this->input->post();
-            $post['tipe'] = 'SSH';
+            $post['tipe'] = 'SBU';
 
             $validation = $this->ssh_service->validateInput($post);
             if (!$validation['isValid']) {
                 $this->session->set_flashdata('danger', implode('<br>', $validation['errors']));
-                redirect("ssh/edit/{$id}");
+                redirect("sbu/edit/{$id}");
             }
 
             $updateData = $validation['cleanData'];
-            $updateData['tipe'] = 'SSH';
+            $updateData['tipe'] = 'SBU';
 
             if (!empty($_FILES['file_lampiran']['name'])) {
                 $uploadResult = $this->ssh_service->handleFileUpload('file_lampiran');
                 if (isset($uploadResult['error'])) {
                     $this->session->set_flashdata('danger', 'Gagal upload file: ' . $uploadResult['error']);
-                    redirect("ssh/edit/{$id}");
+                    redirect("sbu/edit/{$id}");
                 }
                 if ($uploadResult['hasFile']) {
                     $updateData['file_lampiran']  = $uploadResult['fileName'];
@@ -174,21 +174,21 @@ class Ssh extends Auth_Controller
             $res = $this->ssh_model->updateUsulan($id, $updateData, $this->currentUser);
             if ($res['success']) {
                 $this->session->set_flashdata('success', $res['message']);
-                redirect('ssh/usulan');
+                redirect('sbu/usulan');
             } else {
                 $this->session->set_flashdata('danger', $res['message']);
-                redirect("ssh/edit/{$id}");
+                redirect("sbu/edit/{$id}");
             }
         }
 
         $data = [
-            'title'       => 'Edit Usulan SSH - ' . $item->kode_usulan,
+            'title'       => 'Edit Usulan SBU - ' . $item->kode_usulan,
             'tipe'        => $this->tipe,
             'prefixUrl'   => $this->prefixUrl,
             'moduleTitle' => $this->moduleTitle,
             'item'        => $item,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
-            'satuan'      => $this->ssh_model->getSatuanSsh()
+            'kategori'    => $this->ssh_model->getKategoriSbu(),
+            'satuan'      => $this->ssh_model->getSatuanSbu()
         ];
 
         $this->load->view('templates/header', $data);
@@ -201,7 +201,7 @@ class Ssh extends Auth_Controller
         $this->_restrictRoles(['operator_skpd', 'skpd', 'admin']);
         $res = $this->ssh_model->kirimUsulan($id, $this->currentUser);
         $this->session->set_flashdata($res['success'] ? 'success' : 'danger', $res['message']);
-        redirect('ssh/usulan');
+        redirect('sbu/usulan');
     }
 
     public function hapus($id)
@@ -209,11 +209,11 @@ class Ssh extends Auth_Controller
         $this->_restrictRoles(['operator_skpd', 'skpd', 'admin']);
         $res = $this->ssh_model->deleteUsulan($id, $this->currentUser);
         $this->session->set_flashdata($res['success'] ? 'success' : 'danger', $res['message']);
-        redirect('ssh/usulan');
+        redirect('sbu/usulan');
     }
 
     // =========================================================================
-    // 2. MENU: VERIFIKASI USULAN SSH (Role: verifikator, admin)
+    // 2. MENU: VERIFIKASI USULAN SBU (Role: verifikator, admin)
     // =========================================================================
 
     public function verifikasi()
@@ -221,7 +221,7 @@ class Ssh extends Auth_Controller
         $this->_restrictRoles(['verifikator', 'admin']);
 
         $filter = [
-            'tipe'          => 'SSH',
+            'tipe'          => 'SBU',
             'status_proses' => $this->input->get('status', TRUE) ?: 'Diajukan',
             'id_skpd'       => $this->input->get('skpd_id', TRUE),
             'kategori'      => $this->input->get('kategori', TRUE),
@@ -236,7 +236,7 @@ class Ssh extends Auth_Controller
             'moduleTitle' => $this->moduleTitle,
             'list'        => $this->ssh_model->getUsulanVerifikasi($filter),
             'filter'      => $filter,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
+            'kategori'    => $this->ssh_model->getKategoriSbu(),
             'skpdList'    => $this->master_model->getAllSkpd()
         ];
 
@@ -257,11 +257,11 @@ class Ssh extends Auth_Controller
 
         $res = $this->ssh_model->verifikasiUsulan($id, $aksi, $catatan, $hargaDitetapkan, $this->currentUser);
         $this->session->set_flashdata($res['success'] ? 'success' : 'danger', $res['message']);
-        redirect('ssh/verifikasi');
+        redirect('sbu/verifikasi');
     }
 
     // =========================================================================
-    // 3. MENU: PENETAPAN HARGA SSH (Role: penetap, pimpinan, admin)
+    // 3. MENU: PENETAPAN HARGA SBU (Role: penetap, pimpinan, admin)
     // =========================================================================
 
     public function penetapan()
@@ -269,7 +269,7 @@ class Ssh extends Auth_Controller
         $this->_restrictRoles(['penetap', 'pimpinan', 'admin']);
 
         $filter = [
-            'tipe'          => 'SSH',
+            'tipe'          => 'SBU',
             'status_proses' => $this->input->get('status', TRUE) ?: 'Diverifikasi',
             'id_skpd'       => $this->input->get('skpd_id', TRUE),
             'kategori'      => $this->input->get('kategori', TRUE),
@@ -284,7 +284,7 @@ class Ssh extends Auth_Controller
             'moduleTitle' => $this->moduleTitle,
             'list'        => $this->ssh_model->getUsulanPenetapan($filter),
             'filter'      => $filter,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
+            'kategori'    => $this->ssh_model->getKategoriSbu(),
             'skpdList'    => $this->master_model->getAllSkpd()
         ];
 
@@ -300,17 +300,17 @@ class Ssh extends Auth_Controller
 
         $res = $this->ssh_model->tetapkanUsulan($id, $this->currentUser);
         $this->session->set_flashdata($res['success'] ? 'success' : 'danger', $res['message']);
-        redirect('ssh/penetapan');
+        redirect('sbu/penetapan');
     }
 
     // =========================================================================
-    // 4. MENU: MASTER DATA SSH (Role: SEMUA PENGGUNA)
+    // 4. MENU: MASTER DATA SBU (Role: SEMUA PENGGUNA)
     // =========================================================================
 
     public function master_data()
     {
         $filter = [
-            'tipe'     => 'SSH',
+            'tipe'     => 'SBU',
             'kategori' => $this->input->get('kategori', TRUE),
             'id_skpd'  => $this->input->get('skpd_id', TRUE),
             'tahun'    => $this->input->get('tahun', TRUE),
@@ -324,7 +324,7 @@ class Ssh extends Auth_Controller
             'moduleTitle' => $this->moduleTitle,
             'list'        => $this->ssh_model->getMasterData($filter),
             'filter'      => $filter,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
+            'kategori'    => $this->ssh_model->getKategoriSbu(),
             'skpdList'    => $this->master_model->getAllSkpd()
         ];
 
@@ -374,7 +374,7 @@ class Ssh extends Auth_Controller
         $filePath = FCPATH . 'uploads/ssh_sbu/' . $item->file_lampiran;
         if (!file_exists($filePath)) {
             $this->session->set_flashdata('danger', 'File lampiran tidak ditemukan di server.');
-            redirect($this->agent->referrer() ?: 'ssh/master_data');
+            redirect($this->agent->referrer() ?: 'sbu/master_data');
         }
 
         $this->load->helper('download');
