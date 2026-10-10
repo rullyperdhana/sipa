@@ -527,6 +527,8 @@ class Sbu extends Auth_Controller
         $logs = $this->ssh_model->getLogs($id);
 
         if ($this->input->is_ajax_request()) {
+            $item->harga_usulan_formatted = rupiah($item->harga_usulan);
+            $item->harga_ditetapkan_formatted = ($item->harga_ditetapkan !== NULL && $item->harga_ditetapkan !== '') ? rupiah($item->harga_ditetapkan) : NULL;
             return $this->output
                 ->set_content_type('application/json')
                 ->set_output(json_encode(['item' => $item, 'logs' => $logs]));

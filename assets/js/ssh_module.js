@@ -83,6 +83,21 @@
          * Format angka ke string rupiah (Contoh: 1500000 -> 1.500.000)
          */
         formatRupiah: function (angka) {
+            if (angka === null || angka === undefined || angka === '') return '0';
+
+            // Jika input berupa string dari database format desimal standard (contoh "13500000.00" atau "25000.00")
+            if (typeof angka === 'string') {
+                angka = angka.trim();
+                if (/^-?\d+(\.\d+)?$/.test(angka)) {
+                    angka = parseFloat(angka);
+                }
+            }
+
+            if (typeof angka === 'number') {
+                if (isNaN(angka)) return '0';
+                return Math.round(angka).toLocaleString('id-ID');
+            }
+
             let numberString = angka.toString().replace(/[^,\d]/g, '');
             let split = numberString.split(',');
             let sisa = split[0].length % 3;
@@ -101,8 +116,16 @@
          * Parse string Rupiah ke float murni
          */
         parseRupiah: function (rupiahStr) {
-            if (!rupiahStr) return 0;
-            let cleaned = rupiahStr.toString().replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.]/g, '');
+            if (rupiahStr === null || rupiahStr === undefined || rupiahStr === '') return 0;
+            if (typeof rupiahStr === 'number') return rupiahStr;
+
+            let s = rupiahStr.toString().trim();
+            // Jika format desimal murni dari DB (misal "13500000.00")
+            if (/^-?\d+(\.\d+)?$/.test(s)) {
+                return parseFloat(s) || 0;
+            }
+
+            let cleaned = s.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.-]/g, '');
             let val = parseFloat(cleaned);
             return isNaN(val) ? 0 : val;
         },
@@ -402,8 +425,8 @@
                                 <tr><th class="text-muted">Uraian Item</th><td class="fw-bold">${item.uraian}</td></tr>
                                 <tr><th class="text-muted align-top">Spesifikasi</th><td class="bg-light p-2 rounded small text-secondary" style="white-space: pre-line;">${item.spesifikasi}</td></tr>
                                 <tr><th class="text-muted">Satuan</th><td><span class="badge bg-light text-dark border">${item.satuan}</span></td></tr>
-                                <tr><th class="text-muted">Harga Usulan</th><td class="fw-bold text-dark">Rp ${SshModule.helpers.formatRupiah(item.harga_usulan)}</td></tr>
-                                ${item.harga_ditetapkan ? `<tr><th class="text-success">Harga Ditetapkan</th><td class="fw-bold text-success fs-6">Rp ${SshModule.helpers.formatRupiah(item.harga_ditetapkan)}</td></tr>` : ''}
+                                <tr><th class="text-muted">Harga Usulan</th><td class="fw-bold text-dark">${item.harga_usulan_formatted || ('Rp ' + SshModule.helpers.formatRupiah(item.harga_usulan))}</td></tr>
+                                ${item.harga_ditetapkan ? `<tr><th class="text-success">Harga Ditetapkan</th><td class="fw-bold text-success fs-6">${item.harga_ditetapkan_formatted || ('Rp ' + SshModule.helpers.formatRupiah(item.harga_ditetapkan))}</td></tr>` : ''}
                                 <tr><th class="text-muted">Status Proses</th><td><span class="badge bg-primary">${item.status_proses}</span></td></tr>
                                 ${item.catatan_verifikator ? `<tr><th class="text-warning align-top">Catatan</th><td><div class="alert alert-warning py-1 px-2 small mb-0">${item.catatan_verifikator}</div></td></tr>` : ''}
                             </table>
