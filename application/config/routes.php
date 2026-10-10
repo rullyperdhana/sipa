@@ -61,10 +61,12 @@ $route['sbu/download/(:num)']               = 'sbu/download_lampiran/$1';
 $route['sbu/api/transisi']                  = 'sbu/api_transisi_status';
 
 // ===== Master Data =====
-$route['master/skpd']    = 'master/skpd';
-$route['master/barang']  = 'master/barang';
-$route['master/periode'] = 'master/periode';
-$route['master/user']    = 'master/user';
+$route['master/skpd']         = 'master/skpd';
+$route['master/barang']       = 'master/barang';
+$route['master/periode']      = 'master/periode';
+$route['master/user']         = 'master/user';
+$route['master/akun_belanja'] = 'master/akun_belanja';
+$route['master/akun']         = 'master/akun_belanja';
 
 // ===== Laporan =====
 $route['laporan']                     = 'laporan/index';
@@ -77,7 +79,8 @@ $route['profile/update']    = 'user/update_profile';
 $route['profile/password']  = 'user/change_password';
 
 // ===== AJAX Endpoints =====
-$route['ajax/barang/search']    = 'ajax/search_barang';
-$route['ajax/bmd/search']       = 'ajax/search_bmd';
-$route['ajax/notif/list']       = 'ajax/notifikasi';
-$route['ajax/notif/read/(:num)']= 'ajax/baca_notif/$1';
+$route['ajax/barang/search']       = 'ajax/search_barang';
+$route['ajax/bmd/search']          = 'ajax/search_bmd';
+$route['ajax/akun_belanja/search'] = 'ajax/search_akun_belanja';
+$route['ajax/notif/list']          = 'ajax/notifikasi';
+$route['ajax/notif/read/(:num)']   = 'ajax/baca_notif/$1';

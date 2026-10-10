@@ -6,7 +6,7 @@ class Master extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(['master_model', 'user_model']);
+        $this->load->model(['master_model', 'user_model', 'akun_model']);
     }
 
     // ==================== SKPD ====================
@@ -311,6 +311,95 @@ class Master extends Admin_Controller
             $this->user_model->changePassword($id, $newPassword);
             $this->logger->record('reset_password', 'user', "Reset password user ID #{$id}");
             $this->session->set_flashdata('success', 'Password berhasil direset.');
+        }
+    }
+
+    // ==================== AKUN BELANJA (SIPD RI) ====================
+    public function akun_belanja()
+    {
+        $action = $this->input->post('action', TRUE);
+        if ($this->input->method() === 'post' && $action) {
+            $this->_handleAkunBelanja($action);
+            redirect('master/akun_belanja');
+        }
+
+        $filter = [];
+        if ($q = trim($this->input->get('q', TRUE) ?? '')) $filter['q'] = $q;
+        if ($kel = trim($this->input->get('kelompok', TRUE) ?? '')) $filter['kelompok'] = $kel;
+        if (($leaf = $this->input->get('is_leaf', TRUE)) !== null && $leaf !== '') $filter['is_leaf'] = (int) $leaf;
+        if (($lev = $this->input->get('level', TRUE)) !== null && $lev !== '') $filter['level'] = (int) $lev;
+
+        $page = max(1, (int) $this->input->get('page'));
+        $perPage = (int) ($this->input->get('per_page') ?: 25);
+        if (!in_array($perPage, [25, 50, 100])) $perPage = 25;
+        $offset = ($page - 1) * $perPage;
+
+        $totalRows = $this->akun_model->countAkunBelanja($filter);
+        $list = $this->akun_model->getAkunBelanja($filter, $perPage, $offset);
+        $stats = $this->akun_model->getStatistikBelanja();
+        $totalPages = ceil($totalRows / $perPage);
+
+        $data = [
+            'title'      => 'Master Data Akun Belanja SIPD RI',
+            'list'       => $list,
+            'filter'     => $filter,
+            'stats'      => $stats,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'offset'     => $offset,
+            'totalRows'  => $totalRows,
+            'totalPages' => $totalPages
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('master/akun_belanja', $data);
+        $this->load->view('templates/footer');
+    }
+
+    public function ajax_akun_belanja()
+    {
+        $q = $this->input->get('q', TRUE);
+        $leafOnly = $this->input->get('all') ? false : true;
+        $results = $this->akun_model->searchSelect2($q, $leafOnly, 30);
+        $this->output->set_content_type('application/json')
+            ->set_output(json_encode(['results' => $results]));
+    }
+
+    private function _handleAkunBelanja($action)
+    {
+        if ($action === 'save') {
+            $this->form_validation->set_rules('kode_akun', 'Kode Akun', 'required|max_length[50]');
+            $this->form_validation->set_rules('nama_akun', 'Nama Akun', 'required|max_length[500]');
+            if ($this->form_validation->run() === FALSE) {
+                $this->session->set_flashdata('danger', validation_errors());
+                return;
+            }
+
+            $id = (int) $this->input->post('id');
+            $kode = trim($this->input->post('kode_akun', TRUE));
+            $dots = substr_count($kode, '.');
+            $level = $dots + 1;
+
+            $data = [
+                'kode_akun' => $kode,
+                'nama_akun' => trim($this->input->post('nama_akun', TRUE)),
+                'kelompok'  => $this->input->post('kelompok', TRUE) ?: 'Belanja Operasi',
+                'level'     => $level,
+                'is_leaf'   => (int) $this->input->post('is_leaf'),
+                'is_active' => (int) $this->input->post('is_active')
+            ];
+
+            $this->akun_model->saveAkunBelanja($data, $id ?: NULL);
+            $this->logger->record($id ? 'update' : 'create', 'akun_belanja', "Akun: {$data['kode_akun']} - {$data['nama_akun']}");
+            $this->session->set_flashdata('success', 'Data Akun Belanja berhasil disimpan.');
+        } elseif ($action === 'delete') {
+            $id = (int) $this->input->post('id');
+            $item = $this->akun_model->findAkunBelanja($id);
+            if ($item) {
+                $this->akun_model->deleteAkunBelanja($id);
+                $this->logger->record('delete', 'akun_belanja', "Hapus Akun Belanja: {$item->kode_akun}");
+                $this->session->set_flashdata('success', 'Akun Belanja berhasil dihapus.');
+            }
         }
     }
 }

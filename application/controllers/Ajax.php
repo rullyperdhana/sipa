@@ -29,6 +29,16 @@ class Ajax extends Auth_Controller
         $this->output->set_output(json_encode(['results' => $results]));
     }
 
+    public function search_akun_belanja()
+    {
+        $this->load->model('akun_model');
+        $q = $this->input->get('q', TRUE);
+        $leafOnly = $this->input->get('all') ? false : true;
+        $results = $this->akun_model->searchSelect2($q, $leafOnly, 30);
+
+        $this->output->set_output(json_encode(['results' => $results]));
+    }
+
     public function notifikasi()
     {
         $userId = $this->currentUser->id;
