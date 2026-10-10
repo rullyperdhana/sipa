@@ -378,10 +378,13 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                                                 </div>
                                                 <div class="d-flex gap-1 flex-shrink-0">
                                                     <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 btn-preview-lampiran" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#modalPreviewBukti"
                                                             data-id="<?= $item->id ?>" 
                                                             data-prefix="<?= $prefixUrl ?>" 
                                                             data-slot="<?= $idx ?>" 
-                                                            title="Lihat Pratinjau Berkas (Tanpa Download)">
+                                                            title="Lihat Pratinjau Berkas (Tanpa Download)"
+                                                            onclick="if(window.SshModule && window.SshModule.openPreview){ window.SshModule.openPreview(<?= $item->id ?>, '<?= $prefixUrl ?>', <?= $idx ?>); }">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
                                                     <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/{$idx}") ?>" 

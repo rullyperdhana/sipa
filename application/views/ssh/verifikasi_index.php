@@ -180,31 +180,37 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                             <div class="d-inline-flex gap-1 justify-content-center">
                                 <?php if (!empty($row->file_lampiran)): ?>
                                 <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1.5 btn-preview-lampiran" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalPreviewBukti"
                                         data-id="<?= $row->id ?>" 
                                         data-prefix="<?= $prefixUrl ?>" 
                                         data-slot="1" 
                                         title="Pratinjau Survey 1 (Langsung di Layar): <?= e($row->file_nama_asli ?: 'Berkas 1') ?>" 
-                                        data-bs-toggle="tooltip">
+                                        onclick="if(window.SshModule && window.SshModule.openPreview){ window.SshModule.openPreview(<?= $row->id ?>, '<?= $prefixUrl ?>', 1); }">
                                     <i class="bi bi-eye"></i> S1
                                 </button>
                                 <?php endif; ?>
                                 <?php if (!empty($row->file_lampiran_2)): ?>
                                 <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1.5 btn-preview-lampiran" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalPreviewBukti"
                                         data-id="<?= $row->id ?>" 
                                         data-prefix="<?= $prefixUrl ?>" 
                                         data-slot="2" 
                                         title="Pratinjau Survey 2 (Langsung di Layar): <?= e($row->file_nama_asli_2 ?: 'Berkas 2') ?>" 
-                                        data-bs-toggle="tooltip">
+                                        onclick="if(window.SshModule && window.SshModule.openPreview){ window.SshModule.openPreview(<?= $row->id ?>, '<?= $prefixUrl ?>', 2); }">
                                     <i class="bi bi-eye"></i> S2
                                 </button>
                                 <?php endif; ?>
                                 <?php if (!empty($row->file_lampiran_3)): ?>
                                 <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1.5 btn-preview-lampiran" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalPreviewBukti"
                                         data-id="<?= $row->id ?>" 
                                         data-prefix="<?= $prefixUrl ?>" 
                                         data-slot="3" 
                                         title="Pratinjau Survey 3 (Langsung di Layar): <?= e($row->file_nama_asli_3 ?: 'Berkas 3') ?>" 
-                                        data-bs-toggle="tooltip">
+                                        onclick="if(window.SshModule && window.SshModule.openPreview){ window.SshModule.openPreview(<?= $row->id ?>, '<?= $prefixUrl ?>', 3); }">
                                     <i class="bi bi-eye"></i> S3
                                 </button>
                                 <?php endif; ?>

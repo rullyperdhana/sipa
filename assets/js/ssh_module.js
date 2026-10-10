@@ -534,11 +534,10 @@
             const isPdf = (ext === 'pdf');
 
             if (isPdf) {
+                // PDF langsung dirender di iframe; plugin browser PDF tidak selalu mentrigger event onload iframe
                 $iframe.attr('src', item.preview_url);
-                $iframe.off('load').on('load', function () {
-                    $loader.addClass('d-none');
-                    $iframe.removeClass('d-none');
-                });
+                $iframe.removeClass('d-none');
+                $loader.addClass('d-none');
             } else if (isImage) {
                 $img.attr('src', item.preview_url);
                 $img.off('load error').on('load', function () {
@@ -558,15 +557,27 @@
             }
         }
 
-        SshModule.openPreview = function(id, prefix = 'ssh', defaultSlot = 1) {
+        // Expose openPreview method
+        SshModule.openPreview = function(id, prefix, defaultSlot) {
+            id = parseInt(id, 10);
+            prefix = prefix || 'ssh';
+            defaultSlot = parseInt(defaultSlot, 10) || 1;
+
+            const modalEl = document.getElementById('modalPreviewBukti');
             const $modal = $('#modalPreviewBukti');
-            if (!$modal.length) return;
+            if (!modalEl && !$modal.length) return;
 
-            const url = (window.appConfig ? window.appConfig.baseUrl : '/') + prefix + '/api/lampiran/' + id;
+            let base = '/';
+            if (window.appConfig && window.appConfig.baseUrl) {
+                base = window.appConfig.baseUrl;
+            }
+            base = base.replace(/\/+$/, '') + '/';
+            const cleanPrefix = String(prefix || 'ssh').replace(/^\/+|\/+$/g, '');
+            const url = base + cleanPrefix + '/api/lampiran/' + id;
 
-            // Reset modal awal
+            // Reset tampilan modal awal
             $('#badgePreviewKode').text('...');
-            $('#textPreviewSkpd').text('Memuat...');
+            $('#textPreviewSkpd').text('Memuat berkas...');
             $('#textPreviewUraian').text('');
             $('#textNamaBerkasAktif').text('');
             $('#previewLoader').removeClass('d-none');
@@ -575,9 +586,22 @@
             $('#previewFallbackOffice').addClass('d-none');
             $('#previewError').addClass('d-none');
 
-            // Buka modal
-            const bsModal = bootstrap.Modal.getOrCreateInstance($modal[0]);
-            bsModal.show();
+            // Buka modal secara aman
+            try {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    const bsModal = (typeof bootstrap.Modal.getOrCreateInstance === 'function') 
+                        ? bootstrap.Modal.getOrCreateInstance(modalEl) 
+                        : new bootstrap.Modal(modalEl);
+                    bsModal.show();
+                } else if (window.jQuery && typeof $modal.modal === 'function') {
+                    $modal.modal('show');
+                }
+            } catch (err) {
+                console.warn('Bootstrap modal open fallback:', err);
+                if (window.jQuery && typeof $modal.modal === 'function') {
+                    $modal.modal('show');
+                }
+            }
 
             $.getJSON(url).done(function(res) {
                 if (!res.success) {
@@ -592,9 +616,9 @@
                 $('#textPreviewSkpd').text(res.nama_skpd || '-');
                 $('#textPreviewUraian').text(res.uraian || '-');
 
-                // Update size badge di button slot
+                // Update status badge di tombol tab slot
                 for (let i = 1; i <= 3; i++) {
-                    const l = res.lampiran.find(x => parseInt(x.slot, 10) === i);
+                    const l = (res.lampiran || []).find(x => parseInt(x.slot, 10) === i);
                     const $btn = $('#btnSlot' + i);
                     if (l) {
                         $btn.removeClass('disabled text-muted').removeAttr('disabled');
@@ -607,9 +631,9 @@
 
                 // Muat slot yang dipilih
                 loadPreviewSlot(defaultSlot);
-            }).fail(function() {
+            }).fail(function(jqXHR, textStatus) {
                 $('#previewLoader').addClass('d-none');
-                $('#previewErrorMessage').text('Terjadi kesalahan saat memuat berkas dari server.');
+                $('#previewErrorMessage').text('Terjadi kendala saat memuat berkas dari server (' + textStatus + ').');
                 $('#previewError').removeClass('d-none');
             });
         };
@@ -617,16 +641,16 @@
         // Event switcher tab slot di dalam modal
         $(document).on('click', '.btn-slot-switch', function (e) {
             e.preventDefault();
-            const slot = $(this).data('slot');
+            const slot = $(this).data('slot') || $(this).attr('data-slot');
             loadPreviewSlot(slot);
         });
 
         // Event tombol trigger preview di tabel / detail usulan
         $(document).on('click', '.btn-preview-lampiran', function (e) {
             e.preventDefault();
-            const id = $(this).data('id');
-            const prefix = $(this).data('prefix') || 'ssh';
-            const slot = $(this).data('slot') || 1;
+            const id = $(this).attr('data-id') || $(this).data('id');
+            const prefix = $(this).attr('data-prefix') || $(this).data('prefix') || 'ssh';
+            const slot = $(this).attr('data-slot') || $(this).data('slot') || 1;
             SshModule.openPreview(id, prefix, slot);
         });
 

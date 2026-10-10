@@ -20,19 +20,20 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- App JS -->
-<script src="<?= base_url('assets/js/app.js') ?>"></script>
-<!-- SSH & SBU Module JS -->
-<script src="<?= base_url('assets/js/ssh_module.js') ?>"></script>
-
+<!-- App Configuration (Loaded before scripts) -->
 <script>
 window.appConfig = {
     baseUrl: '<?= site_url() ?>',
     csrfName: '<?= $this->security->get_csrf_token_name() ?>',
     csrfHash: '<?= $this->security->get_csrf_hash() ?>',
-    userRole: '<?= $this->auth->user()->role ?>'
+    userRole: '<?= ($this->auth && $this->auth->user()) ? $this->auth->user()->role : "" ?>'
 };
 </script>
+
+<!-- App JS -->
+<script src="<?= base_url('assets/js/app.js?v=' . (file_exists(FCPATH . 'assets/js/app.js') ? filemtime(FCPATH . 'assets/js/app.js') : '2.8.2')) ?>"></script>
+<!-- SSH & SBU Module JS -->
+<script src="<?= base_url('assets/js/ssh_module.js?v=' . (file_exists(FCPATH . 'assets/js/ssh_module.js') ? filemtime(FCPATH . 'assets/js/ssh_module.js') : '2.8.2')) ?>"></script>
 
 </body>
 </html>
