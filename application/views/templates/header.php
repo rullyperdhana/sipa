@@ -105,6 +105,12 @@
             <i class="bi bi-journal-check"></i> <span>Master Data SSH</span>
         </a>
 
+        <?php if (in_array($user->role, ['admin', 'verifikator'])): ?>
+        <a href="<?= site_url('ssh/jadwal') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'jadwal') ? 'active' : '' ?>">
+            <i class="bi bi-calendar-check-fill"></i> <span>Jadwal Pengusulan</span>
+        </a>
+        <?php endif; ?>
+
         <!-- ========== MODUL 2: STANDAR BIAYA UMUM (SBU) ========== -->
         <div class="nav-section">Standar Biaya Umum (SBU)</div>
 
@@ -129,6 +135,12 @@
         <a href="<?= site_url('sbu/master_data') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'master_data') ? 'active' : '' ?>">
             <i class="bi bi-journal-bookmark-fill"></i> <span>Master Data SBU</span>
         </a>
+
+        <?php if (in_array($user->role, ['admin', 'verifikator'])): ?>
+        <a href="<?= site_url('sbu/jadwal') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'jadwal') ? 'active' : '' ?>">
+            <i class="bi bi-calendar-check-fill"></i> <span>Jadwal Pengusulan</span>
+        </a>
+        <?php endif; ?>
 
         <div class="nav-section">Laporan</div>
         <a href="<?= site_url('laporan') ?>" class="nav-link <?= $this->uri->segment(1) === 'laporan' ? 'active' : '' ?>">

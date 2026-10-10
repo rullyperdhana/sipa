@@ -5,6 +5,35 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.1.0] - 2026-10-10
+
+### 🚀 Ditambahkan (Added)
+- **Master Data Standar Harga SSH & SBU TA 2027 (Katalog Referensi Resmi):**
+  - Integrasi 11.519 data resmi dari spreadsheet SIPD RI Kabupaten Tapin: **5.786 item SSH** (`export_excel_ssh_Kab. Tapin.xlsx`) dan **5.733 item SBU** (`export_excel_sbu_Kab. Tapin.xlsx`).
+  - Pembuatan tabel katalog `ref_standar_harga` lengkap dengan kode kelompok, kode standar, nama barang/standar, spesifikasi teknis rinci, satuan, harga satuan 2027, kode rekening belanja SIPD RI, nama rekening belanja, dan tahun anggaran.
+  - Halaman antarmuka katalog Master Data SSH (`/ssh/master_data`) dan SBU (`/sbu/master_data`) dengan Server-Side Pagination cepat (< 30ms), kartu KPI statistik, pencarian Fulltext, filter kategori, dan tombol cepat *"Usulkan"*.
+- **Modul Penjadwalan Pengusulan Standar Harga (`standar_harga_jadwal`):**
+  - Manajemen periode pengusulan oleh BPKAD (Admin/Verifikator) untuk SSH dan SBU per tahun anggaran (`/ssh/jadwal` dan `/sbu/jadwal`).
+  - Mekanisme penguncian pengusulan SKPD: tombol dan form tambah usulan otomatis terkunci (*disabled*) dengan status *"Menunggu Pembuatan Jadwal oleh BPKAD"* jika tidak ada jadwal aktif yang dibuka.
+  - Banner indikator jadwal dinamis pada daftar usulan SKPD yang menampilkan status (Buka/Tutup), periode tanggal mulai-selesai, dan catatan dari BPKAD.
+  - Kemudahan saklar toggle status jadwal (Buka/Tutup) dalam satu klik oleh tim BPKAD.
+- **Interkoneksi Data Menyeluruh Antar Modul:**
+  - Pilihan mode pengusulan pada formulir: **Pilih dari Master Data TA 2027** atau **Input Manual Standar Baru**.
+  - Autocomplete AJAX Select2 terhubung ke master katalog (`/ajax/standar_harga/search` & `/ajax/standar_harga/detail/(:num)`).
+  - Pengisian otomatis (*auto-populate*) nama standar, spesifikasi teknis, satuan, kelompok akun belanja SIPD RI, serta harga dasar TA 2027.
+  - Komparasi harga usulan terhadap baseline 2027 dengan indikator visual selisih dan persentase perubahan harga.
+  - Sinkronisasi otomatis ke katalog master (`ref_standar_harga`) saat usulan disetujui pada tahap penetapan akhir.
+- **Endpoint API AJAX Baru:**
+  - `GET /ajax/standar_harga/search?q={keyword}&tipe={ssh|sbu}&tahun={2027}`: Autocomplete Select2 katalog master standar harga.
+  - `GET /ajax/standar_harga/detail/{id}`: Pengambilan data detail item master beserta rekening belanja SIPD terkait.
+
+### ⚡ Diubah (Changed)
+- **Versi Aplikasi:** Dinaikkan ke `2.1.0` pada `application/config/config.php` dan tampilan footer sistem.
+- **Struktur Tabel Usulan:** Penambahan kolom relasi `master_standar_id`, `kode_kelompok`, `kode_rekening`, `nama_rekening`, dan `harga_acuan_master` pada tabel `standar_harga_usulan`.
+- **Navigasi Sidebar:** Penambahan menu *Jadwal Pengusulan* pada modul SSH dan SBU untuk role Admin dan Verifikator.
+
+---
+
 ## [2.0.0] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

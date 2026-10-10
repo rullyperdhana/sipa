@@ -62,6 +62,77 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                     <?= csrf_input() ?>
                     <!-- Hidden Tipe Otomatis Sesuai Modul -->
                     <input type="hidden" name="tipe" value="<?= $tipe ?>">
+                    <input type="hidden" name="master_standar_id" id="master_standar_id" value="<?= $isEdit ? (int)($item->master_standar_id ?? 0) : (!empty($masterItem) ? (int)$masterItem->id : '') ?>">
+                    <input type="hidden" name="kode_kelompok" id="kode_kelompok" value="<?= $isEdit ? e($item->kode_kelompok ?? '') : (!empty($masterItem) ? e($masterItem->kode_kelompok) : '') ?>">
+                    <input type="hidden" name="harga_acuan_master" id="harga_acuan_master" value="<?= $isEdit ? (float)($item->harga_acuan_master ?? 0) : (!empty($masterItem) ? (float)$masterItem->harga_satuan : '') ?>">
+
+                    <!-- Kotak Pilihan Sumber Usulan (Master Data 2027 vs Item Baru) -->
+                    <?php if (!$isEdit): ?>
+                    <div class="card bg-light border-0 mb-4 p-3 rounded-3">
+                        <div class="fw-bold mb-2 text-dark d-flex align-items-center gap-2">
+                            <i class="bi bi-diagram-3-fill text-primary"></i>
+                            Sumber Referensi Usulan:
+                        </div>
+                        <div class="d-flex flex-wrap gap-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="mode_usulan" id="modeMaster" value="master" checked>
+                                <label class="form-check-label fw-semibold text-primary" for="modeMaster">
+                                    <i class="bi bi-box-arrow-in-down-right me-1"></i>Pilih dari Master Data 2027 (Penyesuaian Harga)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="mode_usulan" id="modeManual" value="manual">
+                                <label class="form-check-label fw-semibold text-secondary" for="modeManual">
+                                    <i class="bi bi-plus-circle me-1"></i>Input Item Baru (Item belum ada di Master)
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown Autocomplete Master Data 2027 -->
+                        <div id="sectionSearchMaster" class="mt-2">
+                            <label for="selectMasterStandar" class="form-label small fw-semibold text-dark mb-1">
+                                Cari & Pilih Item Katalog Resmi <?= $tipe ?> 2027:
+                            </label>
+                            <select class="form-select" id="selectMasterStandar" style="width: 100%;">
+                                <?php if (!empty($masterItem)): ?>
+                                <option value="<?= $masterItem->id ?>" selected>
+                                    <?= e("{$masterItem->kode_kelompok} - {$masterItem->uraian} ({$masterItem->spesifikasi}) - Rp " . number_format($masterItem->harga_satuan, 0, ',', '.') . "/{$masterItem->satuan}") ?>
+                                </option>
+                                <?php else: ?>
+                                <option value="">-- Ketik nama barang / jasa / spesifikasi untuk mencari master 2027 --</option>
+                                <?php endif; ?>
+                            </select>
+                            <div class="form-text small">Pilih salah satu item untuk mengisi otomatis nama, spesifikasi, satuan, kategori, dan rekening SIPD.</div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <!-- Banner Status Terhubung ke Master Data -->
+                    <div id="cardAcuanMaster" class="alert alert-primary border-primary <?= (!empty($masterItem) || ($isEdit && !empty($item->master_standar_id))) ? '' : 'd-none' ?> mb-4 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="alert-heading fw-bold mb-1 text-primary">
+                                    <i class="bi bi-link-45deg fs-5 me-1"></i>Terkoneksi ke Master Data Standar Harga 2027:
+                                </h6>
+                                <div class="small">
+                                    Kode Kelompok: <strong id="lblKodeKelompok"><?= !empty($masterItem) ? e($masterItem->kode_kelompok) : ($isEdit ? e($item->kode_kelompok ?? '-') : '-') ?></strong> &bull;
+                                    Harga Acuan 2027: <strong id="lblHargaAcuan" class="text-primary"><?= !empty($masterItem) ? rupiah($masterItem->harga_satuan) : ($isEdit && !empty($item->harga_acuan_master) ? rupiah($item->harga_acuan_master) : '-') ?></strong>
+                                </div>
+                                <div class="small text-muted mt-1" id="lblRekeningAcuan">
+                                    <?php if (!empty($masterItem) && !empty($masterItem->kode_rekening)): ?>
+                                        <i class="bi bi-journal-text me-1"></i>Rekening SIPD: <strong><?= e($masterItem->kode_rekening) ?></strong> &bull; <?= e($masterItem->nama_rekening ?? '') ?>
+                                    <?php elseif ($isEdit && !empty($item->kode_rekening)): ?>
+                                        <i class="bi bi-journal-text me-1"></i>Rekening SIPD: <strong><?= e($item->kode_rekening) ?></strong> &bull; <?= e($item->nama_rekening ?? '') ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php if (!$isEdit): ?>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnResetMaster" title="Lepas tautan master">
+                                <i class="bi bi-x-circle me-1"></i>Lepas Acuan
+                            </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
 
                     <div class="row g-3 mb-3">
                         <!-- Kategori -->
@@ -72,7 +143,7 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                             <select class="form-select" id="kategori" name="kategori" required>
                                 <option value="">-- Pilih Kategori <?= $tipe ?> --</option>
                                 <?php foreach ($kategori as $kat): ?>
-                                <option value="<?= e($kat) ?>" <?= ($isEdit && $item->kategori === $kat) ? 'selected' : '' ?>>
+                                <option value="<?= e($kat) ?>" <?= (($isEdit && $item->kategori === $kat) || (!empty($masterItem) && $masterItem->kategori === $kat)) ? 'selected' : '' ?>>
                                     <?= e($kat) ?>
                                 </option>
                                 <?php endforeach; ?>
@@ -84,7 +155,26 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                         <div class="col-md-4">
                             <label for="tahun_anggaran" class="form-label fw-semibold">Tahun Anggaran <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="tahun_anggaran" name="tahun_anggaran" 
-                                   value="<?= $isEdit ? $item->tahun_anggaran : date('Y') ?>" min="2020" max="2099" required>
+                                   value="<?= $isEdit ? $item->tahun_anggaran : (!empty($jadwalAktif) ? (int)$jadwalAktif->tahun_anggaran : 2027) ?>" min="2020" max="2099" required>
+                            <div class="form-text small text-muted">Tahun anggaran pelaksanaan usulan.</div>
+                        </div>
+                    </div>
+
+                    <!-- Rekening Belanja SIPD RI -->
+                    <div class="mb-3">
+                        <label for="kode_rekening" class="form-label fw-semibold">
+                            Kode Rekening Belanja SIPD RI <small class="text-muted fw-normal">(Otomatis terisi dari master)</small>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-journal-text text-muted"></i></span>
+                            <input type="text" class="form-control font-monospace" id="kode_rekening" name="kode_rekening" 
+                                   value="<?= $isEdit ? e($item->kode_rekening ?? '') : (!empty($masterItem) ? e($masterItem->kode_rekening) : '') ?>" 
+                                   placeholder="Contoh: 5.1.02.01.001.00038">
+                            <input type="hidden" id="nama_rekening" name="nama_rekening" 
+                                   value="<?= $isEdit ? e($item->nama_rekening ?? '') : (!empty($masterItem) ? e($masterItem->nama_rekening) : '') ?>">
+                        </div>
+                        <div class="small text-muted mt-1" id="lblNamaRekening">
+                            <?= ($isEdit && !empty($item->nama_rekening)) ? e($item->nama_rekening) : (!empty($masterItem) ? e($masterItem->nama_rekening) : '') ?>
                         </div>
                     </div>
 
@@ -236,3 +326,132 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mode switcher (Master vs Manual)
+    const modeMaster = document.getElementById('modeMaster');
+    const modeManual = document.getElementById('modeManual');
+    const secSearch = document.getElementById('sectionSearchMaster');
+    const cardAcuan = document.getElementById('cardAcuanMaster');
+    const btnReset = document.getElementById('btnResetMaster');
+
+    if (modeMaster && modeManual && secSearch) {
+        modeMaster.addEventListener('change', function() {
+            if (this.checked) {
+                secSearch.classList.remove('d-none');
+            }
+        });
+        modeManual.addEventListener('change', function() {
+            if (this.checked) {
+                secSearch.classList.add('d-none');
+                resetMasterAcuan();
+            }
+        });
+    }
+
+    if (btnReset) {
+        btnReset.addEventListener('click', function() {
+            resetMasterAcuan();
+            if ($('#selectMasterStandar').length) {
+                $('#selectMasterStandar').val(null).trigger('change');
+            }
+        });
+    }
+
+    function resetMasterAcuan() {
+        document.getElementById('master_standar_id').value = '';
+        document.getElementById('harga_acuan_master').value = '';
+        if (cardAcuan) cardAcuan.classList.add('d-none');
+        document.getElementById('lblNamaRekening').textContent = '';
+        document.getElementById('kode_rekening').value = '';
+        document.getElementById('nama_rekening').value = '';
+    }
+
+    // Select2 Autocomplete untuk Master Data 2027
+    if (typeof jQuery !== 'undefined' && $('#selectMasterStandar').length) {
+        $('#selectMasterStandar').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Ketik nama barang / jasa / spesifikasi untuk mencari katalog 2027 --',
+            allowClear: true,
+            ajax: {
+                url: '<?= site_url("ajax/standar_harga/search") ?>',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        tipe: '<?= $tipe ?>',
+                        tahun: 2027,
+                        q: params.term || ''
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results || []
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2
+        }).on('select2:select', function(e) {
+            const data = e.params.data;
+            if (!data) return;
+
+            // Isi nilai terhubung
+            document.getElementById('master_standar_id').value = data.id;
+            document.getElementById('kode_kelompok').value = data.kode_kelompok || '';
+            document.getElementById('harga_acuan_master').value = data.harga_satuan || 0;
+
+            document.getElementById('uraian').value = data.uraian || '';
+            document.getElementById('spesifikasi').value = data.spesifikasi || '';
+            document.getElementById('satuan').value = data.satuan || '';
+
+            // Set kategori jika ada di opsi
+            const selectKat = document.getElementById('kategori');
+            if (selectKat && data.kategori) {
+                for (let i = 0; i < selectKat.options.length; i++) {
+                    if (selectKat.options[i].value === data.kategori) {
+                        selectKat.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // Set Rekening Belanja SIPD
+            document.getElementById('kode_rekening').value = data.kode_rekening || '';
+            document.getElementById('nama_rekening').value = data.nama_rekening || '';
+            document.getElementById('lblNamaRekening').textContent = data.nama_rekening ? (data.kode_rekening + ' - ' + data.nama_rekening) : (data.kode_rekening || '');
+
+            // Set Harga Acuan & Default Harga Usulan
+            const inputHarga = document.getElementById('harga_usulan');
+            if (inputHarga) {
+                inputHarga.value = data.harga_satuan_fmt || '0';
+            }
+
+            // Tampilkan card info acuan
+            if (cardAcuan) {
+                cardAcuan.classList.remove('d-none');
+                document.getElementById('lblKodeKelompok').textContent = data.kode_kelompok || '-';
+                document.getElementById('lblHargaAcuan').textContent = 'Rp ' + (data.harga_satuan_fmt || '0');
+                document.getElementById('lblRekeningAcuan').innerHTML = data.kode_rekening 
+                    ? '<i class="bi bi-journal-text me-1"></i>Rekening SIPD: <strong>' + data.kode_rekening + '</strong> &bull; ' + (data.nama_rekening || '') 
+                    : '';
+            }
+        });
+    }
+
+    // Format Rupiah pada input harga
+    const inputHarga = document.getElementById('harga_usulan');
+    if (inputHarga) {
+        inputHarga.addEventListener('input', function(e) {
+            let val = this.value.replace(/[^0-9]/g, '');
+            if (val === '') {
+                this.value = '';
+                return;
+            }
+            this.value = parseInt(val, 10).toLocaleString('id-ID');
+        });
+    }
+});
+</script>
+

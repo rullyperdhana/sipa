@@ -113,17 +113,25 @@ class Ssh_service
             $errors[] = 'Spesifikasi teknis wajib diisi.';
         }
 
+        $rawAcuan = str_replace(['.', ',', 'Rp', ' '], ['', '.', '', ''], $postData['harga_acuan_master'] ?? '');
+        $hargaAcuan = is_numeric($rawAcuan) && (float)$rawAcuan > 0 ? (float)$rawAcuan : NULL;
+
         return [
             'isValid'  => empty($errors),
             'errors'   => $errors,
             'cleanData'=> [
-                'tipe'         => in_array($postData['tipe'] ?? '', ['SSH', 'SBU']) ? $postData['tipe'] : 'SSH',
-                'kategori'     => $kategori,
-                'uraian'       => $uraian,
-                'spesifikasi'  => $spesifikasi,
-                'satuan'       => $satuan,
-                'harga_usulan' => isset($harga) ? $harga : 0,
-                'tahun_anggaran' => (int) ($postData['tahun_anggaran'] ?? date('Y'))
+                'master_standar_id' => !empty($postData['master_standar_id']) ? (int)$postData['master_standar_id'] : NULL,
+                'tipe'              => in_array($postData['tipe'] ?? '', ['SSH', 'SBU']) ? $postData['tipe'] : 'SSH',
+                'kategori'          => $kategori,
+                'kode_kelompok'     => trim($postData['kode_kelompok'] ?? ''),
+                'uraian'            => $uraian,
+                'spesifikasi'       => $spesifikasi,
+                'satuan'            => $satuan,
+                'kode_rekening'     => trim($postData['kode_rekening'] ?? ''),
+                'nama_rekening'     => trim($postData['nama_rekening'] ?? ''),
+                'harga_usulan'      => isset($harga) ? $harga : 0,
+                'harga_acuan_master'=> $hargaAcuan,
+                'tahun_anggaran'    => (int) ($postData['tahun_anggaran'] ?? date('Y'))
             ]
         ];
     }

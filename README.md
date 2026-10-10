@@ -1,14 +1,14 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BPKAD
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Bootstrap](https://img.shields.io/badge/Frontend-Bootstrap%205.3-7952B3.svg?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![License](https://img.shields.io/badge/License-Proprietary%20%2F%20BPKAD%20Tapin-green.svg)](#)
 
-**SIPA** (Sistem Informasi Pengelolaan Aset) adalah platform web terpadu milik **Badan Pengelolaan Keuangan dan Aset Daerah (BPKAD) Pemerintah Kabupaten Tapin** yang dirancang untuk mengelola siklus perencanaan aset daerah (RKBMD), standarisasi harga belanja fisik (SSH), standarisasi biaya operasional dan tarif jasa (SBU), serta integrasi referensi rekening belanja daerah sesuai ketentuan **SIPD RI (Permendagri No. 90 Tahun 2019 dan Kepmendagri No. 050-5888)**.
+**SIPA** (Sistem Informasi Pengelolaan Aset) adalah platform web terpadu milik **Badan Pengelolaan Keuangan dan Aset Daerah (BPKAD) Pemerintah Kabupaten Tapin** yang dirancang untuk mengelola siklus perencanaan aset daerah (RKBMD), standarisasi harga belanja fisik (SSH), standarisasi biaya operasional dan tarif jasa (SBU), penjadwalan periode pengusulan standar harga, katalog master TA 2027, serta integrasi referensi rekening belanja daerah sesuai ketentuan **SIPD RI (Permendagri No. 90 Tahun 2019 dan Kepmendagri No. 050-5888)**.
 
 ---
 
@@ -51,7 +51,26 @@ Standarisasi pos pengeluaran non-fisik dan tarif operasional:
 - **Satuan Berbasis Kegiatan/Waktu:** Mendukung satuan OB (Orang/Bulan), OH (Orang/Hari), OJ (Orang/Jam), OK (Orang/Kegiatan), Paket, dsb.
 - **Alur Independen:** Memiliki submenu usulan, verifikasi, dan penetapan terpisah dari modul SSH.
 
-### 4. Modul Master Referensi Akun Belanja (SIPD RI)
+### 4. Master Katalog Standar Harga TA 2027 (Baseline Usulan Tahun Mendatang)
+- **11.519 Data Resmi Terintegrasi:** Memuat **5.786 item SSH** dan **5.733 item SBU** dari SIPD RI Kabupaten Tapin.
+- **Katalog Rinci:** Setiap item memiliki kode standar, nama barang/jasa, spesifikasi teknis mendalam, satuan, kelompok akun belanja, dan harga acuan dasar 2027.
+- **Server-Side Pagination:** Menampilkan ribuan item dengan latensi sangat rendah (**< 30ms**) dan konsumsi RAM efisien.
+- **Pencarian Cepat & Filter:** Fulltext search dan filter kategori multi-kriteria.
+- **Tombol Cepat "Usulkan":** SKPD dapat langsung mengajukan usulan penyesuaian dari baris katalog master.
+
+### 5. Modul Penjadwalan Pengusulan Standar Harga (Jadwal BPKAD)
+- **Kontrol Periode Terpusat:** BPKAD dapat membuka dan menutup jadwal pengusulan SSH & SBU per tahun anggaran (`/ssh/jadwal` dan `/sbu/jadwal`).
+- **Mekanisme Penguncian Usulan:** Jika jadwal belum dibuka atau telah berakhir, formulir dan tombol tambah usulan otomatis terkunci (*disabled*) dengan keterangan *"Menunggu Pembuatan Jadwal oleh BPKAD"*.
+- **Banner Status Dinamis:** Menampilkan status jadwal aktif (Buka/Tutup), batas tanggal mulai-selesai, dan catatan BPKAD pada halaman usulan SKPD.
+- **One-Click Status Toggle:** Kemudahan verifikator/admin mengubah status aktifitas jadwal secara instan.
+
+### 6. Interkoneksi Data Komprehensif
+- **Dual-Mode Pengusulan:** SKPD dapat memilih usulan dari **Katalog Master TA 2027** atau mengajukan **Item Standar Baru** secara manual.
+- **Otomatisasi Input Form:** Memilih item master otomatis mengisi spesifikasi teknis, satuan, kategori, akun belanja SIPD RI, serta menampilkan harga dasar 2027 sebagai acuan.
+- **Komparasi Harga Otomatis:** Perhitungan selisih dan persentase perubahan harga antara usulan SKPD terhadap harga acuan master.
+- **Sinkronisasi Otomatis ke Master:** Saat usulan disetujui dan ditetapkan oleh BPKAD, sistem otomatis memperbarui atau menambahkan item baru ke katalog `ref_standar_harga` untuk tahun anggaran berikutnya.
+
+### 7. Modul Master Referensi Akun Belanja (SIPD RI)
 Referensi kodefikasi rekening belanja terintegrasi SIPD RI:
 - **Data Lengkap:** Memuat **9.617 akun belanja** (`5.x`) dan **30.669 seluruh akun** SIPD RI (`4.x`, `5.x`, `6.x`).
 - **Klasifikasi Permendagri 90:** Dikelompokkan ke dalam Belanja Operasi (`5.1`), Belanja Modal (`5.2`), Belanja Tidak Terduga (`5.3`), dan Belanja Transfer (`5.4`).
@@ -59,7 +78,7 @@ Referensi kodefikasi rekening belanja terintegrasi SIPD RI:
 - **Indikator Kesiapan Usulan:** Badge khusus akun yang berstatus *Siap Dianggarkan* (Sub Rincian Objek).
 - **Pencarian Cepat:** Dilengkapi B-Tree Index dan Fulltext Search.
 
-### 5. Modul Master Data Barang BMD (Kinerja Tinggi)
+### 8. Modul Master Data Barang BMD (Kinerja Tinggi)
 Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Kapasitas Besar:** Mengelola **13.367 barang terdaftar**.
 - **Server-Side Pagination:** Menggunakan `LIMIT` dan `OFFSET` presisi sehingga respon halaman selalu instan (**< 50ms**) dan konsumsi RAM server **< 1 MB** (menghemat 99% memori dibandingkan client-side rendering).
@@ -68,7 +87,7 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Validasi Anti-Duplikasi:** Pengecekan otomatis di backend untuk mencegah database error 1062 saat menambah atau mengedit kode barang.
 - **Import Excel:** Unggah data massal dari file `.xlsx` / `.xls`.
 
-### 6. Antarmuka UI/UX Responsif & Modern
+### 9. Antarmuka UI/UX Responsif & Modern
 - **Responsive Sidebar Toggle:**
   - **Layar Desktop ($\ge 992\text{px}$):** Tombol hamburger melipat sidebar (*sidebar collapse*) dan memperluas canvas konten ke lebar penuh (*full-width*). Status tersimpan di `localStorage` (anti-FOUC).
   - **Layar Mobile ($< 992\text{px}$):** Sidebar berfungsi sebagai drawer samping (*off-canvas*) dengan latar belakang redup (*backdrop blur*), tombol tutup `X`, dan dukungan tombol `Escape`.
@@ -78,13 +97,13 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 
 ## 👥 Matriks Hak Akses Pengguna (RBAC & RLS)
 
-| Role | RKBMD | Usulan SSH/SBU | Verifikasi SSH/SBU | Penetapan SSH/SBU | Master Data | Laporan |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **admin** | Full | Full (Semua SKPD) | Ya | Ya | Full (SKPD, Barang, Akun, User) | Full |
-| **skpd** / **operator_skpd** | Usulan SKPD | Usulan SKPD (Draft/Revisi) | Lihat Status | Lihat Status | Lihat Barang & Akun | Laporan SKPD |
-| **verifikator** | Lihat | Lihat | Proses Verifikasi | Lihat | Lihat Barang & Akun | Rekap Verifikasi |
-| **penetap** | Lihat | Lihat | Lihat | Proses Penetapan SK | Lihat Barang & Akun | Rekap Penetapan |
-| **pimpinan** | Monitoring | Monitoring | Monitoring | Pengesahan Akhir | Monitoring | Rekap Eksekutif |
+| Role | RKBMD | Usulan SSH/SBU | Jadwal Pengusulan | Verifikasi SSH/SBU | Penetapan SSH/SBU | Master Data | Laporan |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **admin** | Full | Full (Semua SKPD) | Kelola Penuh | Ya | Ya | Full (Katalog, Barang, Akun, User) | Full |
+| **skpd** / **operator_skpd** | Usulan SKPD | Usulan (Jika Jadwal Buka) | Lihat Status | Lihat Status | Lihat Status | Lihat Katalog & Akun | Laporan SKPD |
+| **verifikator** | Lihat | Lihat | Kelola Penuh | Proses Verifikasi | Lihat | Lihat Katalog & Akun | Rekap Verifikasi |
+| **penetap** | Lihat | Lihat | Lihat | Lihat | Proses Penetapan SK | Lihat Katalog & Akun | Rekap Penetapan |
+| **pimpinan** | Monitoring | Monitoring | Monitoring | Monitoring | Pengesahan Akhir | Monitoring | Rekap Eksekutif |
 
 ---
 
@@ -212,12 +231,17 @@ sipa/
    chmod -R 777 uploads/
    ```
 
-4. **Jalankan Seluruh Migrasi Database di VPS:**
+4. **Jalankan Migrasi Database di VPS (Termasuk Master 2027 & Jadwal):**
    ```bash
+   # Migrasi v2.0.0 (Jika belum dijalankan)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_ssh_sbu_module.sql
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_ref_akun_belanja.sql
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/optimize_barang_table.sql
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/fix_duplicate_barang.sql
+
+   # Migrasi v2.1.0 (Master Standar Harga SSH & SBU TA 2027 dan Jadwal Pengusulan)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_master_ssh_sbu_and_jadwal.sql
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/import_master_ssh_sbu_2027.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
@@ -227,6 +251,8 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`create_master_ssh_sbu_and_jadwal.sql`](database/migrations/create_master_ssh_sbu_and_jadwal.sql) | Membuat tabel `ref_standar_harga` (Fulltext & B-Tree index), tabel `standar_harga_jadwal`, seed jadwal awal, dan kolom relasi master pada `standar_harga_usulan`. |
+| [`import_master_ssh_sbu_2027.sql`](database/migrations/import_master_ssh_sbu_2027.sql) | Impor 11.519 data resmi standar harga TA 2027 (5.786 item SSH + 5.733 item SBU) dari file SIPD RI Kab. Tapin. |
 | [`create_ssh_sbu_module.sql`](database/migrations/create_ssh_sbu_module.sql) | Menyesuaikan enum role user, membuat tabel `standar_harga_usulan`, tabel audit log `standar_harga_log`, foreign keys, dan trigger status. |
 | [`create_ref_akun_belanja.sql`](database/migrations/create_ref_akun_belanja.sql) | Membuat tabel `ref_akun_belanja` (9.617 akun belanja), view `akun_belanja`, dan tabel lengkap `ref_akun` (30.669 akun) dari master SIPD RI. |
 | [`optimize_barang_table.sql`](database/migrations/optimize_barang_table.sql) | Skrip idempotent untuk menambahkan index pencarian `idx_nama_barang` dan `idx_is_active` pada tabel barang. |
@@ -237,6 +263,17 @@ sipa/
 ## 🔌 Endpoint API AJAX
 
 Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan autocomplete form:
+
+- **Pencarian Master Standar Harga (SSH & SBU TA 2027):**
+  ```http
+  GET /ajax/standar_harga/search?q={keyword}&tipe={ssh|sbu}&tahun={2027}
+  ```
+  *Response:* `{"results": [{"id": 1, "text": "Kertas HVS A4 70gr", "kode": "1.1.1...", "nama": "Kertas HVS", "spesifikasi": "A4 70gr", "satuan": "Rim", "harga": 55000, "kode_rekening": "5.1.02...", "nama_rekening": "Belanja ATK"}]}`
+
+- **Detail Master Standar Harga:**
+  ```http
+  GET /ajax/standar_harga/detail/{id}
+  ```
 
 - **Pencarian Barang BMD:**
   ```http
@@ -266,6 +303,7 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.1.0 (2026-10-10):** Integrasi 11.519 Master Standar Harga TA 2027 (5.786 SSH + 5.733 SBU), Modul Penjadwalan Pengusulan (`standar_harga_jadwal`) dengan mekanisme "Menunggu Jadwal", Interkoneksi Form & Autocomplete Rekening Belanja SIPD RI, Sinkronisasi Otomatis Penetapan ke Katalog Master.
 - **v2.0.0 (2026-10-10):** Rilis Mayor Pemisahan Modul SSH & SBU, Master Referensi Akun Belanja SIPD RI, Optimasi Server-Side Paging Barang BMD, Responsive Sidebar Drawer & Collapse, Idempotent Database Migrations.
 - **v1.0.0 (2026-08-18):** Rilis Perdana Modul Perencanaan RKBMD (Pengadaan, Pemeliharaan, Pemanfaatan, Pemindahtanganan, Penghapusan), Master SKPD, Verifikasi BPKAD.
 

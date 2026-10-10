@@ -39,6 +39,48 @@ class Ajax extends Auth_Controller
         $this->output->set_output(json_encode(['results' => $results]));
     }
 
+    public function search_standar_harga()
+    {
+        $this->load->model('ssh_model');
+        $tipe = $this->input->get('tipe', TRUE) ?: 'SSH';
+        $q = $this->input->get('q', TRUE);
+        $tahun = $this->input->get('tahun', TRUE) ?: 2027;
+        $limit = (int) ($this->input->get('limit') ?: 30);
+
+        $results = $this->ssh_model->searchMasterAjax($tipe, $q, $tahun, $limit);
+
+        $formatted = array_map(function($m) {
+            $rekText = $m->kode_rekening ? " [Rek: {$m->kode_rekening}]" : '';
+            return [
+                'id'               => (int) $m->id,
+                'text'             => "{$m->kode_kelompok} - {$m->uraian}" . ($m->spesifikasi ? " ({$m->spesifikasi})" : "") . " - Rp " . number_format($m->harga_satuan, 0, ',', '.') . "/{$m->satuan}{$rekText}",
+                'kode_standar'     => $m->kode_standar,
+                'kode_kelompok'    => $m->kode_kelompok,
+                'uraian'           => $m->uraian,
+                'spesifikasi'      => $m->spesifikasi,
+                'satuan'           => $m->satuan,
+                'harga_satuan'     => (float) $m->harga_satuan,
+                'harga_satuan_fmt' => number_format($m->harga_satuan, 0, ',', '.'),
+                'kategori'         => $m->kategori,
+                'kode_rekening'    => $m->kode_rekening,
+                'nama_rekening'    => $m->nama_rekening,
+                'tahun_anggaran'   => (int) $m->tahun_anggaran
+            ];
+        }, $results);
+
+        $this->output->set_output(json_encode(['results' => $formatted]));
+    }
+
+    public function detail_standar_harga($id)
+    {
+        $this->load->model('ssh_model');
+        $item = $this->ssh_model->getMasterById($id);
+        if (!$item) {
+            return $this->output->set_status_header(404)->set_output(json_encode(['error' => 'Not found']));
+        }
+        return $this->output->set_output(json_encode(['item' => $item]));
+    }
+
     public function notifikasi()
     {
         $userId = $this->currentUser->id;

@@ -10,6 +10,8 @@ class Ssh_model extends CI_Model
 {
     protected $table = 'standar_harga_usulan';
     protected $table_log = 'standar_harga_log';
+    protected $table_master = 'ref_standar_harga';
+    protected $table_jadwal = 'standar_harga_jadwal';
 
     public function __construct()
     {
@@ -153,54 +155,114 @@ class Ssh_model extends CI_Model
     }
 
     /**
-     * RLS Policy untuk Master Data (Read-Only untuk SEMUA Role):
-     * Menampilkan semua data yang sudah berstatus 'Ditetapkan'.
-     * Dilengkapi fitur pencarian (search) dan penyaringan (filter) berdasarkan Kategori dan SKPD.
+     * Master Data Katalog Resmi Standar Satuan Harga (SSH) & SBU
+     * Mengambil dari tabel ref_standar_harga (memuat 11.519 data resmi 2027 dan usulan yang telah ditetapkan).
      */
-    public function getMasterData($filter = [])
+    public function countMasterData($filter = [])
     {
-        $this->db->select('u.*, s.nama_skpd, s.kode_skpd, v.nama_lengkap as nama_verifikator, p.nama_lengkap as nama_penetap');
-        $this->db->from($this->table . ' u');
-        $this->db->join('skpd s', 's.id = u.id_skpd', 'left');
-        $this->db->join('users v', 'v.id = u.verifikator_id', 'left');
-        $this->db->join('users p', 'p.id = u.penetap_id', 'left');
-
-        // Master data hanya menampilkan yang telah DITETAPKAN
-        $this->db->where('u.status_proses', 'Ditetapkan');
-
-        // Filter Kategori
-        if (!empty($filter['kategori'])) {
-            $this->db->where('u.kategori', $filter['kategori']);
-        }
-
-        // Filter SKPD
-        if (!empty($filter['id_skpd'])) {
-            $this->db->where('u.id_skpd', (int) $filter['id_skpd']);
-        }
-
-        // Filter Tipe (SSH/SBU)
+        $this->db->from($this->table_master);
         if (!empty($filter['tipe'])) {
-            $this->db->where('u.tipe', $filter['tipe']);
+            $this->db->where('tipe', $filter['tipe']);
         }
-
-        // Filter Tahun Anggaran
         if (!empty($filter['tahun'])) {
-            $this->db->where('u.tahun_anggaran', (int) $filter['tahun']);
+            $this->db->where('tahun_anggaran', (int)$filter['tahun']);
         }
-
-        // Pencarian (Search)
+        if (!empty($filter['kategori'])) {
+            $this->db->where('kategori', $filter['kategori']);
+        }
         if (!empty($filter['q'])) {
-            $q = $filter['q'];
+            $q = trim($filter['q']);
             $this->db->group_start()
-                ->like('u.kode_usulan', $q)
-                ->or_like('u.uraian', $q)
-                ->or_like('u.spesifikasi', $q)
-                ->or_like('u.kategori', $q)
-                ->or_like('s.nama_skpd', $q)
+                ->like('uraian', $q)
+                ->or_like('spesifikasi', $q)
+                ->or_like('kode_standar', $q)
+                ->or_like('kode_kelompok', $q)
+                ->or_like('kode_rekening', $q)
+                ->or_like('nama_rekening', $q)
                 ->group_end();
         }
+        return (int) $this->db->count_all_results();
+    }
 
-        return $this->db->order_by('u.uraian', 'ASC')->get()->result();
+    public function getMasterDataPaginated($filter = [], $limit = 25, $offset = 0)
+    {
+        $this->db->from($this->table_master);
+        if (!empty($filter['tipe'])) {
+            $this->db->where('tipe', $filter['tipe']);
+        }
+        if (!empty($filter['tahun'])) {
+            $this->db->where('tahun_anggaran', (int)$filter['tahun']);
+        }
+        if (!empty($filter['kategori'])) {
+            $this->db->where('kategori', $filter['kategori']);
+        }
+        if (!empty($filter['q'])) {
+            $q = trim($filter['q']);
+            $this->db->group_start()
+                ->like('uraian', $q)
+                ->or_like('spesifikasi', $q)
+                ->or_like('kode_standar', $q)
+                ->or_like('kode_kelompok', $q)
+                ->or_like('kode_rekening', $q)
+                ->or_like('nama_rekening', $q)
+                ->group_end();
+        }
+        return $this->db->order_by('id', 'ASC')
+            ->limit((int)$limit, (int)$offset)
+            ->get()->result();
+    }
+
+    public function getMasterData($filter = [])
+    {
+        return $this->getMasterDataPaginated($filter, 100, 0);
+    }
+
+    public function getMasterById($id)
+    {
+        return $this->db->get_where($this->table_master, ['id' => (int)$id])->row();
+    }
+
+    public function searchMasterAjax($tipe, $q, $tahun = 2027, $limit = 30)
+    {
+        $this->db->from($this->table_master);
+        if ($tipe) {
+            $this->db->where('tipe', $tipe);
+        }
+        if ($tahun) {
+            $this->db->where('tahun_anggaran', (int)$tahun);
+        }
+        if (!empty($q)) {
+            $this->db->group_start()
+                ->like('uraian', $q)
+                ->or_like('spesifikasi', $q)
+                ->or_like('kode_standar', $q)
+                ->or_like('kode_kelompok', $q)
+                ->or_like('kode_rekening', $q)
+                ->group_end();
+        }
+        return $this->db->order_by('uraian', 'ASC')
+            ->limit((int)$limit)
+            ->get()->result();
+    }
+
+    public function getDistinctKategoriMaster($tipe, $tahun = NULL)
+    {
+        $this->db->distinct()->select('kategori');
+        $this->db->from($this->table_master);
+        if ($tipe) $this->db->where('tipe', $tipe);
+        if ($tahun) $this->db->where('tahun_anggaran', (int)$tahun);
+        $this->db->where('kategori IS NOT NULL', NULL, FALSE);
+        $res = $this->db->order_by('kategori', 'ASC')->get()->result();
+        return array_column($res, 'kategori');
+    }
+
+    public function getDistinctTahunMaster($tipe = NULL)
+    {
+        $this->db->distinct()->select('tahun_anggaran');
+        $this->db->from($this->table_master);
+        if ($tipe) $this->db->where('tipe', $tipe);
+        $res = $this->db->order_by('tahun_anggaran', 'DESC')->get()->result();
+        return array_column($res, 'tahun_anggaran');
     }
 
     /**
@@ -250,22 +312,27 @@ class Ssh_model extends CI_Model
         $kodeUsulan = $this->generateKodeUsulan($tipe, $tahun);
 
         $insertData = [
-            'kode_usulan'     => $kodeUsulan,
-            'tipe'            => $tipe,
-            'kategori'        => trim($data['kategori']),
-            'uraian'          => trim($data['uraian']),
-            'spesifikasi'     => trim($data['spesifikasi']),
-            'satuan'          => trim($data['satuan']),
-            'harga_usulan'    => (float) $data['harga_usulan'],
-            'harga_ditetapkan'=> NULL,
-            'file_lampiran'   => $data['file_lampiran'] ?? NULL,
-            'file_nama_asli'  => $data['file_nama_asli'] ?? NULL,
-            'id_skpd'         => (int) $user->skpd_id, // RLS Bound
-            'user_id'         => (int) $user->id,
-            'status_proses'   => 'Draft', // RLS Initial Status Rule
-            'tahun_anggaran'  => $tahun,
-            'created_at'      => date('Y-m-d H:i:s'),
-            'updated_at'      => date('Y-m-d H:i:s')
+            'master_standar_id' => !empty($data['master_standar_id']) ? (int)$data['master_standar_id'] : NULL,
+            'kode_usulan'       => $kodeUsulan,
+            'tipe'              => $tipe,
+            'kategori'          => trim($data['kategori']),
+            'kode_kelompok'     => trim($data['kode_kelompok'] ?? ''),
+            'uraian'            => trim($data['uraian']),
+            'spesifikasi'       => trim($data['spesifikasi']),
+            'satuan'            => trim($data['satuan']),
+            'kode_rekening'     => trim($data['kode_rekening'] ?? ''),
+            'nama_rekening'     => trim($data['nama_rekening'] ?? ''),
+            'harga_usulan'      => (float) $data['harga_usulan'],
+            'harga_acuan_master'=> !empty($data['harga_acuan_master']) ? (float)$data['harga_acuan_master'] : NULL,
+            'harga_ditetapkan'  => NULL,
+            'file_lampiran'     => $data['file_lampiran'] ?? NULL,
+            'file_nama_asli'    => $data['file_nama_asli'] ?? NULL,
+            'id_skpd'           => (int) $user->skpd_id, // RLS Bound
+            'user_id'           => (int) $user->id,
+            'status_proses'     => 'Draft', // RLS Initial Status Rule
+            'tahun_anggaran'    => $tahun,
+            'created_at'        => date('Y-m-d H:i:s'),
+            'updated_at'        => date('Y-m-d H:i:s')
         ];
 
         $this->db->insert($this->table, $insertData);
@@ -305,13 +372,18 @@ class Ssh_model extends CI_Model
         }
 
         $updateData = [
-            'tipe'         => in_array($data['tipe'], ['SSH', 'SBU'], TRUE) ? $data['tipe'] : $existing->tipe,
-            'kategori'     => trim($data['kategori']),
-            'uraian'       => trim($data['uraian']),
-            'spesifikasi'  => trim($data['spesifikasi']),
-            'satuan'       => trim($data['satuan']),
-            'harga_usulan' => (float) $data['harga_usulan'],
-            'updated_at'   => date('Y-m-d H:i:s')
+            'master_standar_id' => !empty($data['master_standar_id']) ? (int)$data['master_standar_id'] : $existing->master_standar_id,
+            'tipe'              => in_array($data['tipe'], ['SSH', 'SBU'], TRUE) ? $data['tipe'] : $existing->tipe,
+            'kategori'          => trim($data['kategori']),
+            'kode_kelompok'     => trim($data['kode_kelompok'] ?? $existing->kode_kelompok),
+            'uraian'            => trim($data['uraian']),
+            'spesifikasi'       => trim($data['spesifikasi']),
+            'satuan'            => trim($data['satuan']),
+            'kode_rekening'     => trim($data['kode_rekening'] ?? $existing->kode_rekening),
+            'nama_rekening'     => trim($data['nama_rekening'] ?? $existing->nama_rekening),
+            'harga_usulan'      => (float) $data['harga_usulan'],
+            'harga_acuan_master'=> !empty($data['harga_acuan_master']) ? (float)$data['harga_acuan_master'] : $existing->harga_acuan_master,
+            'updated_at'        => date('Y-m-d H:i:s')
         ];
 
         if (!empty($data['file_lampiran'])) {
@@ -477,8 +549,11 @@ class Ssh_model extends CI_Model
 
         $this->db->where('id', (int) $id)->update($this->table, $updateData);
 
+        // Sinkronkan ke master data resmi (ref_standar_harga)
+        $this->syncToMasterData($existing, $hargaFinal);
+
         // Audit Trail
-        $this->logActivity($id, $user, $statusSebelum, 'Ditetapkan', 'Standar harga resmi ditetapkan dan dikunci ke Master Data.');
+        $this->logActivity($id, $user, $statusSebelum, 'Ditetapkan', 'Standar harga resmi ditetapkan dan disinkronkan ke Master Data.');
 
         return ['success' => TRUE, 'message' => "Item '{$existing->uraian}' berhasil ditetapkan dan dikunci sebagai Master Data resmi."];
     }
@@ -651,5 +726,157 @@ class Ssh_model extends CI_Model
         }
 
         return $this->db->get($this->table)->row();
+    }
+
+    /**
+     * Sinkronisasi data usulan yang telah DITETAPKAN ke tabel ref_standar_harga.
+     */
+    public function syncToMasterData($usulan, $hargaFinal)
+    {
+        $now = date('Y-m-d H:i:s');
+        if (!empty($usulan->master_standar_id)) {
+            // Update item yang ada di katalog master
+            $this->db->where('id', (int)$usulan->master_standar_id)->update($this->table_master, [
+                'harga_satuan' => (float)$hargaFinal,
+                'updated_at'   => $now
+            ]);
+        } else {
+            // Item baru ditambahkan ke katalog master untuk tahun anggaran berkenaan
+            $kodeStandar = $this->generateKodeStandarMaster($usulan->tipe, $usulan->tahun_anggaran);
+            $this->db->insert($this->table_master, [
+                'tipe'           => in_array($usulan->tipe, ['SSH', 'SBU']) ? $usulan->tipe : 'SSH',
+                'tahun_anggaran' => (int)$usulan->tahun_anggaran,
+                'kode_kelompok'  => !empty($usulan->kode_kelompok) ? $usulan->kode_kelompok : ($usulan->tipe === 'SSH' ? '1.1.12.01.01.0001' : '8.1.02.01.01.0001'),
+                'kode_standar'   => $kodeStandar,
+                'uraian'         => $usulan->uraian,
+                'spesifikasi'    => $usulan->spesifikasi,
+                'satuan'         => $usulan->satuan,
+                'harga_satuan'   => (float)$hargaFinal,
+                'kode_rekening'  => !empty($usulan->kode_rekening) ? $usulan->kode_rekening : NULL,
+                'nama_rekening'  => !empty($usulan->nama_rekening) ? $usulan->nama_rekening : NULL,
+                'kategori'       => !empty($usulan->kategori) ? $usulan->kategori : 'Umum',
+                'is_active'      => 1,
+                'created_at'     => $now,
+                'updated_at'     => $now
+            ]);
+            $newMasterId = $this->db->insert_id();
+            // Tautkan kembali ke usulan
+            $this->db->where('id', (int)$usulan->id)->update($this->table, [
+                'master_standar_id' => $newMasterId
+            ]);
+        }
+    }
+
+    public function generateKodeStandarMaster($tipe = 'SSH', $tahun = 2027)
+    {
+        $prefix = "{$tipe}-{$tahun}-";
+        $this->db->like('kode_standar', $prefix, 'after');
+        $this->db->order_by('id', 'DESC');
+        $this->db->limit(1);
+        $last = $this->db->get($this->table_master)->row();
+
+        $nextNum = 1;
+        if ($last) {
+            $parts = explode('-', $last->kode_standar);
+            $lastNum = (int) end($parts);
+            $nextNum = $lastNum + 1;
+        }
+
+        return $prefix . str_pad($nextNum, 5, '0', STR_PAD_LEFT);
+    }
+
+    // =========================================================================
+    // JADWAL PENGUSULAN STANDAR HARGA (SSH & SBU)
+    // =========================================================================
+
+    public function getJadwalList($filter = [])
+    {
+        $this->db->from($this->table_jadwal);
+        if (!empty($filter['tipe']) && $filter['tipe'] !== 'SEMUA') {
+            $this->db->group_start()
+                ->where('tipe', $filter['tipe'])
+                ->or_where('tipe', 'SEMUA')
+                ->group_end();
+        }
+        if (!empty($filter['tahun'])) {
+            $this->db->where('tahun_anggaran', (int)$filter['tahun']);
+        }
+        if (!empty($filter['status'])) {
+            $this->db->where('status', $filter['status']);
+        }
+        return $this->db->order_by('tahun_anggaran', 'DESC')
+            ->order_by('tanggal_mulai', 'DESC')
+            ->get()->result();
+    }
+
+    public function getJadwalById($id)
+    {
+        return $this->db->get_where($this->table_jadwal, ['id' => (int)$id])->row();
+    }
+
+    /**
+     * Cek apakah ada jadwal pengusulan yang sedang dibuka/aktif.
+     */
+    public function getJadwalAktif($tipe = NULL, $tahun = NULL)
+    {
+        $today = date('Y-m-d');
+        $this->db->from($this->table_jadwal);
+        $this->db->where('status', 'buka');
+        $this->db->where('tanggal_mulai <=', $today);
+        $this->db->where('tanggal_selesai >=', $today);
+
+        if ($tipe) {
+            $this->db->group_start()
+                ->where('tipe', $tipe)
+                ->or_where('tipe', 'SEMUA')
+                ->group_end();
+        }
+        if ($tahun) {
+            $this->db->where('tahun_anggaran', (int)$tahun);
+        }
+
+        return $this->db->order_by('tahun_anggaran', 'DESC')->get()->row();
+    }
+
+    public function isJadwalBuka($tipe = 'SSH', $tahun = NULL)
+    {
+        $jadwal = $this->getJadwalAktif($tipe, $tahun);
+        return !empty($jadwal);
+    }
+
+    public function saveJadwal($data, $id = NULL, $userId = NULL)
+    {
+        $payload = [
+            'tipe'            => in_array($data['tipe'] ?? '', ['SSH', 'SBU', 'SEMUA']) ? $data['tipe'] : 'SEMUA',
+            'tahun_anggaran'  => (int) ($data['tahun_anggaran'] ?? date('Y') + 1),
+            'nama_jadwal'     => trim($data['nama_jadwal'] ?? ''),
+            'tanggal_mulai'   => $data['tanggal_mulai'] ?? date('Y-m-d'),
+            'tanggal_selesai' => $data['tanggal_selesai'] ?? date('Y-12-31'),
+            'status'          => in_array($data['status'] ?? '', ['buka', 'tutup']) ? $data['status'] : 'buka',
+            'keterangan'      => trim($data['keterangan'] ?? '')
+        ];
+
+        if ($id) {
+            $this->db->where('id', (int)$id)->update($this->table_jadwal, $payload);
+            return ['success' => TRUE, 'message' => 'Jadwal pengusulan berhasil diperbarui.'];
+        } else {
+            $payload['created_by'] = $userId ? (int)$userId : NULL;
+            $this->db->insert($this->table_jadwal, $payload);
+            return ['success' => TRUE, 'message' => 'Jadwal pengusulan baru berhasil dibuat.'];
+        }
+    }
+
+    public function toggleJadwalStatus($id)
+    {
+        $row = $this->getJadwalById($id);
+        if (!$row) return FALSE;
+        $newStatus = ($row->status === 'buka') ? 'tutup' : 'buka';
+        $this->db->where('id', (int)$id)->update($this->table_jadwal, ['status' => $newStatus]);
+        return $newStatus;
+    }
+
+    public function deleteJadwal($id)
+    {
+        return $this->db->delete($this->table_jadwal, ['id' => (int)$id]);
     }
 }

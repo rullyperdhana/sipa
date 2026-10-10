@@ -7,7 +7,7 @@ $prefixUrl = $prefixUrl ?? strtolower($tipe);
 $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
 ?>
 
-<div class="page-header d-flex justify-content-between align-items-center mb-4">
+<div class="page-header d-flex justify-content-between align-items-center mb-3">
     <div>
         <h1 class="page-title">
             <i class="bi <?= $isSbu ? 'bi-receipt-cutoff text-info' : 'bi-box-seam-fill text-primary' ?> me-2"></i>
@@ -19,12 +19,48 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                 : 'Kelola dan ajukan usulan harga satuan barang, peralatan, dan material fisik SKPD Anda.' ?>
         </p>
     </div>
-    <div>
+    <div class="d-flex gap-2">
+        <?php if ($isJadwalBuka || in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE)): ?>
         <a href="<?= site_url("{$prefixUrl}/tambah") ?>" class="btn <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Tambah Usulan <?= $tipe ?> Baru
         </a>
+        <?php else: ?>
+        <button type="button" class="btn btn-secondary shadow-sm" disabled title="Jadwal pengusulan saat ini ditutup / belum dibuka oleh BPKAD">
+            <i class="bi bi-lock-fill me-1"></i> Menunggu Jadwal Dibuka
+        </button>
+        <?php endif; ?>
+        <?php if (in_array($this->currentUser->role, ['admin', 'verifikator'], TRUE)): ?>
+        <a href="<?= site_url("{$prefixUrl}/jadwal") ?>" class="btn btn-outline-primary" title="Kelola Jadwal Pengusulan">
+            <i class="bi bi-calendar-range me-1"></i> Atur Jadwal
+        </a>
+        <?php endif; ?>
     </div>
 </div>
+
+<!-- Banner Status Jadwal Pengusulan -->
+<?php if ($isJadwalBuka && !empty($jadwalAktif)): ?>
+<div class="alert alert-success border-success shadow-sm d-flex justify-content-between align-items-center mb-4 py-2.5 px-3">
+    <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-broadcast fs-5 text-success"></i>
+        <div>
+            <strong>Jadwal Pengusulan Aktif:</strong> <?= e($jadwalAktif->nama_jadwal) ?> (TA <?= (int)$jadwalAktif->tahun_anggaran ?>)
+            <span class="text-muted small ms-2">&bull; Batas Akhir: <strong><?= date('d M Y', strtotime($jadwalAktif->tanggal_selesai)) ?></strong></span>
+        </div>
+    </div>
+    <span class="badge bg-success py-1.5 px-2.5"><i class="bi bi-unlock-fill me-1"></i>PENGUSULAN DIBUKA</span>
+</div>
+<?php else: ?>
+<div class="alert alert-warning border-warning shadow-sm d-flex justify-content-between align-items-center mb-4 py-2.5 px-3">
+    <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-clock-history fs-5 text-warning"></i>
+        <div>
+            <strong>Pengusulan Ditutup / Menunggu Jadwal:</strong> Tahapan pengusulan <?= $tipe ?> saat ini belum dibuka atau telah berakhir.
+            <div class="text-muted small">Silakan menunggu pembuatan dan pengaktifan jadwal pengusulan resmi oleh BPKAD Kabupaten Tapin.</div>
+        </div>
+    </div>
+    <span class="badge bg-danger py-1.5 px-2.5"><i class="bi bi-lock-fill me-1"></i>MENUNGGU JADWAL</span>
+</div>
+<?php endif; ?>
 
 <!-- Statistik Ringkasan -->
 <div class="row g-3 mb-4">
@@ -165,6 +201,18 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                             <div class="small text-muted text-truncate" style="max-width: 320px;" title="<?= e($row->spesifikasi) ?>">
                                 <?= e($row->spesifikasi) ?>
                             </div>
+                            <?php if (!empty($row->master_standar_id)): ?>
+                            <div class="mt-1">
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace" style="font-size: 11px;">
+                                    <i class="bi bi-link-45deg me-1"></i>Acuan Master 2027 (Harga Dasar: <?= rupiah($row->harga_acuan_master) ?>)
+                                </span>
+                            </div>
+                            <?php endif; ?>
+                            <?php if (!empty($row->kode_rekening)): ?>
+                            <div class="text-muted small mt-0.5" style="font-size: 11px;" title="<?= e($row->nama_rekening ?? '') ?>">
+                                <i class="bi bi-journal-text me-1 text-secondary"></i><span class="font-monospace"><?= e($row->kode_rekening) ?></span>
+                            </div>
+                            <?php endif; ?>
                             <?php if ($row->status_proses === 'Direvisi' && !empty($row->catatan_verifikator)): ?>
                             <div class="alert alert-warning py-1 px-2 mt-2 mb-0 small border-warning d-flex align-items-center gap-1">
                                 <i class="bi bi-exclamation-triangle-fill text-warning flex-shrink-0"></i>

@@ -45,7 +45,7 @@ class Sbu extends Auth_Controller
         $this->_restrictRoles(['operator_skpd', 'skpd', 'admin']);
 
         $filter = [
-            'tipe'          => 'SBU',
+            'tipe'          => $this->tipe,
             'status_proses' => $this->input->get('status', TRUE),
             'kategori'      => $this->input->get('kategori', TRUE),
             'tahun'         => $this->input->get('tahun', TRUE),
@@ -57,16 +57,21 @@ class Sbu extends Auth_Controller
             $skpdId = (int) $this->input->get('skpd_id');
         }
 
+        $jadwalAktif = $this->ssh_model->getJadwalAktif($this->tipe);
+        $isJadwalBuka = $this->ssh_model->isJadwalBuka($this->tipe);
+
         $data = [
-            'title'       => 'Usulan ' . $this->moduleTitle,
-            'tipe'        => $this->tipe,
-            'prefixUrl'   => $this->prefixUrl,
-            'moduleTitle' => $this->moduleTitle,
-            'list'        => $this->ssh_model->getUsulanBySkpd($skpdId, $filter),
-            'summary'     => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
-            'filter'      => $filter,
-            'kategori'    => $this->ssh_model->getKategoriSbu(),
-            'skpdList'    => ($this->currentUser->role === 'admin') ? $this->master_model->getAllSkpd() : []
+            'title'        => 'Usulan ' . $this->moduleTitle,
+            'tipe'         => $this->tipe,
+            'prefixUrl'    => $this->prefixUrl,
+            'moduleTitle'  => $this->moduleTitle,
+            'list'         => $this->ssh_model->getUsulanBySkpd($skpdId, $filter),
+            'summary'      => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
+            'filter'       => $filter,
+            'kategori'     => $this->ssh_model->getKategoriSbu(),
+            'skpdList'     => ($this->currentUser->role === 'admin') ? $this->master_model->getAllSkpd() : [],
+            'jadwalAktif'  => $jadwalAktif,
+            'isJadwalBuka' => $isJadwalBuka
         ];
 
         $this->load->view('templates/header', $data);
@@ -81,24 +86,31 @@ class Sbu extends Auth_Controller
     {
         $this->_restrictRoles(['operator_skpd', 'skpd', 'admin']);
 
+        // Pengecekan Jadwal Pengusulan Aktif (Khusus role SKPD)
+        $isJadwalBuka = $this->ssh_model->isJadwalBuka($this->tipe);
+        if (!in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE) && !$isJadwalBuka) {
+            $this->session->set_flashdata('warning', "Pengusulan {$this->moduleTitle} saat ini belum dibuka atau telah ditutup. Silakan menunggu pembuatan/pembukaan jadwal pengusulan oleh BPKAD.");
+            redirect("{$this->prefixUrl}/usulan");
+        }
+
         if ($this->input->method() === 'post') {
             $post = $this->input->post();
-            $post['tipe'] = 'SBU';
+            $post['tipe'] = $this->tipe;
 
             $validation = $this->ssh_service->validateInput($post);
             if (!$validation['isValid']) {
                 $this->session->set_flashdata('danger', implode('<br>', $validation['errors']));
-                redirect('sbu/tambah');
+                redirect("{$this->prefixUrl}/tambah");
             }
 
             $uploadResult = $this->ssh_service->handleFileUpload('file_lampiran');
             if (isset($uploadResult['error'])) {
                 $this->session->set_flashdata('danger', 'Gagal upload file: ' . $uploadResult['error']);
-                redirect('sbu/tambah');
+                redirect("{$this->prefixUrl}/tambah");
             }
 
             $postData = $validation['cleanData'];
-            $postData['tipe'] = 'SBU';
+            $postData['tipe'] = $this->tipe;
             if ($uploadResult['hasFile']) {
                 $postData['file_lampiran']  = $uploadResult['fileName'];
                 $postData['file_nama_asli'] = $uploadResult['origName'];
@@ -106,13 +118,21 @@ class Sbu extends Auth_Controller
 
             $result = $this->ssh_model->insertUsulan($postData, $this->currentUser);
             if ($result['success']) {
-                $this->session->set_flashdata('success', "Usulan SBU <strong>{$result['kode_usulan']}</strong> berhasil dibuat dengan status <strong>Draft</strong>.");
-                redirect('sbu/usulan');
+                $this->session->set_flashdata('success', "Usulan {$this->tipe} <strong>{$result['kode_usulan']}</strong> berhasil dibuat dengan status <strong>Draft</strong>.");
+                redirect("{$this->prefixUrl}/usulan");
             } else {
                 $this->session->set_flashdata('danger', 'Gagal menyimpan usulan.');
-                redirect('sbu/tambah');
+                redirect("{$this->prefixUrl}/tambah");
             }
         }
+
+        // Cek jika prefill dari item master katalog 2027
+        $masterItem = NULL;
+        if ($masterId = (int) $this->input->get('master_id')) {
+            $masterItem = $this->ssh_model->getMasterById($masterId);
+        }
+
+        $jadwalAktif = $this->ssh_model->getJadwalAktif($this->tipe);
 
         $data = [
             'title'       => 'Tambah Usulan ' . $this->moduleTitle,
@@ -120,7 +140,9 @@ class Sbu extends Auth_Controller
             'prefixUrl'   => $this->prefixUrl,
             'moduleTitle' => $this->moduleTitle,
             'kategori'    => $this->ssh_model->getKategoriSbu(),
-            'satuan'      => $this->ssh_model->getSatuanSbu()
+            'satuan'      => $this->ssh_model->getSatuanSbu(),
+            'masterItem'  => $masterItem,
+            'jadwalAktif' => $jadwalAktif
         ];
 
         $this->load->view('templates/header', $data);
@@ -309,28 +331,109 @@ class Sbu extends Auth_Controller
 
     public function master_data()
     {
+        $page = max(1, (int) $this->input->get('page'));
+        $perPage = min(100, max(10, (int) ($this->input->get('per_page') ?: 25)));
+        $offset = ($page - 1) * $perPage;
+
         $filter = [
-            'tipe'     => 'SBU',
+            'tipe'     => $this->tipe,
             'kategori' => $this->input->get('kategori', TRUE),
-            'id_skpd'  => $this->input->get('skpd_id', TRUE),
-            'tahun'    => $this->input->get('tahun', TRUE),
+            'tahun'    => $this->input->get('tahun', TRUE) ?: 2027,
             'q'        => $this->input->get('q', TRUE)
         ];
+
+        $totalRows = $this->ssh_model->countMasterData($filter);
+        $totalPages = max(1, ceil($totalRows / $perPage));
+        $list = $this->ssh_model->getMasterDataPaginated($filter, $perPage, $offset);
 
         $data = [
             'title'       => 'Master Data ' . $this->moduleTitle,
             'tipe'        => $this->tipe,
             'prefixUrl'   => $this->prefixUrl,
             'moduleTitle' => $this->moduleTitle,
-            'list'        => $this->ssh_model->getMasterData($filter),
+            'list'        => $list,
             'filter'      => $filter,
-            'kategori'    => $this->ssh_model->getKategoriSbu(),
-            'skpdList'    => $this->master_model->getAllSkpd()
+            'kategori'    => $this->ssh_model->getDistinctKategoriMaster($this->tipe, $filter['tahun']),
+            'tahunList'   => $this->ssh_model->getDistinctTahunMaster($this->tipe),
+            'page'        => $page,
+            'perPage'     => $perPage,
+            'totalRows'   => $totalRows,
+            'totalPages'  => $totalPages
         ];
 
         $this->load->view('templates/header', $data);
         $this->load->view('ssh/master_index', $data);
         $this->load->view('templates/footer');
+    }
+
+    // =========================================================================
+    // JADWAL PENGUSULAN STANDAR HARGA
+    // =========================================================================
+
+    public function jadwal()
+    {
+        $this->_restrictRoles(['admin', 'verifikator']);
+
+        $filter = [
+            'tipe'   => $this->tipe,
+            'tahun'  => $this->input->get('tahun', TRUE),
+            'status' => $this->input->get('status', TRUE)
+        ];
+
+        $data = [
+            'title'       => 'Jadwal Pengusulan ' . $this->moduleTitle,
+            'tipe'        => $this->tipe,
+            'prefixUrl'   => $this->prefixUrl,
+            'moduleTitle' => $this->moduleTitle,
+            'list'        => $this->ssh_model->getJadwalList($filter),
+            'filter'      => $filter
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('ssh/jadwal_index', $data);
+        $this->load->view('templates/footer');
+    }
+
+    public function simpan_jadwal()
+    {
+        $this->_restrictRoles(['admin', 'verifikator']);
+        if ($this->input->method() !== 'post') show_404();
+
+        $id = $this->input->post('id') ? (int) $this->input->post('id') : NULL;
+        $postData = [
+            'tipe'            => $this->input->post('tipe', TRUE) ?: $this->tipe,
+            'tahun_anggaran'  => (int) $this->input->post('tahun_anggaran'),
+            'nama_jadwal'     => $this->input->post('nama_jadwal', TRUE),
+            'tanggal_mulai'   => $this->input->post('tanggal_mulai', TRUE),
+            'tanggal_selesai' => $this->input->post('tanggal_selesai', TRUE),
+            'status'          => $this->input->post('status', TRUE) ?: 'buka',
+            'keterangan'      => $this->input->post('keterangan', TRUE)
+        ];
+
+        $res = $this->ssh_model->saveJadwal($postData, $id, $this->currentUser->id);
+        $this->session->set_flashdata($res['success'] ? 'success' : 'danger', $res['message']);
+        redirect("{$this->prefixUrl}/jadwal");
+    }
+
+    public function toggle_jadwal($id)
+    {
+        $this->_restrictRoles(['admin', 'verifikator']);
+        $newStatus = $this->ssh_model->toggleJadwalStatus($id);
+        if ($newStatus) {
+            $msg = ($newStatus === 'buka') ? 'Jadwal pengusulan berhasil DIBUKA.' : 'Jadwal pengusulan berhasil DITUTUP.';
+            $this->session->set_flashdata('success', $msg);
+        } else {
+            $this->session->set_flashdata('danger', 'Gagal mengubah status jadwal.');
+        }
+        redirect("{$this->prefixUrl}/jadwal");
+    }
+
+    public function hapus_jadwal($id)
+    {
+        $this->_restrictRoles(['admin']);
+        $this->ssh_model->deleteJadwal($id);
+        $this->session->set_flashdata('success', 'Jadwal pengusulan berhasil dihapus.');
+        redirect("{$this->prefixUrl}/jadwal");
     }
 
     // =========================================================================
