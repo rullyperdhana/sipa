@@ -5,6 +5,26 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.8.0] - 2026-10-10
+
+### 🚀 Ditambahkan (Added)
+- **Tahun Periode Anggaran Global (Login & Header Switcher):**
+  - **Dropdown Pilihan Tahun Anggaran pada Halaman Login (`/login`):** Pengguna dapat langsung menentukan tahun periode kerja sebelum masuk (pilihan dinamis: TA 2028, TA 2027 Perencanaan [default], TA 2026 Berjalan, TA 2025 Arsip).
+  - **Quick Year Switcher di Header / Topbar (`templates/header.php`):** Tombol badge dropdown di pojok kanan atas navbar (`[ 📅 TA 2027 ▼ ]`) yang memungkinkan pengguna beralih tahun anggaran aktif kapan saja dalam 1 kali klik tanpa perlu logout.
+  - **Route Cepat `/switch-year/(:num)`:** Endpoint pengalihan konteks tahun aktif dengan validasi sesi dan pemuatan ulang halaman otomatis.
+  - **Sinkronisasi Otomatis Seluruh Modul:** Dashboard, Pusat Laporan, Form Usulan SSH/SBU, Form Usulan RKBMD, dan filter antrean usulan otomatis mengikuti tahun aktif yang terpilih.
+- **Manajemen Nomenklatur & Histori SKPD Per Tahun Anggaran (`skpd_nomenklatur`):**
+  - **Dukungan Perubahan Perda / Regulasi Kelembagaan:** Mengatasi potensi perubahan nama dinas, kode sub-unit, atau pejabat Kepala SKPD di tahun mendatang tanpa merusak integritas cetak laporan dan usulan tahun lampau.
+  - **Tabel Basis Data `skpd_nomenklatur`:** Mencatat riwayat nama SKPD, kode unit, pejabat kepala SKPD & NIP, pengurus barang, dan dasar regulasi/keterangan per tahun anggaran.
+  - **Resolusi Otomatis Berbasis Tahun pada Master Model:** Method `findSkpd($id, $tahun)` dan `getAllSkpd($activeOnly, $tahun)` otomatis mengambil nomenklatur resmi pada tahun bersangkutan (fallback ke master pokok jika belum ada aturan khusus).
+  - **Modal Interaktif di Master SKPD (`/master/skpd`):** Tombol aksi *"Riwayat & Nomenklatur Per Tahun"* dengan modal interaktif untuk menambah, melihat, mengedit, dan menghapus aturan nomenklatur per tahun anggaran.
+
+### 🛡️ Keamanan & Pembersihan Repositori (Security & Repository Cleanup)
+- **Penghapusan File Sensitif dari GitHub:** Menghapus 3 file spreadsheet mentah (`export_excel_sbu_Kab. Tapin.xlsx`, `export_excel_ssh_Kab. Tapin.xlsx`, `sipd_ri_r_akun.xlsx`) dari pelacakan git dan repositori GitHub.
+- **Pengetatan Aturan `.gitignore`:** Menambahkan aturan pengabaian permanen untuk semua file `*.xlsx`, `*.xls`, dan `*.csv` (dikecualikan untuk `!vendor/**`) agar data mentah tidak dapat terunggah ke repositori publik.
+
+---
+
 ## [2.7.0] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

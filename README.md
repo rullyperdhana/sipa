@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BPKAD
 
-[![Version](https://img.shields.io/badge/version-2.7.0-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.8.0-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -132,6 +132,18 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Pengamanan Direktori Uploads (`uploads/.htaccess`):** Melarang eksekusi file script apapun (`.php`, `.phtml`, `.cgi`, `.sh`, `.exe`, dll.) di folder penyimpanan berkas unggahan dan menonaktifkan directory browsing.
 - **Hardening Root Web Server (`.htaccess`):** Menonaktifkan *Directory Listing* (`Options -Indexes`) dan memblokir akses langsung ke file sensitif (`.env`, `.sql`, `.json`, `.lock`, `.log`, `database.local.php`).
 - **Autentikasi Remember-Me Aman:** Verifikasi token hash Bcrypt dengan auto-rotasi token acak, `HttpOnly`, dan atribut cookie `SameSite=Lax`.
+
+### 14. Konteks Tahun Periode Anggaran Global & Multi-Tahun
+- **Dropdown Pemilih Tahun pada Halaman Login (`/login`):** Pengguna dapat langsung menentukan tahun periode kerja saat masuk (pilihan dinamis: TA 2028, TA 2027 Perencanaan [default], TA 2026 Berjalan, TA 2025 Arsip).
+- **Quick Year Switcher di Header / Topbar (`templates/header.php`):** Tombol badge dropdown di navbar (`[ 📅 TA 2027 ▼ ]`) yang memungkinkan pengguna beralih tahun anggaran aktif kapan saja dalam 1 kali klik tanpa perlu logout.
+- **Route Cepat `/switch-year/(:num)`:** Endpoint pengalihan konteks tahun aktif dengan validasi sesi dan pemuatan ulang halaman otomatis.
+- **Sinkronisasi Otomatis Seluruh Modul:** Dashboard, Pusat Laporan, Form Usulan SSH/SBU, Form Usulan RKBMD, dan filter antrean usulan otomatis mengikuti tahun aktif yang terpilih.
+
+### 15. Manajemen Nomenklatur & Histori SKPD Per Tahun Anggaran
+- **Dukungan Perubahan Perda / Regulasi Kelembagaan:** Mengatasi potensi perubahan nama dinas, kode sub-unit, atau pejabat Kepala SKPD di tahun mendatang tanpa merusak integritas cetak laporan dan usulan tahun lampau.
+- **Tabel Basis Data `skpd_nomenklatur`:** Mencatat riwayat nama SKPD, kode unit, pejabat kepala SKPD & NIP, pengurus barang, dan dasar regulasi/keterangan per tahun anggaran.
+- **Resolusi Otomatis Berbasis Tahun pada Master Model:** Method `findSkpd($id, $tahun)` dan `getAllSkpd($activeOnly, $tahun)` otomatis mengambil nomenklatur resmi pada tahun bersangkutan (fallback ke master pokok jika belum ada aturan khusus).
+- **Modal Interaktif di Master SKPD (`/master/skpd`):** Tombol aksi *"Riwayat & Nomenklatur Per Tahun"* dengan modal interaktif untuk menambah, melihat, mengedit, dan menghapus aturan nomenklatur per tahun anggaran.
 
 ---
 
