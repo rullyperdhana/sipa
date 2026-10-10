@@ -91,11 +91,11 @@ $config['time_reference']   = 'local';
 $config['rewrite_short_tags'] = FALSE;
 $config['proxy_ips']        = '';
 
-// ===== Konfigurasi Aplikasi RKBMD =====
-$config['app_name']         = 'SIPA - Sistem Informasi RKBMD';
-$config['app_version']      = '1.0.0';
+// ===== Konfigurasi Aplikasi SIPA =====
+$config['app_name']         = 'SIPA - Sistem Informasi Pengelolaan Aset';
+$config['app_version']      = '2.0.0';
 $config['app_owner']        = 'Pemerintah Kabupaten Tapin';
-$config['app_unit']         = 'Badan Pengelolaan Keuangan dan Aset Daerah';
+$config['app_unit']         = 'Badan Pengelolaan Keuangan dan Aset Daerah (BPKAD)';
 $config['app_provinsi']     = 'Kalimantan Selatan';
 $config['app_kabupaten']    = 'Tapin';
 
