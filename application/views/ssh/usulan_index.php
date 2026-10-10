@@ -64,7 +64,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
 
 <!-- Statistik Ringkasan -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-4 col-xl-2">
+    <div class="col-6 col-md-4 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 <?= $isSbu ? 'border-info' : 'border-primary' ?>">
             <div class="card-body p-2">
                 <small class="text-muted fw-semibold d-block text-uppercase">Total Usulan</small>
@@ -72,7 +72,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4 col-xl-2">
+    <div class="col-6 col-md-4 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-secondary">
             <div class="card-body p-2">
                 <small class="text-muted fw-semibold d-block text-uppercase">Draft</small>
@@ -80,7 +80,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4 col-xl-2">
+    <div class="col-6 col-md-4 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-info">
             <div class="card-body p-2">
                 <small class="text-muted fw-semibold d-block text-uppercase">Diajukan</small>
@@ -88,7 +88,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4 col-xl-2">
+    <div class="col-6 col-md-4 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-warning">
             <div class="card-body p-2">
                 <small class="text-muted fw-semibold d-block text-uppercase">Direvisi</small>
@@ -96,7 +96,15 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4 col-xl-2">
+    <div class="col-6 col-md-4 col-xl">
+        <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-danger">
+            <div class="card-body p-2">
+                <small class="text-muted fw-semibold d-block text-uppercase">Ditolak</small>
+                <h3 class="mb-0 mt-1 fw-bold text-danger"><?= (int)($summary->ditolak ?? 0) ?></h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-primary">
             <div class="card-body p-2">
                 <small class="text-muted fw-semibold d-block text-uppercase">Diverifikasi</small>
@@ -104,7 +112,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4 col-xl-2">
+    <div class="col-6 col-md-4 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-success">
             <div class="card-body p-2">
                 <small class="text-muted fw-semibold d-block text-uppercase">Ditetapkan</small>
@@ -122,7 +130,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                 <label class="form-label small fw-semibold text-muted mb-1">Status Usulan</label>
                 <select class="form-select form-select-sm" name="status">
                     <option value="">Semua Status</option>
-                    <?php foreach (['Draft', 'Diajukan', 'Direvisi', 'Diverifikasi', 'Ditetapkan'] as $st): ?>
+                    <?php foreach (['Draft', 'Diajukan', 'Direvisi', 'Ditolak', 'Diverifikasi', 'Ditetapkan'] as $st): ?>
                     <option value="<?= $st ?>" <?= ($filter['status_proses'] ?? '') === $st ? 'selected' : '' ?>><?= $st ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -217,6 +225,12 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                             <div class="alert alert-warning py-1 px-2 mt-2 mb-0 small border-warning d-flex align-items-center gap-1">
                                 <i class="bi bi-exclamation-triangle-fill text-warning flex-shrink-0"></i>
                                 <span><strong>Catatan Koreksi:</strong> <?= e($row->catatan_verifikator) ?></span>
+                            </div>
+                            <?php endif; ?>
+                            <?php if ($row->status_proses === 'Ditolak' && !empty($row->catatan_verifikator)): ?>
+                            <div class="alert alert-danger py-1 px-2 mt-2 mb-0 small border-danger d-flex align-items-center gap-1">
+                                <i class="bi bi-x-circle-fill text-danger flex-shrink-0"></i>
+                                <span><strong>Alasan Penolakan:</strong> <?= e($row->catatan_verifikator) ?></span>
                             </div>
                             <?php endif; ?>
                         </td>

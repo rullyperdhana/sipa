@@ -86,10 +86,12 @@ class Wa extends MY_Controller
                 $templateType = 'standar_revisi';
             } elseif ($actionType === 'setuju') {
                 $templateType = 'standar_diverifikasi';
+            } elseif ($actionType === 'tolak') {
+                $templateType = 'standar_tolak';
             } elseif ($actionType === 'penetapan') {
                 $templateType = 'standar_penetapan';
             } else {
-                $templateType = ($usulan->status_proses === 'Direvisi') ? 'standar_revisi' : (($usulan->status_proses === 'Ditetapkan') ? 'standar_penetapan' : 'standar_diverifikasi');
+                $templateType = ($usulan->status_proses === 'Direvisi') ? 'standar_revisi' : (($usulan->status_proses === 'Ditolak') ? 'standar_tolak' : (($usulan->status_proses === 'Ditetapkan') ? 'standar_penetapan' : 'standar_diverifikasi'));
             }
         } else {
             return $this->output->set_content_type('application/json')

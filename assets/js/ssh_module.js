@@ -369,6 +369,22 @@
             modal.show();
         });
 
+        // Modal Tolak
+        $(document).on('click', '.btn-tolak-modal', function () {
+            const id = $(this).data('id');
+            const kode = $(this).data('kode');
+            const uraian = $(this).data('uraian');
+            const prefix = $(this).data('prefix') || 'ssh';
+
+            $('#formTolakUsulan').attr('action', (window.appConfig ? window.appConfig.baseUrl : '/') + prefix + '/proses-verifikasi/' + id);
+            $('#tolakKode').text(kode);
+            $('#tolakUraian').text(uraian);
+            $('#tolakCatatan').val('');
+
+            const modal = new bootstrap.Modal(document.getElementById('modalTolak'));
+            modal.show();
+        });
+
         // ---------------------------------------------------------------------
         // AKSI 3: PENETAPAN HARGA (Role: penetap) -> Diverifikasi -> Ditetapkan
         // ---------------------------------------------------------------------
@@ -427,8 +443,8 @@
                                 <tr><th class="text-muted">Satuan</th><td><span class="badge bg-light text-dark border">${item.satuan}</span></td></tr>
                                 <tr><th class="text-muted">Harga Usulan</th><td class="fw-bold text-dark">${item.harga_usulan_formatted || ('Rp ' + SshModule.helpers.formatRupiah(item.harga_usulan))}</td></tr>
                                 ${item.harga_ditetapkan ? `<tr><th class="text-success">Harga Ditetapkan</th><td class="fw-bold text-success fs-6">${item.harga_ditetapkan_formatted || ('Rp ' + SshModule.helpers.formatRupiah(item.harga_ditetapkan))}</td></tr>` : ''}
-                                <tr><th class="text-muted">Status Proses</th><td><span class="badge bg-primary">${item.status_proses}</span></td></tr>
-                                ${item.catatan_verifikator ? `<tr><th class="text-warning align-top">Catatan</th><td><div class="alert alert-warning py-1 px-2 small mb-0">${item.catatan_verifikator}</div></td></tr>` : ''}
+                                <tr><th class="text-muted">Status Proses</th><td><span class="badge ${item.status_proses === 'Ditolak' ? 'bg-danger' : (item.status_proses === 'Direvisi' ? 'bg-warning text-dark' : (item.status_proses === 'Ditetapkan' ? 'bg-success' : 'bg-primary'))}">${item.status_proses}</span></td></tr>
+                                ${item.catatan_verifikator ? `<tr><th class="${item.status_proses === 'Ditolak' ? 'text-danger' : 'text-warning'} align-top">${item.status_proses === 'Ditolak' ? 'Alasan Tolak' : 'Catatan'}</th><td><div class="alert ${item.status_proses === 'Ditolak' ? 'alert-danger border-danger' : 'alert-warning'} py-1 px-2 small mb-0">${item.catatan_verifikator}</div></td></tr>` : ''}
                             </table>
                         </div>
                         <div class="col-md-5 border-start">
@@ -475,6 +491,7 @@
             const status = $(this).data('status') || '';
             let actionType = 'revisi';
             if (status === 'Diverifikasi') actionType = 'setuju';
+            if (status === 'Ditolak') actionType = 'tolak';
             if (status === 'Ditetapkan') actionType = 'penetapan';
 
             if (window.SipaWa) {
@@ -499,6 +516,24 @@
                     module: prefix,
                     id: id,
                     action_type: 'revisi',
+                    catatan: catatan
+                });
+            }
+        });
+
+        $(document).on('click', '#btnWaFromModalTolak', function (e) {
+            e.preventDefault();
+            const actionUrl = $('#formTolakUsulan').attr('action') || '';
+            const parts = actionUrl.split('/');
+            const id = parts[parts.length - 1];
+            const prefix = actionUrl.indexOf('/sbu/') !== -1 ? 'sbu' : 'ssh';
+            const catatan = $('#tolakCatatan').val() || '';
+
+            if (window.SipaWa) {
+                window.SipaWa.open({
+                    module: prefix,
+                    id: id,
+                    action_type: 'tolak',
                     catatan: catatan
                 });
             }

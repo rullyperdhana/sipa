@@ -24,7 +24,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
 <?php if (isset($summary)): ?>
 <!-- Statistik Antrean Verifikasi -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-lg">
         <a href="<?= site_url("{$prefixUrl}/verifikasi?status=Diajukan") ?>" class="text-decoration-none">
             <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-warning">
                 <div class="card-body p-2">
@@ -35,7 +35,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
             </div>
         </a>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-lg">
         <a href="<?= site_url("{$prefixUrl}/verifikasi?status=Diverifikasi") ?>" class="text-decoration-none">
             <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-primary">
                 <div class="card-body p-2">
@@ -46,19 +46,30 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
             </div>
         </a>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-lg">
         <a href="<?= site_url("{$prefixUrl}/verifikasi?status=Direvisi") ?>" class="text-decoration-none">
-            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-danger">
+            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-warning">
                 <div class="card-body p-2">
                     <small class="text-muted fw-semibold d-block text-uppercase">Perlu Revisi SKPD</small>
-                    <h3 class="mb-0 mt-1 fw-bold text-danger"><?= (int)($summary->direvisi ?? 0) ?></h3>
+                    <h3 class="mb-0 mt-1 fw-bold text-warning"><?= (int)($summary->direvisi ?? 0) ?></h3>
                     <small class="text-muted" style="font-size:11px;">Dikembalikan</small>
                 </div>
             </div>
         </a>
     </div>
-    <div class="col-6 col-md-3">
-        <a href="<?= site_url("{$prefixUrl}/verifikasi?status=") ?>" class="text-decoration-none">
+    <div class="col-6 col-md-4 col-lg">
+        <a href="<?= site_url("{$prefixUrl}/verifikasi?status=Ditolak") ?>" class="text-decoration-none">
+            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-danger">
+                <div class="card-body p-2">
+                    <small class="text-muted fw-semibold d-block text-uppercase">Ditolak</small>
+                    <h3 class="mb-0 mt-1 fw-bold text-danger"><?= (int)($summary->ditolak ?? 0) ?></h3>
+                    <small class="text-muted" style="font-size:11px;">Tidak disetujui</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-12 col-md-4 col-lg">
+        <a href="<?= site_url("{$prefixUrl}/verifikasi?status=all") ?>" class="text-decoration-none">
             <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-secondary">
                 <div class="card-body p-2">
                     <small class="text-muted fw-semibold d-block text-uppercase">Total Seluruh Berkas</small>
@@ -81,7 +92,8 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                     <option value="Diajukan" <?= ($filter['status_proses'] ?? '') === 'Diajukan' ? 'selected' : '' ?>>Menunggu Verifikasi (Diajukan)</option>
                     <option value="Diverifikasi" <?= ($filter['status_proses'] ?? '') === 'Diverifikasi' ? 'selected' : '' ?>>Sudah Diverifikasi</option>
                     <option value="Direvisi" <?= ($filter['status_proses'] ?? '') === 'Direvisi' ? 'selected' : '' ?>>Dikembalikan (Direvisi)</option>
-                    <option value="" <?= ($filter['status_proses'] ?? '') === '' ? 'selected' : '' ?>>Semua Status</option>
+                    <option value="Ditolak" <?= ($filter['status_proses'] ?? '') === 'Ditolak' ? 'selected' : '' ?>>Ditolak</option>
+                    <option value="all" <?= in_array($filter['status_proses'] ?? '', ['all', ''], TRUE) ? 'selected' : '' ?>>Semua Status</option>
                 </select>
             </div>
             <div class="col-md-3">
@@ -142,7 +154,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                         <th class="text-end">Harga Usulan</th>
                         <th class="text-center">Lampiran</th>
                         <th class="text-center">Status</th>
-                        <th class="text-center" width="220">Aksi Verifikasi</th>
+                        <th class="text-center" width="270">Aksi Verifikasi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -244,6 +256,15 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                                         title="Kembalikan usulan ke SKPD dengan catatan perbaikan">
                                     <i class="bi bi-arrow-repeat me-1"></i> Revisi
                                 </button>
+                                <!-- Tombol Tolak -->
+                                <button type="button" class="btn btn-danger btn-tolak-modal" 
+                                        data-id="<?= $row->id ?>" 
+                                        data-kode="<?= e($row->kode_usulan) ?>"
+                                        data-uraian="<?= e($row->uraian) ?>"
+                                        data-prefix="<?= $prefixUrl ?>"
+                                        title="Tolak usulan (alasan penolakan wajib diisi)">
+                                    <i class="bi bi-x-circle me-1"></i> Tolak
+                                </button>
                                 <?php endif; ?>
                                 <!-- Tombol WhatsApp -->
                                 <button type="button" class="btn btn-outline-success btn-kirim-wa-ssh" 
@@ -331,6 +352,41 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                     <div>
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-warning text-dark fw-semibold"><i class="bi bi-send-exclamation me-1"></i> Kirim Catatan Revisi</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Dialog: Tolak Usulan -->
+<div class="modal fade" id="modalTolak" tabindex="-1" aria-labelledby="modalTolakLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold" id="modalTolakLabel"><i class="bi bi-x-circle-fill me-2"></i>Tolak Usulan <?= $tipe ?></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formTolakUsulan" method="post" action="">
+                <?= csrf_input() ?>
+                <input type="hidden" name="aksi" value="tolak">
+                <div class="modal-body">
+                    <p class="mb-2">Usulan <strong id="tolakKode"></strong> (<span id="tolakUraian"></span>) akan <strong>Ditolak</strong>.</p>
+                    
+                    <div class="mb-3">
+                        <label for="tolakCatatan" class="form-label fw-semibold">Alasan Penolakan <span class="text-danger">*</span></label>
+                        <textarea class="form-control border-danger" id="tolakCatatan" name="catatan_verifikator" rows="4" 
+                                  placeholder="Tuliskan alasan penolakan secara jelas (contoh: Tidak sesuai tupoksi/kebutuhan daerah, usulan duplikat, barang tidak memenuhi kriteria standarisasi)..." required></textarea>
+                        <div class="form-text text-danger">Alasan penolakan ini akan dicatat dan dapat dilihat oleh SKPD pengusul.</div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-outline-success btn-sm" id="btnWaFromModalTolak">
+                        <i class="bi bi-whatsapp me-1"></i>Draf Notif WA
+                    </button>
+                    <div>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-danger fw-semibold"><i class="bi bi-x-circle me-1"></i> Konfirmasi Tolak</button>
                     </div>
                 </div>
             </form>

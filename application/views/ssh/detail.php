@@ -137,10 +137,10 @@
                         </tr>
                         <?php if (!empty($item->catatan_verifikator)): ?>
                         <tr>
-                            <th class="text-muted fw-normal align-top">Catatan Verifikator</th>
+                            <th class="text-muted fw-normal align-top"><?= $item->status_proses === 'Ditolak' ? 'Alasan Penolakan' : 'Catatan Verifikator' ?></th>
                             <td>
-                                <div class="alert alert-warning py-2 px-3 mb-0 small">
-                                    <i class="bi bi-chat-left-dots-fill me-1"></i> <?= nl2br(e($item->catatan_verifikator)) ?>
+                                <div class="alert <?= $item->status_proses === 'Ditolak' ? 'alert-danger border-danger' : 'alert-warning' ?> py-2 px-3 mb-0 small">
+                                    <i class="bi <?= $item->status_proses === 'Ditolak' ? 'bi-x-circle-fill text-danger' : 'bi-chat-left-dots-fill' ?> me-1"></i> <?= nl2br(e($item->catatan_verifikator)) ?>
                                 </div>
                             </td>
                         </tr>

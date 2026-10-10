@@ -52,8 +52,8 @@ class Dashboard extends Auth_Controller
         $statistikStandar = $this->laporan_model->getSshSbuStatistik($filterSsh);
 
         $rekapStandar = [
-            'SSH' => ['total' => 0, 'draft' => 0, 'diajukan' => 0, 'diverifikasi' => 0, 'ditetapkan' => 0, 'direvisi' => 0, 'nilai' => 0],
-            'SBU' => ['total' => 0, 'draft' => 0, 'diajukan' => 0, 'diverifikasi' => 0, 'ditetapkan' => 0, 'direvisi' => 0, 'nilai' => 0]
+            'SSH' => ['total' => 0, 'draft' => 0, 'diajukan' => 0, 'diverifikasi' => 0, 'ditetapkan' => 0, 'direvisi' => 0, 'ditolak' => 0, 'nilai' => 0],
+            'SBU' => ['total' => 0, 'draft' => 0, 'diajukan' => 0, 'diverifikasi' => 0, 'ditetapkan' => 0, 'direvisi' => 0, 'ditolak' => 0, 'nilai' => 0]
         ];
 
         foreach ($statistikStandar as $row) {
@@ -98,7 +98,7 @@ class Dashboard extends Auth_Controller
         $totalDraft = array_sum(array_column($rekap, 'draft')) + $rekapStandar['SSH']['draft'] + $rekapStandar['SBU']['draft'];
         $totalVerif = $totalAntreanVerif + $rekapStandar['SSH']['diverifikasi'] + $rekapStandar['SBU']['diverifikasi'];
         $totalDisetujui = array_sum(array_column($rekap, 'disetujui')) + $rekapStandar['SSH']['ditetapkan'] + $rekapStandar['SBU']['ditetapkan'];
-        $totalDitolak = array_sum(array_column($rekap, 'ditolak')) + $rekapStandar['SSH']['direvisi'] + $rekapStandar['SBU']['direvisi'];
+        $totalDitolak = array_sum(array_column($rekap, 'ditolak')) + $rekapStandar['SSH']['direvisi'] + $rekapStandar['SBU']['direvisi'] + $rekapStandar['SSH']['ditolak'] + $rekapStandar['SBU']['ditolak'];
 
         $chartStatus = [
             'labels' => ['Draft', 'Diajukan / Verifikasi', 'Disetujui / Ditetapkan', 'Ditolak / Revisi'],

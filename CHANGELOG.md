@@ -5,6 +5,19 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.8.1] - 2026-10-10
+
+### 🚀 Ditambahkan (Added)
+- **Status "Ditolak" pada Modul Standar Satuan Harga (SSH) & Standar Biaya Umum (SBU):**
+  - **State Machine & Alur Transisi:** Memperluas enum `status_proses` pada tabel `standar_harga_usulan` menjadi `('Draft','Diajukan','Direvisi','Diverifikasi','Ditolak','Ditetapkan')`. Menetapkan status `Ditolak` sebagai *terminal state* yang hanya dapat dilakukan oleh role verifikator dan admin dari usulan berstatus `Diajukan`.
+  - **Tombol & Modal Aksi Penolakan (Verifikasi SSH/SBU):** Verifikator dapat menolak usulan langsung melalui tombol merah *"Tolak"* dengan modal dialog konfirmasi yang mewajibkan pengisian alasan/catatan penolakan secara spesifik (`#modalTolak`).
+  - **Audit Trail & Jejak Aktivitas:** Setiap penolakan dicatat otomatis ke log aktivitas sistem (`standar_harga_log`) lengkap dengan username, timestamp, status sebelum/sesudah, dan alasan penolakan.
+  - **Kartu Rekap Statistik & Filter:** Menambahkan kartu ringkasan antrean *"Ditolak"* berwarna merah pada header antrean verifikasi serta dashboard usulan SKPD, lengkap dengan opsi filter status *"Ditolak"*.
+  - **Transparansi Alasan Penolakan untuk SKPD:** Tampilan baris usulan pada dashboard SKPD dan detail item otomatis memunculkan banner alert merah berisi alasan penolakan dari BPKAD.
+  - **Integrasi Notifikasi WhatsApp Kedinasan (`standar_tolak`):** Verifikator dapat mengirim draf notifikasi penolakan resmi secara instan ke nomor WhatsApp operator SKPD pengusul.
+
+---
+
 ## [2.8.0] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

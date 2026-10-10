@@ -317,9 +317,12 @@ class Sbu extends Auth_Controller
     {
         $this->_restrictRoles(['verifikator', 'admin']);
 
+        $rawStatus = $this->input->get('status', TRUE);
+        $statusProses = ($rawStatus !== NULL) ? $rawStatus : 'Diajukan';
+
         $filter = [
             'tipe'          => 'SBU',
-            'status_proses' => $this->input->get('status', TRUE) ?: 'Diajukan',
+            'status_proses' => $statusProses,
             'id_skpd'       => $this->input->get('skpd_id', TRUE),
             'kategori'      => $this->input->get('kategori', TRUE),
             'tahun'         => $this->input->get('tahun', TRUE),
@@ -708,6 +711,8 @@ class Sbu extends Auth_Controller
             $result = $this->ssh_model->verifikasiUsulan($id, 'setujui', $catatan, $hargaDitetapkan, $this->currentUser);
         } elseif ($targetStatus === 'Direvisi') {
             $result = $this->ssh_model->verifikasiUsulan($id, 'revisi', $catatan, NULL, $this->currentUser);
+        } elseif ($targetStatus === 'Ditolak') {
+            $result = $this->ssh_model->verifikasiUsulan($id, 'tolak', $catatan, NULL, $this->currentUser);
         } elseif ($targetStatus === 'Ditetapkan') {
             $result = $this->ssh_model->tetapkanUsulan($id, $this->currentUser);
         }

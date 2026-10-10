@@ -144,6 +144,20 @@ class Whatsapp
                 $body .= "👉 {$link}\n\n";
                 break;
 
+            case 'standar_tolak':
+                $body .= "❌ *PEMBERITAHUAN USULAN STANDAR HARGA DITOLAK ({$modulJudul})*\n\n";
+                $body .= "Disampaikan bahwa usulan Standar Harga/Biaya berikut belum dapat disetujui / ditolak oleh Tim Verifikator:\n\n";
+                $body .= "• *Kode Usulan:* {$nomorUsulan}\n";
+                if (!empty($uraian)) $body .= "• *Uraian:* {$uraian}\n";
+                $body .= "• *Status:* ❌ *DITOLAK*\n\n";
+                if (!empty($catatan)) {
+                    $body .= "📝 *Alasan Penolakan:*\n";
+                    $body .= "_{$catatan}_\n\n";
+                }
+                $body .= "Rincian usulan dapat dilihat melalui tautan:\n";
+                $body .= "👉 {$link}\n\n";
+                break;
+
             case 'standar_diverifikasi':
                 $body .= "✅ *USULAN STANDAR HARGA DIVERIFIKASI*\n\n";
                 $body .= "Usulan Standar Harga/Biaya berikut telah selesai diverifikasi oleh Tim BPKAD:\n\n";

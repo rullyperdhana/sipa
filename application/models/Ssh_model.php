@@ -77,9 +77,11 @@ class Ssh_model extends CI_Model
         $this->db->join('users usr', 'usr.id = u.user_id', 'left');
         $this->db->join('users v', 'v.id = u.verifikator_id', 'left');
 
-        // Default hanya usulan yang 'Diajukan' untuk antrean kerja verifikator
-        if (isset($filter['status_proses']) && $filter['status_proses'] !== '') {
-            $this->db->where('u.status_proses', $filter['status_proses']);
+        // Default hanya usulan yang 'Diajukan' untuk antrean kerja verifikator, kecuali 'all' / semua status
+        if (isset($filter['status_proses'])) {
+            if ($filter['status_proses'] !== '' && $filter['status_proses'] !== 'all') {
+                $this->db->where('u.status_proses', $filter['status_proses']);
+            }
         } else {
             $this->db->where('u.status_proses', 'Diajukan');
         }
@@ -559,6 +561,24 @@ class Ssh_model extends CI_Model
             $this->logActivity($id, $user, $statusSebelum, 'Direvisi', 'Dikembalikan ke SKPD untuk direvisi. Catatan: ' . $catatan);
 
             return ['success' => TRUE, 'message' => 'Usulan dikembalikan ke SKPD untuk dilakukan perbaikan/revisi.'];
+
+        } elseif ($action === 'tolak') {
+            if (empty(trim($catatan))) {
+                return ['success' => FALSE, 'message' => 'Alasan/catatan penolakan wajib diisi untuk usulan yang ditolak.'];
+            }
+
+            $updateData = [
+                'status_proses'       => 'Ditolak',
+                'catatan_verifikator' => trim($catatan),
+                'verifikator_id'      => (int) $user->id,
+                'tgl_verifikasi'      => $now,
+                'updated_at'          => $now
+            ];
+
+            $this->db->where('id', (int) $id)->update($this->table, $updateData);
+            $this->logActivity($id, $user, $statusSebelum, 'Ditolak', 'Ditolak oleh verifikator. Alasan penolakan: ' . $catatan);
+
+            return ['success' => TRUE, 'message' => 'Usulan berhasil ditolak.'];
         }
 
         return ['success' => FALSE, 'message' => 'Aksi verifikasi tidak valid.'];
@@ -793,6 +813,7 @@ class Ssh_model extends CI_Model
             COUNT(CASE WHEN status_proses = 'Draft' THEN 1 END) as draft,
             COUNT(CASE WHEN status_proses = 'Diajukan' THEN 1 END) as diajukan,
             COUNT(CASE WHEN status_proses = 'Direvisi' THEN 1 END) as direvisi,
+            COUNT(CASE WHEN status_proses = 'Ditolak' THEN 1 END) as ditolak,
             COUNT(CASE WHEN status_proses = 'Diverifikasi' THEN 1 END) as diverifikasi,
             COUNT(CASE WHEN status_proses = 'Ditetapkan' THEN 1 END) as ditetapkan,
             COUNT(*) as total

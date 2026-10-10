@@ -15,8 +15,9 @@ class Ssh_service
      */
     protected $allowedTransitions = [
         'Draft'        => ['Diajukan'],
-        'Diajukan'     => ['Diverifikasi', 'Direvisi'],
+        'Diajukan'     => ['Diverifikasi', 'Direvisi', 'Ditolak'],
         'Direvisi'     => ['Diajukan'],
+        'Ditolak'      => [], // Terminal state (Usulan ditolak)
         'Diverifikasi' => ['Ditetapkan'],
         'Ditetapkan'   => [] // Terminal state (Terkunci secara permanen)
     ];
@@ -54,8 +55,9 @@ class Ssh_service
 
             case 'Diverifikasi':
             case 'Direvisi':
+            case 'Ditolak':
                 if (!in_array($userRole, ['verifikator', 'admin'], TRUE)) {
-                    return ['allowed' => FALSE, 'message' => 'Hanya verifikator yang berhak menyetujui atau meminta revisi usulan.'];
+                    return ['allowed' => FALSE, 'message' => 'Hanya verifikator yang berhak menyetujui, meminta revisi, atau menolak usulan.'];
                 }
                 break;
 
