@@ -40,7 +40,7 @@
                         <?php elseif (empty($perms)): ?>
                             <span class="badge bg-secondary-subtle text-secondary border"><i class="bi bi-gear-wide-connected me-1"></i>Default Role</span>
                         <?php else: ?>
-                            <div class="d-flex flex-wrap gap-1" style="max-width: 260px;">
+                            <div class="d-flex flex-wrap gap-1" style="max-width: 280px;">
                                 <?php
                                 $badges = [];
                                 $rkbmdItems = ['rkbmd_pengadaan', 'rkbmd_pemeliharaan', 'rkbmd_pemanfaatan', 'rkbmd_pemindahtanganan', 'rkbmd_penghapusan'];
@@ -49,27 +49,34 @@
                                     if (in_array($rk, $perms)) $hasRkbmd++;
                                 }
                                 if ($hasRkbmd === 5) {
-                                    $badges[] = '<span class="badge bg-success-subtle text-success border" title="Semua Modul RKBMD"><i class="bi bi-diagram-3 me-1"></i>RKBMD (5)</span>';
+                                    $badges[] = '<span class="badge bg-success-subtle text-success border" title="Semua 5 Modul RKBMD"><i class="bi bi-diagram-3-fill me-1"></i>Grup RKBMD (5/5)</span>';
                                 } elseif ($hasRkbmd > 0) {
-                                    $badges[] = '<span class="badge bg-success-subtle text-success border" title="Sebagian Modul RKBMD"><i class="bi bi-diagram-3 me-1"></i>RKBMD (' . $hasRkbmd . ')</span>';
+                                    $badges[] = '<span class="badge bg-success-subtle text-success border" title="Sebagian Modul RKBMD"><i class="bi bi-diagram-3 me-1"></i>Grup RKBMD (' . $hasRkbmd . '/5)</span>';
                                 }
 
-                                if (in_array('ssh', $perms)) {
-                                    $badges[] = '<span class="badge bg-primary-subtle text-primary border"><i class="bi bi-tag me-1"></i>SSH</span>';
+                                $hasSsh = in_array('ssh', $perms);
+                                $hasSbu = in_array('sbu', $perms);
+                                if ($hasSsh && $hasSbu) {
+                                    $badges[] = '<span class="badge bg-primary-subtle text-primary border" title="Modul SSH & SBU Lengkap"><i class="bi bi-tags-fill me-1"></i>Grup Standar (SSH & SBU)</span>';
+                                } elseif ($hasSsh) {
+                                    $badges[] = '<span class="badge bg-primary-subtle text-primary border"><i class="bi bi-tag-fill me-1"></i>Standar SSH</span>';
+                                } elseif ($hasSbu) {
+                                    $badges[] = '<span class="badge bg-info-subtle text-info border"><i class="bi bi-wallet2 me-1"></i>Standar SBU</span>';
                                 }
-                                if (in_array('sbu', $perms)) {
-                                    $badges[] = '<span class="badge bg-info-subtle text-info border"><i class="bi bi-wallet2 me-1"></i>SBU</span>';
-                                }
+
                                 if (in_array('laporan', $perms)) {
-                                    $badges[] = '<span class="badge bg-warning-subtle text-dark border"><i class="bi bi-file-earmark-bar-graph me-1"></i>Laporan</span>';
+                                    $badges[] = '<span class="badge bg-warning-subtle text-dark border"><i class="bi bi-file-earmark-bar-graph-fill me-1"></i>Grup Laporan</span>';
                                 }
+
                                 $verifItems = ['verifikasi_rkbmd', 'verifikasi_standar', 'penetapan_standar', 'jadwal_standar'];
                                 $hasVerif = 0;
                                 foreach ($verifItems as $vk) {
                                     if (in_array($vk, $perms)) $hasVerif++;
                                 }
-                                if ($hasVerif > 0) {
-                                    $badges[] = '<span class="badge bg-dark-subtle text-dark border"><i class="bi bi-shield-check me-1"></i>Verif (' . $hasVerif . ')</span>';
+                                if ($hasVerif === 4) {
+                                    $badges[] = '<span class="badge bg-dark-subtle text-dark border"><i class="bi bi-shield-check me-1"></i>Grup Verif (4/4)</span>';
+                                } elseif ($hasVerif > 0) {
+                                    $badges[] = '<span class="badge bg-dark-subtle text-dark border"><i class="bi bi-shield me-1"></i>Verif (' . $hasVerif . '/4)</span>';
                                 }
 
                                 echo !empty($badges) ? implode(' ', $badges) : '<span class="text-muted small">-</span>';
@@ -147,29 +154,45 @@
                         <div class="col-md-3"><label class="form-label">Status</label><select name="is_active" id="u_active" class="form-select"><option value="1">Aktif</option><option value="0">Nonaktif</option></select></div>
                     </div>
 
-                    <!-- Checklist Hak Akses Menu -->
+                    <!-- Checklist Hak Akses Menu Berhirarki -->
                     <div class="mt-4">
                         <div class="card border border-primary-subtle shadow-none">
-                            <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
-                                <div>
-                                    <h6 class="mb-0 fw-bold text-primary">
-                                        <i class="bi bi-ui-checks-grid me-1"></i>Pengaturan Hak Akses Menu & Modul
-                                    </h6>
-                                    <small class="text-muted">Centang menu apa saja yang diizinkan untuk diakses oleh pengguna ini.</small>
+                            <div class="card-header bg-light py-2">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                                    <div>
+                                        <h6 class="mb-0 fw-bold text-primary">
+                                            <i class="bi bi-diagram-3-fill me-1"></i>Hirarki Pengelompokan Hak Akses Menu & Modul
+                                        </h6>
+                                        <small class="text-muted">Centang Group Parent untuk mengaktifkan seluruh modul di grup tersebut, atau atur secara spesifik per sub-modul.</small>
+                                    </div>
+                                    <div class="btn-group btn-group-sm flex-wrap" role="group">
+                                        <button type="button" class="btn btn-outline-primary" id="btnPresetAll" title="Centang seluruh modul">
+                                            <i class="bi bi-check-all me-1"></i>Pilih Semua
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" id="btnPresetClear" title="Hilangkan semua centang">
+                                            <i class="bi bi-x-circle me-1"></i>Bersihkan
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="btn-group btn-group-sm flex-wrap" role="group">
-                                    <button type="button" class="btn btn-outline-primary" id="btnPresetAll" title="Centang seluruh menu">
-                                        <i class="bi bi-check-all me-1"></i>Pilih Semua
-                                    </button>
-                                    <button type="button" class="btn btn-outline-info" id="btnPresetSshSbu" title="User A: Hanya Usulan SSH, SBU & Laporan">
-                                        <i class="bi bi-tags-fill me-1"></i>User A (SSH + SBU + Laporan)
-                                    </button>
-                                    <button type="button" class="btn btn-outline-success" id="btnPresetRkbmd" title="User B: Hanya Usulan RKBMD & Laporan">
-                                        <i class="bi bi-diagram-3-fill me-1"></i>User B (RKBMD + Laporan)
-                                    </button>
-                                    <button type="button" class="btn btn-outline-secondary" id="btnPresetClear" title="Hilangkan semua centang">
-                                        <i class="bi bi-x-circle me-1"></i>Bersihkan
-                                    </button>
+
+                                <!-- Template Group Profiler -->
+                                <div class="row g-2 align-items-center p-2 bg-white rounded border border-secondary-subtle">
+                                    <div class="col-md-4">
+                                        <label class="form-label mb-0 small fw-bold text-dark d-flex align-items-center">
+                                            <i class="bi bi-layers-fill text-primary me-1 fs-6"></i>Template Grup Hak Akses:
+                                        </label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <select class="form-select form-select-sm" id="selectGroupTemplate">
+                                            <option value="">-- Pilih Preset Template Grup Cepat --</option>
+                                            <option value="user_a">🏷️ Preset User A: Grup Standar Harga (SSH + SBU) & Laporan</option>
+                                            <option value="user_b">📦 Preset User B: Grup Perencanaan RKBMD (5 Modul) & Laporan</option>
+                                            <option value="verifikator">⚖️ Preset Verifikator: Telaah RKBMD & Standar Harga, Jadwal, Laporan</option>
+                                            <option value="penetap">🛡️ Preset Penetap & Pimpinan: RKBMD, Standar Harga, Penetapan SK, Laporan</option>
+                                            <option value="all">👑 Preset Akses Penuh: Aktifkan Semua Grup</option>
+                                            <option value="clear">🧹 Bersihkan Semua Grup (Gunakan Hak Bawaan Role)</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-body p-3">
@@ -180,22 +203,30 @@
                                 <div class="row g-3">
                                     <?php if (!empty($availablePermissions)): foreach ($availablePermissions as $groupKey => $group): ?>
                                     <div class="col-md-6">
-                                        <div class="border rounded p-3 bg-white h-100 shadow-sm">
-                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
-                                                <div class="fw-bold text-dark small">
-                                                    <i class="bi <?= e($group['icon']) ?> text-primary me-1"></i><?= e($group['label']) ?>
+                                        <div class="border rounded p-3 bg-white h-100 shadow-sm tree-group-card">
+                                            <!-- Parent Group Header -->
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom bg-light-subtle rounded p-2">
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input group-parent-cb" type="checkbox" id="group_cb_<?= $groupKey ?>" data-group="<?= $groupKey ?>">
+                                                    <label class="form-check-label fw-bold text-dark small cursor-pointer" for="group_cb_<?= $groupKey ?>">
+                                                        <i class="bi <?= e($group['icon']) ?> text-primary me-1"></i><?= e($group['label']) ?>
+                                                    </label>
                                                 </div>
-                                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none group-toggle-btn" data-group="<?= $groupKey ?>" style="font-size: 0.75rem;">
-                                                    Pilih Grup
-                                                </button>
+                                                <span class="badge bg-white text-secondary border small group-count-badge" id="badge_count_<?= $groupKey ?>">
+                                                    0 / <?= count($group['items']) ?>
+                                                </span>
                                             </div>
-                                            <div class="vstack gap-2">
+
+                                            <!-- Child Items (Hierarchical Tree Indentation) -->
+                                            <div class="tree-group-children ms-3 ps-3 border-start border-2 border-primary-subtle vstack gap-2 pt-1">
                                                 <?php foreach ($group['items'] as $permKey => $perm): ?>
                                                 <div class="form-check">
-                                                    <input class="form-check-input perm-checkbox group-<?= $groupKey ?>" type="checkbox" name="permissions[]" value="<?= e($permKey) ?>" id="perm_<?= e($permKey) ?>">
-                                                    <label class="form-check-label" for="perm_<?= e($permKey) ?>">
-                                                        <span class="fw-semibold small d-block"><?= e($perm['label']) ?></span>
-                                                        <span class="text-muted" style="font-size: 0.75rem;"><?= e($perm['desc']) ?></span>
+                                                    <input class="form-check-input perm-checkbox child-of-<?= $groupKey ?>" type="checkbox" name="permissions[]" value="<?= e($permKey) ?>" id="perm_<?= e($permKey) ?>" data-group="<?= $groupKey ?>">
+                                                    <label class="form-check-label cursor-pointer" for="perm_<?= e($permKey) ?>">
+                                                        <span class="fw-semibold small d-block text-dark">
+                                                            <i class="bi bi-arrow-return-right text-muted me-1 small"></i><?= e($perm['label']) ?>
+                                                        </span>
+                                                        <span class="text-muted" style="font-size: 0.74rem;"><?= e($perm['desc']) ?></span>
                                                     </label>
                                                 </div>
                                                 <?php endforeach; ?>
@@ -208,7 +239,7 @@
                                 <div class="mt-3 p-2 bg-light rounded small text-muted d-flex align-items-center">
                                     <i class="bi bi-info-circle text-primary me-2 fs-5"></i>
                                     <div>
-                                        <strong>Petunjuk:</strong> Jika semua checkbox di atas dibiarkan kosong, akun akan otomatis menggunakan <em>default permissions</em> sesuai peran (role)-nya.
+                                        <strong>Petunjuk Hirarki:</strong> Centang toggle pada <strong>Parent Group</strong> untuk mengaktifkan seluruh sub-modul anak sekaligus. Jika hanya sebagian anak yang dicentang, grup akan berstatus <em>indeterminate</em> (strip).
                                     </div>
                                 </div>
                             </div>
@@ -251,15 +282,48 @@ function checkRoleNotice() {
     }
 }
 
+// Sinkronisasi status Parent Checkbox & Badge Counter berdasarkan anak-anaknya
+function updateGroupState(groupKey) {
+    const children = $('.child-of-' + groupKey);
+    const total = children.length;
+    const checked = children.filter(':checked').length;
+    const parent = $('#group_cb_' + groupKey);
+    const badge = $('#badge_count_' + groupKey);
+
+    badge.text(checked + ' / ' + total);
+
+    if (checked === total && total > 0) {
+        parent.prop('checked', true).prop('indeterminate', false);
+        badge.removeClass('bg-white text-secondary bg-warning-subtle text-dark border-warning').addClass('bg-primary text-white border-primary');
+    } else if (checked === 0) {
+        parent.prop('checked', false).prop('indeterminate', false);
+        badge.removeClass('bg-primary text-white border-primary bg-warning-subtle text-dark border-warning').addClass('bg-white text-secondary');
+    } else {
+        parent.prop('checked', false).prop('indeterminate', true);
+        badge.removeClass('bg-primary text-white border-primary bg-white text-secondary').addClass('bg-warning-subtle text-dark border-warning');
+    }
+}
+
+// Update semua grup sekaligus
+function updateAllGroups() {
+    $('.group-parent-cb').each(function() {
+        const groupKey = $(this).data('group');
+        updateGroupState(groupKey);
+    });
+}
+
 function clearAllPermissions() {
     $('.perm-checkbox').prop('checked', false);
+    $('#selectGroupTemplate').val('');
+    updateAllGroups();
 }
 
 function setPresetPermissions(list) {
-    clearAllPermissions();
+    $('.perm-checkbox').prop('checked', false);
     list.forEach(function(key) {
         $('#perm_' + key).prop('checked', true);
     });
+    updateAllGroups();
 }
 
 function openAddModal(){
@@ -286,38 +350,80 @@ window.addEventListener('load', function() {
 
     $('#u_role').on('change', checkRoleNotice);
 
-    // Preset Buttons
+    // 1. Parent Checkbox di-klik -> Centang / Hapus semua anak dalam grup
+    $(document).on('change', '.group-parent-cb', function() {
+        const groupKey = $(this).data('group');
+        const isChecked = $(this).is(':checked');
+        $('.child-of-' + groupKey).prop('checked', isChecked);
+        updateGroupState(groupKey);
+        $('#selectGroupTemplate').val(''); // Custom
+    });
+
+    // 2. Child Checkbox di-klik -> Perbarui status Parent (checked, unchecked, indeterminate)
+    $(document).on('change', '.perm-checkbox', function() {
+        const groupKey = $(this).data('group');
+        if (groupKey) {
+            updateGroupState(groupKey);
+        }
+        $('#selectGroupTemplate').val(''); // Custom
+    });
+
+    // 3. Dropdown Template Grup Hak Akses
+    $('#selectGroupTemplate').on('change', function() {
+        const val = $(this).val();
+        if (val === 'user_a') {
+            // Preset User A: SSH + SBU + Laporan
+            setPresetPermissions(['ssh', 'sbu', 'laporan']);
+        } else if (val === 'user_b') {
+            // Preset User B: RKBMD (5 Modul) + Laporan
+            setPresetPermissions([
+                'rkbmd_pengadaan',
+                'rkbmd_pemeliharaan',
+                'rkbmd_pemanfaatan',
+                'rkbmd_pemindahtanganan',
+                'rkbmd_penghapusan',
+                'laporan'
+            ]);
+        } else if (val === 'verifikator') {
+            // Preset Verifikator BPKAD
+            setPresetPermissions([
+                'verifikasi_rkbmd',
+                'verifikasi_standar',
+                'jadwal_standar',
+                'laporan'
+            ]);
+        } else if (val === 'penetap') {
+            // Preset Penetap & Pimpinan
+            setPresetPermissions([
+                'rkbmd_pengadaan',
+                'rkbmd_pemeliharaan',
+                'rkbmd_pemanfaatan',
+                'rkbmd_pemindahtanganan',
+                'rkbmd_penghapusan',
+                'ssh',
+                'sbu',
+                'penetapan_standar',
+                'laporan'
+            ]);
+        } else if (val === 'all') {
+            $('.perm-checkbox').prop('checked', true);
+            updateAllGroups();
+        } else if (val === 'clear') {
+            clearAllPermissions();
+        }
+        $(this).val(val);
+    });
+
+    // Tombol Pilih Semua & Bersihkan
     $('#btnPresetAll').on('click', function() {
         $('.perm-checkbox').prop('checked', true);
+        $('#selectGroupTemplate').val('all');
+        updateAllGroups();
     });
 
     $('#btnPresetClear').on('click', function() {
         clearAllPermissions();
-    });
-
-    // Preset User A: SSH, SBU, Laporan
-    $('#btnPresetSshSbu').on('click', function() {
-        setPresetPermissions(['ssh', 'sbu', 'laporan']);
-    });
-
-    // Preset User B: RKBMD (semua 5 jenis) + Laporan
-    $('#btnPresetRkbmd').on('click', function() {
-        setPresetPermissions([
-            'rkbmd_pengadaan',
-            'rkbmd_pemeliharaan',
-            'rkbmd_pemanfaatan',
-            'rkbmd_pemindahtanganan',
-            'rkbmd_penghapusan',
-            'laporan'
-        ]);
-    });
-
-    // Toggle per group
-    $('.group-toggle-btn').on('click', function() {
-        const group = $(this).data('group');
-        const cbs = $('.group-' + group);
-        const anyUnchecked = cbs.filter(':not(:checked)').length > 0;
-        cbs.prop('checked', anyUnchecked);
+        $('#selectGroupTemplate').val('clear');
     });
 
     // Tombol Edit User
@@ -352,6 +458,7 @@ window.addEventListener('load', function() {
             }
         }
 
+        updateAllGroups();
         checkRoleNotice();
         new bootstrap.Modal(document.getElementById('modalUser')).show();
     });
