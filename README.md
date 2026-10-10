@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BPKAD
 
-[![Version](https://img.shields.io/badge/version-2.8.0-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.8.1-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -40,9 +40,9 @@ Menangani 5 instrumen perencanaan aset daerah sesuai Permendagri No. 19 Tahun 20
 ### 2. Modul Standar Satuan Harga (SSH)
 Standarisasi harga satuan barang fisik dan material baru:
 - **Formulir Khusus SSH:** Input barang fisik, perlengkapan kantor, material bangunan, kendaraan dinas, alat kesehatan.
-- **Alur 5 Tahapan:** `Draft` &rarr; `Diajukan` &rarr; `Direvisi` &rarr; `Diverifikasi` &rarr; `Ditetapkan`.
-- **Row-Level Security (RLS):** SKPD hanya dapat melihat dan mengelola usulannya sendiri saat berstatus `Draft` atau `Direvisi`. Data terkunci otomatis saat berstatus `Diajukan`.
-- **Verifikasi BPKAD:** Tim verifikator dapat menyetujui, memberi catatan revisi, atau menolak usulan.
+- **Alur 6 Tahapan Status:** `Draft` &rarr; `Diajukan` &rarr; `Direvisi` / `Ditolak` &rarr; `Diverifikasi` &rarr; `Ditetapkan`.
+- **Row-Level Security (RLS):** SKPD hanya dapat melihat dan mengelola usulannya sendiri saat berstatus `Draft` atau `Direvisi`. Data terkunci otomatis saat berstatus `Diajukan`, `Ditolak`, `Diverifikasi`, atau `Ditetapkan`.
+- **Verifikasi BPKAD:** Tim verifikator dapat menyetujui, meminta revisi ke SKPD, atau menolak usulan dengan wajib mencantumkan alasan penolakan.
 - **Penetapan Harga:** Pimpinan/Penetap menetapkan harga final dan menerbitkan surat keputusan standar satuan harga.
 
 ### 3. Modul Standar Biaya Umum (SBU)
@@ -325,8 +325,17 @@ sipa/
 
    # Migrasi v2.8.0 (Manajemen Nomenklatur SKPD Per Tahun & Konteks Tahun Anggaran Global)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_global_fiscal_year_and_skpd_nomenklatur.sql
+
+   # Migrasi v2.8.1 (Penambahan Status Ditolak pada Modul SSH & SBU)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_ditolak_status_to_ssh_sbu.sql
    ```
    *(Masukkan password database VPS saat diminta).*
+
+   > [!TIP]
+   > Alternatif eksekusi migrasi otomatis tanpa password MySQL root VPS:
+   > ```bash
+   > php -r 'define("BASEPATH",true);define("ENVIRONMENT","production");require "application/config/database.php";$cfg=$db["default"];$pdo=new PDO("mysql:host=".($cfg["hostname"]??"localhost").";port=".($cfg["port"]??3306).";dbname=".$cfg["database"],$cfg["username"],$cfg["password"]);$pdo->exec(file_get_contents("database/migrations/add_ditolak_status_to_ssh_sbu.sql"));echo "Migrasi Berhasil!\n";'
+   > ```
 
 ---
 
@@ -334,6 +343,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`add_ditolak_status_to_ssh_sbu.sql`](database/migrations/add_ditolak_status_to_ssh_sbu.sql) | Menambahkan status `Ditolak` pada enum `status_proses` tabel `standar_harga_usulan` untuk modul SSH dan SBU. |
 | [`add_global_fiscal_year_and_skpd_nomenklatur.sql`](database/migrations/add_global_fiscal_year_and_skpd_nomenklatur.sql) | Menambahkan tabel `skpd_nomenklatur` untuk mencatat riwayat nama SKPD, kode unit, dan Kepala SKPD per Tahun Anggaran agar dokumen cetak lampau tetap otentik. |
 | [`add_user_registration_settings.sql`](database/migrations/add_user_registration_settings.sql) | Menambahkan konfigurasi default pendaftaran mandiri pengguna (`registration_enabled`, `registration_require_approval`, `registration_default_role`) pada tabel `ex_settings`. |
 | [`add_wa_notification_features.sql`](database/migrations/add_wa_notification_features.sql) | Menambahkan kolom `no_wa` pada tabel `users`, tabel konfigurasi `ex_settings`, dan nilai bawaan notifikasi WhatsApp SIPA. |
