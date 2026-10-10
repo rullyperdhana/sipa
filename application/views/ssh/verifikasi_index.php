@@ -127,13 +127,26 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                             <?= rupiah($row->harga_usulan) ?>
                         </td>
                         <td class="text-center">
-                            <?php if (!empty($row->file_lampiran)): ?>
-                            <a href="<?= site_url("{$prefixUrl}/download/{$row->id}") ?>" class="btn btn-sm btn-outline-primary" title="<?= e($row->file_nama_asli ?: 'Unduh Dokumen') ?>">
-                                <i class="bi bi-paperclip"></i>
-                            </a>
-                            <?php else: ?>
-                            <span class="text-muted small">-</span>
-                            <?php endif; ?>
+                            <div class="d-inline-flex gap-1 justify-content-center">
+                                <?php if (!empty($row->file_lampiran)): ?>
+                                <a href="<?= site_url("{$prefixUrl}/download/{$row->id}/1") ?>" class="btn btn-sm btn-outline-primary py-0 px-1.5" title="Survey 1: <?= e($row->file_nama_asli ?: 'Berkas 1') ?>" data-bs-toggle="tooltip">
+                                    <i class="bi bi-file-earmark-text"></i> S1
+                                </a>
+                                <?php endif; ?>
+                                <?php if (!empty($row->file_lampiran_2)): ?>
+                                <a href="<?= site_url("{$prefixUrl}/download/{$row->id}/2") ?>" class="btn btn-sm btn-outline-primary py-0 px-1.5" title="Survey 2: <?= e($row->file_nama_asli_2 ?: 'Berkas 2') ?>" data-bs-toggle="tooltip">
+                                    <i class="bi bi-file-earmark-text"></i> S2
+                                </a>
+                                <?php endif; ?>
+                                <?php if (!empty($row->file_lampiran_3)): ?>
+                                <a href="<?= site_url("{$prefixUrl}/download/{$row->id}/3") ?>" class="btn btn-sm btn-outline-primary py-0 px-1.5" title="Survey 3: <?= e($row->file_nama_asli_3 ?: 'Berkas 3') ?>" data-bs-toggle="tooltip">
+                                    <i class="bi bi-file-earmark-text"></i> S3
+                                </a>
+                                <?php endif; ?>
+                                <?php if (empty($row->file_lampiran) && empty($row->file_lampiran_2) && empty($row->file_lampiran_3)): ?>
+                                <span class="text-muted small">-</span>
+                                <?php endif; ?>
+                            </div>
                         </td>
                         <td class="text-center">
                             <?= badge_status($row->status_proses) ?>

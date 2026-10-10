@@ -5,6 +5,23 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.2.0] - 2026-10-10
+
+### 🚀 Ditambahkan (Added)
+- **Mandatori 3 Berkas Bukti Survey Harga Pasar / Brosur Resmi:**
+  - Peningkatan formulir pengusulan SSH & SBU (`/ssh/tambah`, `/ssh/edit`, `/sbu/tambah`, `/sbu/edit`): dari 1 upload berkas tunggal menjadi **3 berkas bukti survey pasar / brosur resmi toko/distributor** yang independen (`file_lampiran`, `file_lampiran_2`, `file_lampiran_3`).
+  - **Validasi Ketat Wajib Terisi (Strict Mandatory):**
+    - Client-side validation (SweetAlert2 & Bootstrap visual states): Mengharuskan ketiga slot survey diunggah dan membatasi ukuran maksimal 5MB per berkas.
+    - Server-side validation pada controller `Ssh.php` dan `Sbu.php`: Menggagalkan pengajuan usulan jika salah satu atau lebih dari ketiga berkas survey belum diunggah.
+    - Edit mode safeguard: Memastikan integritas data ketiga slot survey tetap lengkap (baik berkas yang sudah ada maupun berkas baru yang diganti).
+  - Tampilan visual kartu modern 3 kolom dengan nomor berkas, label *"Wajib"*, petunjuk survey toko/vendor, dan tombol preview/download berkas saat mode edit.
+  - Multi-file download routes: Dukungan pengunduhan berkas per nomor survey (`/ssh/download/{id}/{slot}` dan `/sbu/download/{id}/{slot}`) untuk slot 1, 2, dan 3.
+  - Kolom bukti survey pada tabel daftar usulan (`/ssh/usulan`, `/sbu/usulan`) dan verifikasi (`/ssh/verifikasi`, `/sbu/verifikasi`) menampilkan 3 tombol pintasan unduh (`S1`, `S2`, `S3`) dengan tooltip.
+  - Halaman detail usulan (`/ssh/detail/{id}`, `/sbu/detail/{id}`) menyajikan rincian lengkap ketiga dokumen survey pasar yang diunggah.
+  - Script migrasi database: `database/migrations/add_bukti_survey_3_files.sql` untuk penambahan kolom `file_lampiran_2`, `file_nama_asli_2`, `file_lampiran_3`, `file_nama_asli_3` pada tabel `standar_harga_usulan`.
+
+---
+
 ## [2.1.0] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

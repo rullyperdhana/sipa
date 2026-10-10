@@ -177,19 +177,38 @@
                 }
             }
 
-            // 6. Validasi Ukuran File Upload (Maksimal 5MB)
-            const $file = $form.find('#file_lampiran');
-            if ($file.length && $file[0].files && $file[0].files[0]) {
-                const file = $file[0].files[0];
-                const maxSize = 5 * 1024 * 1024; // 5MB
-                if (file.size > maxSize) {
-                    $file.addClass('is-invalid');
-                    errors.push('Ukuran file dokumen pendukung melebihi batas maksimal 5MB.');
-                    isValid = false;
-                } else {
-                    $file.removeClass('is-invalid');
+            // 6. Validasi 3 Berkas Bukti Survey Harga Pasar / Brosur Resmi (Wajib Terisi & Maks 5MB)
+            const fileSlots = [
+                { id: 'file_lampiran', label: 'Bukti Survey 1 / Brosur Toko 1' },
+                { id: 'file_lampiran_2', label: 'Bukti Survey 2 / Brosur Toko 2' },
+                { id: 'file_lampiran_3', label: 'Bukti Survey 3 / Brosur Toko 3' }
+            ];
+
+            fileSlots.forEach(function (slot) {
+                const $file = $form.find('#' + slot.id);
+                if ($file.length) {
+                    const hasExisting = $file.attr('data-has-existing') === '1';
+                    const hasSelected = $file[0].files && $file[0].files.length > 0;
+
+                    if (!hasExisting && !hasSelected) {
+                        $file.addClass('is-invalid');
+                        errors.push(slot.label + ' wajib diunggah.');
+                        isValid = false;
+                    } else if (hasSelected) {
+                        const file = $file[0].files[0];
+                        const maxSize = 5 * 1024 * 1024; // 5MB
+                        if (file.size > maxSize) {
+                            $file.addClass('is-invalid');
+                            errors.push('Ukuran ' + slot.label + ' melebihi batas maksimal 5MB.');
+                            isValid = false;
+                        } else {
+                            $file.removeClass('is-invalid').addClass('is-valid');
+                        }
+                    } else {
+                        $file.removeClass('is-invalid');
+                    }
                 }
-            }
+            });
 
             return { isValid: isValid, errors: errors };
         }
@@ -207,6 +226,13 @@
             let parsed = SshModule.helpers.parseRupiah(raw);
             if (parsed > 0) {
                 $(this).val(SshModule.helpers.formatRupiah(parsed));
+            }
+        });
+
+        // Realtime removal of is-invalid on selecting survey file
+        $(document).on('change', '.input-survey-file', function () {
+            if (this.files && this.files.length > 0) {
+                $(this).removeClass('is-invalid').addClass('is-valid');
             }
         });
 

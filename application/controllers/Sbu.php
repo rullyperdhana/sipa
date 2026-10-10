@@ -103,18 +103,47 @@ class Sbu extends Auth_Controller
                 redirect("{$this->prefixUrl}/tambah");
             }
 
-            $uploadResult = $this->ssh_service->handleFileUpload('file_lampiran');
-            if (isset($uploadResult['error'])) {
-                $this->session->set_flashdata('danger', 'Gagal upload file: ' . $uploadResult['error']);
+            // Validasi 3 Berkas Bukti Survey Harga Pasar / Brosur Resmi (Wajib Terisi)
+            $fileSlots = [
+                'file_lampiran'   => 'Bukti Survey 1 / Brosur Resmi 1',
+                'file_lampiran_2' => 'Bukti Survey 2 / Brosur Resmi 2',
+                'file_lampiran_3' => 'Bukti Survey 3 / Brosur Resmi 3',
+            ];
+
+            $missingFiles = [];
+            foreach ($fileSlots as $slotField => $slotLabel) {
+                if (empty($_FILES[$slotField]['name'])) {
+                    $missingFiles[] = $slotLabel;
+                }
+            }
+
+            if (!empty($missingFiles)) {
+                $this->session->set_flashdata('danger', 'Seluruh 3 Bukti Survey Harga Pasar / Brosur Resmi wajib diunggah. Berkas yang belum diunggah: <strong>' . implode(', ', $missingFiles) . '</strong>.');
                 redirect("{$this->prefixUrl}/tambah");
+            }
+
+            // Proses upload ketiga berkas
+            $uploadedFiles = [];
+            foreach ($fileSlots as $slotField => $slotLabel) {
+                $uploadResult = $this->ssh_service->handleFileUpload($slotField);
+                if (isset($uploadResult['error'])) {
+                    foreach ($uploadedFiles as $up) {
+                        @unlink(FCPATH . 'uploads/ssh_sbu/' . $up['fileName']);
+                    }
+                    $this->session->set_flashdata('danger', "Gagal upload {$slotLabel}: " . $uploadResult['error']);
+                    redirect("{$this->prefixUrl}/tambah");
+                }
+                $uploadedFiles[$slotField] = $uploadResult;
             }
 
             $postData = $validation['cleanData'];
             $postData['tipe'] = $this->tipe;
-            if ($uploadResult['hasFile']) {
-                $postData['file_lampiran']  = $uploadResult['fileName'];
-                $postData['file_nama_asli'] = $uploadResult['origName'];
-            }
+            $postData['file_lampiran']    = $uploadedFiles['file_lampiran']['fileName'];
+            $postData['file_nama_asli']   = $uploadedFiles['file_lampiran']['origName'];
+            $postData['file_lampiran_2']  = $uploadedFiles['file_lampiran_2']['fileName'];
+            $postData['file_nama_asli_2'] = $uploadedFiles['file_lampiran_2']['origName'];
+            $postData['file_lampiran_3']  = $uploadedFiles['file_lampiran_3']['fileName'];
+            $postData['file_nama_asli_3'] = $uploadedFiles['file_lampiran_3']['origName'];
 
             $result = $this->ssh_model->insertUsulan($postData, $this->currentUser);
             if ($result['success']) {
@@ -181,15 +210,37 @@ class Sbu extends Auth_Controller
             $updateData = $validation['cleanData'];
             $updateData['tipe'] = 'SBU';
 
-            if (!empty($_FILES['file_lampiran']['name'])) {
-                $uploadResult = $this->ssh_service->handleFileUpload('file_lampiran');
-                if (isset($uploadResult['error'])) {
-                    $this->session->set_flashdata('danger', 'Gagal upload file: ' . $uploadResult['error']);
-                    redirect("sbu/edit/{$id}");
+            $fileSlots = [
+                'file_lampiran'   => ['label' => 'Bukti Survey 1 / Brosur Resmi 1', 'file' => 'file_lampiran', 'orig' => 'file_nama_asli'],
+                'file_lampiran_2' => ['label' => 'Bukti Survey 2 / Brosur Resmi 2', 'file' => 'file_lampiran_2', 'orig' => 'file_nama_asli_2'],
+                'file_lampiran_3' => ['label' => 'Bukti Survey 3 / Brosur Resmi 3', 'file' => 'file_lampiran_3', 'orig' => 'file_nama_asli_3'],
+            ];
+
+            $missingFiles = [];
+            foreach ($fileSlots as $slotField => $cfg) {
+                $hasOld = !empty($item->{$cfg['file']});
+                $hasNew = !empty($_FILES[$slotField]['name']);
+                if (!$hasOld && !$hasNew) {
+                    $missingFiles[] = $cfg['label'];
                 }
-                if ($uploadResult['hasFile']) {
-                    $updateData['file_lampiran']  = $uploadResult['fileName'];
-                    $updateData['file_nama_asli'] = $uploadResult['origName'];
+            }
+
+            if (!empty($missingFiles)) {
+                $this->session->set_flashdata('danger', 'Ketiga Bukti Survey Harga Pasar / Brosur Resmi wajib terisi. Berkas yang belum ada: <strong>' . implode(', ', $missingFiles) . '</strong>.');
+                redirect("sbu/edit/{$id}");
+            }
+
+            foreach ($fileSlots as $slotField => $cfg) {
+                if (!empty($_FILES[$slotField]['name'])) {
+                    $uploadResult = $this->ssh_service->handleFileUpload($slotField);
+                    if (isset($uploadResult['error'])) {
+                        $this->session->set_flashdata('danger', "Gagal upload {$cfg['label']}: " . $uploadResult['error']);
+                        redirect("sbu/edit/{$id}");
+                    }
+                    if ($uploadResult['hasFile']) {
+                        $updateData[$cfg['file']] = $uploadResult['fileName'];
+                        $updateData[$cfg['orig']] = $uploadResult['origName'];
+                    }
                 }
             }
 
@@ -469,19 +520,29 @@ class Sbu extends Auth_Controller
         $this->load->view('templates/footer');
     }
 
-    public function download_lampiran($id)
+    public function download_lampiran($id, $slot = 1)
     {
-        $item = $this->ssh_model->findWithRls($id, $this->currentUser);
-        if (!$item || empty($item->file_lampiran)) show_404();
+        $slot = (int) $slot;
+        if (!in_array($slot, [1, 2, 3], TRUE)) {
+            $slot = 1;
+        }
 
-        $filePath = FCPATH . 'uploads/ssh_sbu/' . $item->file_lampiran;
+        $colFile = ($slot === 1) ? 'file_lampiran' : "file_lampiran_{$slot}";
+        $colOrig = ($slot === 1) ? 'file_nama_asli' : "file_nama_asli_{$slot}";
+
+        $item = $this->ssh_model->findWithRls($id, $this->currentUser);
+        if (!$item || empty($item->$colFile)) {
+            show_404();
+        }
+
+        $filePath = FCPATH . 'uploads/ssh_sbu/' . $item->$colFile;
         if (!file_exists($filePath)) {
             $this->session->set_flashdata('danger', 'File lampiran tidak ditemukan di server.');
-            redirect($this->agent->referrer() ?: 'sbu/master_data');
+            redirect($this->agent->referrer() ?: 'sbu/usulan');
         }
 
         $this->load->helper('download');
-        force_download($item->file_nama_asli ?: $item->file_lampiran, file_get_contents($filePath));
+        force_download($item->$colOrig ?: $item->$colFile, file_get_contents($filePath));
     }
 
     public function api_transisi_status()

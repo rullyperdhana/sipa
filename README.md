@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BPKAD
 
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -239,7 +239,7 @@ sipa/
    chmod -R 777 uploads/
    ```
 
-4. **Jalankan Migrasi Database di VPS (Termasuk Master 2027 & Jadwal):**
+4. **Jalankan Migrasi Database di VPS (Termasuk Master 2027, Jadwal & 3 Bukti Survey):**
    ```bash
    # Migrasi v2.0.0 (Jika belum dijalankan)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_ssh_sbu_module.sql
@@ -250,6 +250,9 @@ sipa/
    # Migrasi v2.1.0 (Master Standar Harga SSH & SBU TA 2027 dan Jadwal Pengusulan)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_master_ssh_sbu_and_jadwal.sql
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/import_master_ssh_sbu_2027.sql
+
+   # Migrasi v2.2.0 (Mandatori 3 Berkas Bukti Survey Pasar / Brosur Resmi)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_bukti_survey_3_files.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
@@ -259,6 +262,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`add_bukti_survey_3_files.sql`](database/migrations/add_bukti_survey_3_files.sql) | Menambahkan kolom `file_lampiran_2`, `file_nama_asli_2`, `file_lampiran_3`, `file_nama_asli_3` pada `standar_harga_usulan` untuk mandatori 3 berkas survey pasar / brosur resmi. |
 | [`create_master_ssh_sbu_and_jadwal.sql`](database/migrations/create_master_ssh_sbu_and_jadwal.sql) | Membuat tabel `ref_standar_harga` (Fulltext & B-Tree index), tabel `standar_harga_jadwal`, seed jadwal awal, dan kolom relasi master pada `standar_harga_usulan`. |
 | [`import_master_ssh_sbu_2027.sql`](database/migrations/import_master_ssh_sbu_2027.sql) | Impor 11.519 data resmi standar harga TA 2027 (5.786 item SSH + 5.733 item SBU) dari file SIPD RI Kab. Tapin. |
 | [`create_ssh_sbu_module.sql`](database/migrations/create_ssh_sbu_module.sql) | Menyesuaikan enum role user, membuat tabel `standar_harga_usulan`, tabel audit log `standar_harga_log`, foreign keys, dan trigger status. |

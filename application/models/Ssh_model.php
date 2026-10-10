@@ -327,6 +327,10 @@ class Ssh_model extends CI_Model
             'harga_ditetapkan'  => NULL,
             'file_lampiran'     => $data['file_lampiran'] ?? NULL,
             'file_nama_asli'    => $data['file_nama_asli'] ?? NULL,
+            'file_lampiran_2'   => $data['file_lampiran_2'] ?? NULL,
+            'file_nama_asli_2'  => $data['file_nama_asli_2'] ?? NULL,
+            'file_lampiran_3'   => $data['file_lampiran_3'] ?? NULL,
+            'file_nama_asli_3'  => $data['file_nama_asli_3'] ?? NULL,
             'id_skpd'           => (int) $user->skpd_id, // RLS Bound
             'user_id'           => (int) $user->id,
             'status_proses'     => 'Draft', // RLS Initial Status Rule
@@ -389,6 +393,14 @@ class Ssh_model extends CI_Model
         if (!empty($data['file_lampiran'])) {
             $updateData['file_lampiran']  = $data['file_lampiran'];
             $updateData['file_nama_asli'] = $data['file_nama_asli'] ?? $data['file_lampiran'];
+        }
+        if (!empty($data['file_lampiran_2'])) {
+            $updateData['file_lampiran_2']  = $data['file_lampiran_2'];
+            $updateData['file_nama_asli_2'] = $data['file_nama_asli_2'] ?? $data['file_lampiran_2'];
+        }
+        if (!empty($data['file_lampiran_3'])) {
+            $updateData['file_lampiran_3']  = $data['file_lampiran_3'];
+            $updateData['file_nama_asli_3'] = $data['file_nama_asli_3'] ?? $data['file_lampiran_3'];
         }
 
         $this->db->where('id', (int) $id)->update($this->table, $updateData);
@@ -576,10 +588,12 @@ class Ssh_model extends CI_Model
             return ['success' => FALSE, 'message' => 'Hanya data dengan status Draft yang dapat dihapus.'];
         }
 
-        // Hapus file fisik jika ada
-        if (!empty($existing->file_lampiran)) {
-            $filePath = FCPATH . 'uploads/ssh_sbu/' . $existing->file_lampiran;
-            if (file_exists($filePath)) @unlink($filePath);
+        // Hapus file fisik jika ada (Survey 1, 2, 3)
+        foreach (['file_lampiran', 'file_lampiran_2', 'file_lampiran_3'] as $fCol) {
+            if (!empty($existing->$fCol)) {
+                $filePath = FCPATH . 'uploads/ssh_sbu/' . $existing->$fCol;
+                if (file_exists($filePath)) @unlink($filePath);
+            }
         }
 
         $this->db->where('id', (int) $id)->delete($this->table);

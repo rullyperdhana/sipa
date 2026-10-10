@@ -67,12 +67,39 @@
                         </tr>
                         <?php endif; ?>
                         <tr>
-                            <th class="text-muted fw-normal">Dokumen Lampiran</th>
+                            <th class="text-muted fw-normal align-top">Bukti Survey / Brosur</th>
                             <td>
-                                <?php if (!empty($item->file_lampiran)): ?>
-                                <a href="<?= site_url('ssh/download/' . $item->id) ?>" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-paperclip me-1"></i> <?= e($item->file_nama_asli ?: $item->file_lampiran) ?>
-                                </a>
+                                <?php
+                                $prefixUrl = strtolower($item->tipe ?: 'ssh');
+                                $hasSurveyFiles = (!empty($item->file_lampiran) || !empty($item->file_lampiran_2) || !empty($item->file_lampiran_3));
+                                ?>
+                                <?php if ($hasSurveyFiles): ?>
+                                <div class="d-flex flex-column gap-2">
+                                    <?php if (!empty($item->file_lampiran)): ?>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-primary">Survey 1</span>
+                                        <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/1") ?>" class="btn btn-sm btn-outline-primary py-0">
+                                            <i class="bi bi-download me-1"></i> <?= e($item->file_nama_asli ?: $item->file_lampiran) ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($item->file_lampiran_2)): ?>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-primary">Survey 2</span>
+                                        <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/2") ?>" class="btn btn-sm btn-outline-primary py-0">
+                                            <i class="bi bi-download me-1"></i> <?= e($item->file_nama_asli_2 ?: $item->file_lampiran_2) ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($item->file_lampiran_3)): ?>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-primary">Survey 3</span>
+                                        <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/3") ?>" class="btn btn-sm btn-outline-primary py-0">
+                                            <i class="bi bi-download me-1"></i> <?= e($item->file_nama_asli_3 ?: $item->file_lampiran_3) ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
                                 <?php else: ?>
                                 <span class="text-muted small">Tidak ada lampiran dokumen.</span>
                                 <?php endif; ?>

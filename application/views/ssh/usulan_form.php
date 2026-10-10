@@ -297,32 +297,99 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                         </div>
                     </div>
 
-                    <!-- Upload File Pendukung -->
-                    <div class="mb-4">
-                        <label for="file_lampiran" class="form-label fw-semibold">
-                            <?= $isSbu ? 'Upload Bukti / Telaahan Staf / Regulasi Acuan' : 'Upload Bukti Survey Harga Pasar / Brosur Resmi' ?>
-                            <small class="text-muted fw-normal">(Opsional / Dianjurkan)</small>
-                        </label>
-                        <input class="form-control" type="file" id="file_lampiran" name="file_lampiran" 
-                               accept=".pdf,.jpg,.jpeg,.png,.docx,.doc,.xlsx,.xls">
-                        <div class="form-text">
-                            Format yang didukung: <strong>PDF, JPG, PNG, DOCX, XLSX</strong> (Maksimal 5MB).<br>
-                            <?= $isSbu 
-                                ? 'Lampirkan nota dinas telaahan staf, SK/regulasi tarif yang berlaku, atau perbandingan standar biaya masukan.' 
-                                : 'Lampirkan hasil survey harga pasar minimal 3 toko/distributor, brosur resmi distributor, atau screenshot e-katalog LKPP.' ?>
-                        </div>
-
-                        <?php if ($isEdit && !empty($item->file_lampiran)): ?>
-                        <div class="mt-2 p-2 bg-light border rounded d-flex align-items-center justify-content-between">
-                            <div class="small">
-                                <i class="bi bi-paperclip text-primary me-1"></i>
-                                <strong>File Saat Ini:</strong> <?= e($item->file_nama_asli ?: $item->file_lampiran) ?>
+                    <!-- Upload Bukti Survey Harga Pasar / Brosur Resmi (Wajib 3 File) -->
+                    <div class="card border mb-4 shadow-none bg-light-subtle">
+                        <div class="card-header bg-white py-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-dark">
+                                        <i class="bi bi-file-earmark-check-fill text-primary me-2"></i>
+                                        <?= $isSbu ? 'Upload Bukti Acuan & Regulasi / Survey Harga (3 Berkas)' : 'Upload Bukti Survey Harga Pasar / Brosur Resmi (3 Berkas)' ?>
+                                    </h6>
+                                    <div class="small text-muted">
+                                        Seluruh 3 (tiga) bukti survey pasar / brosur resmi <strong>wajib diunggah</strong> sebagai dasar penetapan standar harga yang akuntabel.
+                                    </div>
+                                </div>
+                                <span class="badge bg-danger px-2.5 py-1.5"><i class="bi bi-asterisk me-1"></i>Wajib 3 Berkas</span>
                             </div>
-                            <a href="<?= site_url("{$prefixUrl}/download/{$item->id}") ?>" class="btn btn-sm btn-outline-primary py-0">
-                                <i class="bi bi-download"></i> Unduh
-                            </a>
                         </div>
-                        <?php endif; ?>
+                        <div class="card-body p-3">
+                            <div class="alert alert-info py-2 px-3 small d-flex align-items-center gap-2 mb-3">
+                                <i class="bi bi-info-circle-fill flex-shrink-0 fs-6"></i>
+                                <div>
+                                    Format didukung: <strong>PDF, JPG, PNG, DOCX, XLSX</strong> (Maksimal 5MB per berkas). Lampirkan bukti survey dari 3 vendor/toko berbeda atau brosur resmi/screenshot e-katalog.
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <?php
+                                $slots = [
+                                    1 => [
+                                        'field' => 'file_lampiran',
+                                        'file'  => $item->file_lampiran ?? NULL,
+                                        'orig'  => $item->file_nama_asli ?? NULL,
+                                        'title' => 'Bukti Survey 1 / Brosur Toko 1',
+                                        'desc'  => 'Survey harga pasar / brosur resmi toko 1'
+                                    ],
+                                    2 => [
+                                        'field' => 'file_lampiran_2',
+                                        'file'  => $item->file_lampiran_2 ?? NULL,
+                                        'orig'  => $item->file_nama_asli_2 ?? NULL,
+                                        'title' => 'Bukti Survey 2 / Brosur Toko 2',
+                                        'desc'  => 'Survey harga pasar / brosur resmi toko 2'
+                                    ],
+                                    3 => [
+                                        'field' => 'file_lampiran_3',
+                                        'file'  => $item->file_lampiran_3 ?? NULL,
+                                        'orig'  => $item->file_nama_asli_3 ?? NULL,
+                                        'title' => 'Bukti Survey 3 / Brosur Toko 3',
+                                        'desc'  => 'Survey harga pasar / brosur resmi toko 3'
+                                    ],
+                                ];
+                                ?>
+                                <?php foreach ($slots as $idx => $slot): ?>
+                                <div class="col-md-4">
+                                    <div class="p-3 bg-white rounded border h-100 d-flex flex-column justify-content-between">
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <label for="<?= $slot['field'] ?>" class="form-label fw-bold mb-0 small text-dark">
+                                                    <span class="badge bg-primary me-1">#<?= $idx ?></span> <?= $slot['title'] ?>
+                                                </label>
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle small">Wajib</span>
+                                            </div>
+                                            <p class="text-muted small mb-2" style="font-size: 0.8rem;"><?= $slot['desc'] ?></p>
+                                            
+                                            <input class="form-control form-control-sm input-survey-file" 
+                                                   type="file" 
+                                                   id="<?= $slot['field'] ?>" 
+                                                   name="<?= $slot['field'] ?>" 
+                                                   accept=".pdf,.jpg,.jpeg,.png,.docx,.doc,.xlsx,.xls"
+                                                   data-index="<?= $idx ?>"
+                                                   data-has-existing="<?= ($isEdit && !empty($slot['file'])) ? '1' : '0' ?>"
+                                                   <?= (!$isEdit || empty($slot['file'])) ? 'required' : '' ?>>
+                                        </div>
+
+                                        <?php if ($isEdit && !empty($slot['file'])): ?>
+                                        <div class="mt-2 p-2 bg-light border rounded small">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="text-truncate me-1" title="<?= e($slot['orig'] ?: $slot['file']) ?>">
+                                                    <i class="bi bi-file-earmark-check text-success me-1"></i>
+                                                    <span class="fw-semibold"><?= e($slot['orig'] ?: $slot['file']) ?></span>
+                                                </div>
+                                                <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/{$idx}") ?>" 
+                                                   class="btn btn-sm btn-outline-primary py-0 px-2 flex-shrink-0" 
+                                                   title="Unduh File Saat Ini">
+                                                    <i class="bi bi-download"></i>
+                                                </a>
+                                            </div>
+                                            <div class="text-muted text-end mt-1" style="font-size: 0.72rem;">Unggah berkas baru jika ingin mengganti</div>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
                     </div>
 
                     <hr class="my-4">
