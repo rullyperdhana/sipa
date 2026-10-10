@@ -308,6 +308,7 @@ class Ssh extends Auth_Controller
             'prefixUrl'   => $this->prefixUrl,
             'moduleTitle' => $this->moduleTitle,
             'list'        => $this->ssh_model->getUsulanVerifikasi($filter),
+            'summary'     => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
             'filter'      => $filter,
             'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
             'skpdList'    => $this->master_model->getAllSkpd()
@@ -356,6 +357,7 @@ class Ssh extends Auth_Controller
             'prefixUrl'   => $this->prefixUrl,
             'moduleTitle' => $this->moduleTitle,
             'list'        => $this->ssh_model->getUsulanPenetapan($filter),
+            'summary'     => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
             'filter'      => $filter,
             'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
             'skpdList'    => $this->master_model->getAllSkpd()

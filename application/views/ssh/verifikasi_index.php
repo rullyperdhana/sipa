@@ -21,6 +21,56 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
     </div>
 </div>
 
+<?php if (isset($summary)): ?>
+<!-- Statistik Antrean Verifikasi -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <a href="<?= site_url("{$prefixUrl}/verifikasi?status=Diajukan") ?>" class="text-decoration-none">
+            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-warning">
+                <div class="card-body p-2">
+                    <small class="text-muted fw-semibold d-block text-uppercase">Menunggu Verifikasi</small>
+                    <h3 class="mb-0 mt-1 fw-bold text-warning"><?= (int)($summary->diajukan ?? 0) ?></h3>
+                    <small class="text-muted" style="font-size:11px;">Perlu ditelaah BPKAD</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="<?= site_url("{$prefixUrl}/verifikasi?status=Diverifikasi") ?>" class="text-decoration-none">
+            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-primary">
+                <div class="card-body p-2">
+                    <small class="text-muted fw-semibold d-block text-uppercase">Telah Diverifikasi</small>
+                    <h3 class="mb-0 mt-1 fw-bold text-primary"><?= (int)($summary->diverifikasi ?? 0) ?></h3>
+                    <small class="text-muted" style="font-size:11px;">Siap ke penetapan</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="<?= site_url("{$prefixUrl}/verifikasi?status=Direvisi") ?>" class="text-decoration-none">
+            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-danger">
+                <div class="card-body p-2">
+                    <small class="text-muted fw-semibold d-block text-uppercase">Perlu Revisi SKPD</small>
+                    <h3 class="mb-0 mt-1 fw-bold text-danger"><?= (int)($summary->direvisi ?? 0) ?></h3>
+                    <small class="text-muted" style="font-size:11px;">Dikembalikan</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="<?= site_url("{$prefixUrl}/verifikasi?status=") ?>" class="text-decoration-none">
+            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-secondary">
+                <div class="card-body p-2">
+                    <small class="text-muted fw-semibold d-block text-uppercase">Total Seluruh Berkas</small>
+                    <h3 class="mb-0 mt-1 fw-bold text-secondary"><?= (int)($summary->total ?? 0) ?></h3>
+                    <small class="text-muted" style="font-size:11px;">Semua status</small>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+<?php endif; ?>
+
 <!-- Card Filter & Search -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">

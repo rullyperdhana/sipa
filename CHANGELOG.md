@@ -5,6 +5,28 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.4.0] - 2026-10-10
+
+### 🚀 Ditambahkan (Added)
+- **Perombakan Total Dashboard Utama Terpadu SIPA (`/dashboard`):**
+  - **Integrasi Penuh Modul Standar Harga (SSH & SBU):** Mengakhiri keterisolasian data Standar Harga, kini dipantau secara real-time bersama dengan modul RKBMD.
+  - **Banner Live Jadwal Pengusulan:** Indikator dinamis status jadwal pengusulan SSH & SBU (apakah jadwal sedang DIBUKA beserta tanggal batas akhir, atau DITUTUP oleh BPKAD).
+  - **Quick Action Bar (Akses Cepat):** Tombol aksi cepat kontekstual berdasarkan peran pengguna (`+ Usul RKBMD`, `+ Usul SSH`, `+ Usul SBU`, `Verifikasi BPKAD`, `Pusat Laporan & Rekap Eksekutif`).
+  - **4 Kartu Metrik KPI Modern Bergradien:** Total Seluruh Usulan Terpadu, Total Pagu Usulan Terpadu, Antrean Menunggu Verifikasi BPKAD, dan Kepatuhan Partisipasi SKPD (dengan bubble glassmorphism icons).
+  - **Dua Visualisasi Grafik Interaktif (Chart.js):**
+    - *Grafik Batang:* Distribusi Alokasi Anggaran Terpadu per Modul (Pengadaan, Pemeliharaan, Pemanfaatan, Pemindahtanganan, Penghapusan, SSH, dan SBU).
+    - *Grafik Donat:* Proporsi Status Usulan (Draft, Diajukan/Verifikasi, Disetujui/Ditetapkan, Ditolak/Revisi).
+  - **Ringkasan Modul Terpadu Simetris:**
+    - *Modul Standar Harga (SSH & SBU):* 2 kartu performa dengan breakdown status (Draft, Diajukan, Diverifikasi, Ditetapkan) serta total nilai pagu.
+    - *Modul RKBMD (5 Instrumen):* 5 kartu instrumen (Pengadaan, Pemeliharaan, Pemanfaatan, Pemindahtanganan, Penghapusan) ditambah 1 kartu rekap total membentuk grid 3x2 simetris yang rapi.
+  - **Monitoring Progres SKPD & Aktivitas Usulan Terbaru:** Tabulasi usulan terbaru RKBMD vs Standar Harga dan monitoring per SKPD.
+
+- **Peningkatan Sub-Dashboard Verifikasi & Penetapan SSH/SBU:**
+  - Penambahan Kartu Indikator KPI Antrean Kerja pada `/ssh/verifikasi` dan `/sbu/verifikasi` (*Menunggu Verifikasi*, *Telah Diverifikasi*, *Perlu Revisi SKPD*, *Total Berkas*).
+  - Penambahan Kartu Indikator KPI Antrean Kerja pada `/ssh/penetapan` dan `/sbu/penetapan` (*Menunggu Penetapan Resmi*, *Telah Ditetapkan (SK)*, *Total Berkas*).
+
+---
+
 ## [2.3.0] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

@@ -21,6 +21,45 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
     </div>
 </div>
 
+<?php if (isset($summary)): ?>
+<!-- Statistik Antrean Penetapan -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <a href="<?= site_url("{$prefixUrl}/penetapan?status=Diverifikasi") ?>" class="text-decoration-none">
+            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-warning">
+                <div class="card-body p-2">
+                    <small class="text-muted fw-semibold d-block text-uppercase">Menunggu Penetapan Resmi</small>
+                    <h3 class="mb-0 mt-1 fw-bold text-warning"><?= (int)($summary->diverifikasi ?? 0) ?></h3>
+                    <small class="text-muted" style="font-size:11px;">Siap disahkan Pimpinan</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="<?= site_url("{$prefixUrl}/penetapan?status=Ditetapkan") ?>" class="text-decoration-none">
+            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-success">
+                <div class="card-body p-2">
+                    <small class="text-muted fw-semibold d-block text-uppercase">Telah Ditetapkan (SK Bupati)</small>
+                    <h3 class="mb-0 mt-1 fw-bold text-success"><?= (int)($summary->ditetapkan ?? 0) ?></h3>
+                    <small class="text-muted" style="font-size:11px;">Aktif di Master Data</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="<?= site_url("{$prefixUrl}/penetapan?status=") ?>" class="text-decoration-none">
+            <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-secondary">
+                <div class="card-body p-2">
+                    <small class="text-muted fw-semibold d-block text-uppercase">Total Seluruh Berkas</small>
+                    <h3 class="mb-0 mt-1 fw-bold text-secondary"><?= (int)($summary->total ?? 0) ?></h3>
+                    <small class="text-muted" style="font-size:11px;">Semua tahapan</small>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+<?php endif; ?>
+
 <!-- Card Filter & Search -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
