@@ -108,6 +108,31 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
   - Ekspor Spreadsheet Excel/CSV per modul (`/laporan/export/{modul}/excel`).
   - Lembar cetak laporan resmi ber-kop Pemerintah Kabupaten Tapin & BPKAD (`/laporan/cetak`) siap ditandatangani Kepala BPKAD.
 
+### 11. Modul Integrasi WhatsApp & Notifikasi Cepat Operator (`/wa`)
+- **Pemberitahuan 1-Klik:** Tombol aksi langsung WhatsApp pada lembar verifikasi RKBMD (`/verifikasi/detail`) dan verifikasi Standar Harga (`/ssh/verifikasi` & `/sbu/verifikasi`).
+- **Format Pesan Kedinasan Otomatis (Markdown WA):** Otomatis menyusun kop instansi resmi BPKAD Kab. Tapin, nama operator/SKPD, nomor usulan, status usulan (⚠️ *Perlu Perbaikan*, ✅ *Selesai / Disetujui*, ❌ *Ditolak*), catatan verifikator, serta tautan langsung untuk perbaikan data.
+- **Pencarian Nomor Kontak Cerdas:** Mengambil nomor WhatsApp akun pengguna operator SKPD secara otomatis (`users.no_wa`) dengan fallback ke nomor kontak dinas SKPD (`skpd.telepon`).
+- **Modal Interaktif Notifikasi WhatsApp Global (`templates/wa_modal`):** Memungkinkan verifikator memeriksa nomor tujuan, mengedit isi pesan leluasa sebelum dikirim, menyalin teks, atau langsung membuka WhatsApp Web / Desktop / HP.
+- **Dua Mode Integrasi:** Mode *Direct Click-to-Chat* (100% gratis tanpa biaya gateway pihak ketiga) dan mode *WhatsApp Gateway API* (opsional latar belakang via Fonnte / Webhook).
+
+### 12. Modul Pendaftaran Mandiri & Persetujuan Akun Operator (`/register`)
+- **Kendali Penuh Administrator (Buka/Tutup Pendaftaran):** Admin BPKAD dapat mengaktifkan atau menonaktifkan registrasi mandiri publik sewaktu-waktu melalui modal pengaturan di `/master/user`.
+- **Alur Persetujuan Bertingkat (Admin Approval Workflow):** Pendaftar mandiri otomatis berstatus *Nonaktif / Menunggu Verifikasi* (`is_active = 0`) agar keamanan data aset daerah tetap terjaga dari pihak yang tidak berwenang.
+- **Aktivasi Cepat 1-Klik:** Tombol *Setujui & Aktifkan* langsung pada tabel pengguna admin untuk mengesahkan akun pemohon.
+- **Notifikasi Sambutan Akun Aktif via WA:** Tombol WhatsApp khusus pada baris pengguna untuk mengirimkan konfirmasi aktivasi akun ke pemohon secara instan.
+- **Formulir Pendaftaran Lengkap:** Menyediakan input Nama Lengkap, NIP, Username, Email, Nomor WhatsApp aktif, Pilihan SKPD, Password kuat (minimal 8 karakter), serta verifikasi Anti-Bot matematika dinamis.
+- **Halaman Penanganan Adaptif:** Menampilkan pemberitahuan kedinasan yang ramah saat pendaftaran sedang ditutup oleh administrator.
+
+### 13. Arsitektur Keamanan & Proteksi Sistem Online (Security Hardening)
+- **Auto-Environment Detection (`index.php`):** Otomatis beralih ke `ENVIRONMENT = 'production'` pada domain online untuk menonaktifkan tampilan error trace PHP dan mencegah kebocoran informasi sistem (*Information Disclosure*).
+- **Proteksi Brute-Force Berbasis IP & Akun (`Auth.php`):** Pemblokiran IP otomatis jika terdeteksi $\ge 10$ kegagalan login dalam kurun waktu 15 menit.
+- **Mitigasi Timing Attack (`Auth.php`):** Menjalankan kalkulasi dummy bcrypt hash saat username tidak ditemukan untuk meratakan durasi respon server.
+- **Tantangan Anti-Bot Captcha Dinamis pada Login (`Login.php`):** Otomatis memunculkan verifikasi matematika jika terjadi kegagalan login $\ge 3$ kali berturut-turut.
+- **Header Keamanan HTTP Lengkap (`MY_Controller`):** Seluruh controller (termasuk Login & Register) diproteksi header `X-Frame-Options: SAMEORIGIN` (anti-clickjacking), `X-Content-Type-Options: nosniff`, `X-XSS-Protection: 1; mode=block`, `Referrer-Policy: strict-origin-when-cross-origin`, dan `Strict-Transport-Security` (HSTS).
+- **Pengamanan Direktori Uploads (`uploads/.htaccess`):** Melarang eksekusi file script apapun (`.php`, `.phtml`, `.cgi`, `.sh`, `.exe`, dll.) di folder penyimpanan berkas unggahan dan menonaktifkan directory browsing.
+- **Hardening Root Web Server (`.htaccess`):** Menonaktifkan *Directory Listing* (`Options -Indexes`) dan memblokir akses langsung ke file sensitif (`.env`, `.sql`, `.json`, `.lock`, `.log`, `database.local.php`).
+- **Autentikasi Remember-Me Aman:** Verifikasi token hash Bcrypt dengan auto-rotasi token acak, `HttpOnly`, dan atribut cookie `SameSite=Lax`.
+
 ---
 
 ## 👥 Matriks Hak Akses Pengguna (RBAC & RLS)
@@ -128,45 +153,55 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 sipa/
 ├── application/
 │   ├── config/
-│   │   ├── config.php               # Konfigurasi nama aplikasi, versi (v2.0.0), session
+│   │   ├── config.php               # Konfigurasi nama aplikasi, versi (v2.7.0), session, CSRF
 │   │   ├── database.php             # Konfigurasi database default / production
 │   │   ├── database.local.php       # Override koneksi database lokal (di-ignore oleh git)
 │   │   └── routes.php               # Konfigurasi routing URL modular
 │   ├── controllers/
 │   │   ├── Ajax.php                 # Endpoint AJAX pencarian Select2 & notifikasi
 │   │   ├── Dashboard.php            # Dashboard statistik dan grafik
-│   │   ├── Login.php                # Autentikasi dan sesi pengguna
-│   │   ├── Master.php               # CRUD SKPD, Barang BMD, Akun Belanja, Periode, User
+│   │   ├── Laporan.php              # Pusat laporan, rekap, cetak berita acara & ekspor Excel
+│   │   ├── Login.php                # Autentikasi pengguna, anti-bot captcha, auto remember-me
+│   │   ├── Master.php               # CRUD SKPD, Barang BMD, Akun Belanja, Periode, User & RBAC
+│   │   ├── Register.php             # Pendaftaran mandiri operator, captcha, kontrol approval
 │   │   ├── Rkbmd.php                # Controller induk 5 modul perencanaan RKBMD
-│   │   ├── Ssh.php                  # Controller modul Standar Satuan Harga fisik
-│   │   ├── Sbu.php                  # Controller modul Standar Biaya Umum non-fisik
-│   │   └── Verifikasi.php           # Modul verifikasi RKBMD BPKAD
+│   │   ├── Ssh.php                  # Controller modul Standar Satuan Harga fisik & jadwal
+│   │   ├── Sbu.php                  # Controller modul Standar Biaya Umum non-fisik & jadwal
+│   │   ├── Verifikasi.php           # Modul verifikasi RKBMD BPKAD
+│   │   └── Wa.php                   # Controller integrasi WhatsApp & pengaturan gateway
+│   ├── core/
+│   │   └── MY_Controller.php        # Base controller dengan HTTP Security Headers & HSTS
+│   ├── libraries/
+│   │   ├── Auth.php                 # Library autentikasi, brute-force IP rate limit, RBAC
+│   │   ├── Whatsapp.php             # Library WhatsApp URL generator & Gateway integration
+│   │   ├── Ssh_service.php          # Layanan bisnis modul standar satuan harga
+│   │   └── Logger.php               # Pencatatan audit trail aktivitas sistem
 │   ├── models/
 │   │   ├── Akun_model.php           # Model referensi akun belanja SIPD RI
 │   │   ├── Master_model.php         # Model master data barang, SKPD, dan periode
 │   │   ├── Ssh_model.php            # Model usulan, log audit, verifikasi, dan penetapan
-│   │   └── User_model.php           # Model autentikasi dan manajemen user
+│   │   └── User_model.php           # Model pengguna, RBAC permissions, kontak WA operator
 │   └── views/
-│       ├── master/
-│       │   ├── akun_belanja.php     # Tampilan master referensi akun belanja SIPD RI
-│       │   └── barang.php           # Tampilan master barang BMD dengan server-side paging
-│       ├── ssh/                     # Tampilan modul SSH (usulan, verifikasi, penetapan)
-│       ├── sbu/                     # Tampilan modul SBU (usulan, verifikasi, penetapan)
+│       ├── auth/                    # Halaman masuk (login.php) dan registrasi (register.php)
+│       ├── master/                  # Tampilan master barang, SKPD, user, WA settings
+│       ├── ssh/                     # Tampilan modul SSH (usulan, verifikasi, penetapan, jadwal)
+│       ├── sbu/                     # Tampilan modul SBU (usulan, verifikasi, penetapan, jadwal)
+│       ├── verifikasi/              # Tampilan verifikasi usulan RKBMD
 │       └── templates/
 │           ├── header.php           # Navbar, brand, notifikasi, sidebar responsif
-│           └── footer.php           # Skrip JS global, CSRF token, library
+│           ├── footer.php           # Skrip JS global, CSRF token, library
+│           └── wa_modal.php         # Modal dialog pengiriman pesan WhatsApp global
 ├── assets/
 │   ├── css/
 │   │   └── app.css                  # Custom CSS styling, transisi drawer, desktop collapse
 │   └── js/
 │       ├── app.js                   # Logika toggle hamburger, backdrop, notifikasi polling
-│       └── ssh_module.js            # Format rupiah, validasi form usulan, helper terbilang
+│       └── ssh_module.js            # Format rupiah, validasi form usulan, integrasi tombol WA
 ├── database/
-│   └── migrations/
-│       ├── create_ssh_sbu_module.sql    # Tabel standar_harga_usulan dan log audit
-│       ├── create_ref_akun_belanja.sql  # Tabel ref_akun_belanja, ref_akun, view akun_belanja
-│       ├── optimize_barang_table.sql    # Idempotent index optimization tabel barang
-│       └── fix_duplicate_barang.sql     # Pembersihan baris ganda dan whitespace kode barang
+│   └── migrations/                  # Skrip SQL migrasi database modular
+├── uploads/
+│   └── .htaccess                    # Proteksi larangan eksekusi file script di folder upload
+├── .htaccess                        # Hardening root web server, anti directory listing
 ├── CHANGELOG.md                     # Catatan riwayat rilis
 └── README.md                        # Dokumentasi sistem ini
 ```
@@ -349,12 +384,27 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
   POST /ajax/notif/read/{id}
   ```
 
+- **Persiapan Draf & Kontak Notifikasi WhatsApp:**
+  ```http
+  POST /wa/ajax_prepare
+  ```
+  *Payload:* `{"context": "rkbmd|ssh", "id": 1, "status": "revisi|disetujui|ditolak", "catatan": "..."}`
+  *Response:* `{"success": true, "data": {"phone": "62812...", "recipient_name": "...", "message": "...", "whatsapp_url": "https://api.whatsapp.com/send?..."}}`
+
+- **Kirim Notifikasi via WhatsApp Gateway API:**
+  ```http
+  POST /wa/ajax_send_gateway
+  ```
+  *Payload:* `{"phone": "62812...", "message": "..."}`
+  *Response:* `{"success": true, "message": "Pesan berhasil dikirim via WhatsApp Gateway"}`
+
 ---
 
 ## 📜 Riwayat Versi (Changelog)
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.7.0 (2026-10-10):** Fitur & Pengaturan Pendaftaran Mandiri Operator SKPD (`/register`), Kontrol Buka/Tutup Registrasi di Admin (`master/user`), Alur Persetujuan Verifikasi Admin (Admin Approval Workflow), Verifikasi Anti-Bot Captcha, Notifikasi Aktivasi Akun via WhatsApp, Auto-Environment Detection Production (`index.php`), Rate Limiting IP Brute-Force Protection (`Auth.php`), Anti-Bot Login (`Login.php`), HTTP Security Headers Lengkap (`MY_Controller`), dan Hardening Folder Berkas (`uploads/.htaccess`).
 - **v2.6.0 (2026-10-10):** Fitur Pemberitahuan & Notifikasi WhatsApp ke Operator SKPD (`/wa`), Integrasi 1-Klik pada Verifikasi RKBMD & Standar Harga (SSH & SBU), Draf Pesan Otomatis Kedinasan (Revisi, Disetujui, Ditolak, Ditetapkan), Modal WhatsApp Global, dan Pengaturan WA Gateway.
 - **v2.5.0 (2026-10-10):** Pengaturan Hak Akses Menu Granular Per-User (Granular RBAC) via Admin Master User (`master/user`), Checklist Izin Modul & Presets Cepat (User A: SSH/SBU/Laporan, User B: RKBMD/Laporan), Proteksi Controller Level HTTP 403, Sidebar & Quick Action Adaptif.
 - **v2.4.0 (2026-10-10):** Perombakan Total Dashboard Utama Terpadu SIPA (`/dashboard`) - Live Banner Jadwal, Quick Action Bar, 4 KPI Metrics, 2 Chart Interaktif (Chart.js), Tabulasi Usulan Terbaru & Monitoring SKPD.
