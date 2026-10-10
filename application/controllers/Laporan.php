@@ -14,6 +14,10 @@ class Laporan extends Auth_Controller
         parent::__construct();
         $this->load->model(['laporan_model', 'rkbmd_model', 'ssh_model', 'master_model']);
         $this->load->helper(['app', 'form', 'download']);
+
+        if (!can_access('laporan')) {
+            show_error('Anda tidak memiliki hak akses untuk membuka Pusat Laporan. Hubungi Administrator.', 403, 'Akses Ditolak');
+        }
     }
 
     public function index()

@@ -275,9 +275,10 @@ class Master extends Admin_Controller
         }
 
         $data = [
-            'title' => 'Master Data User',
-            'list'  => $this->user_model->getAll(),
-            'skpd'  => $this->master_model->getAllSkpd()
+            'title'                => 'Master Data User',
+            'list'                 => $this->user_model->getAll(),
+            'skpd'                 => $this->master_model->getAllSkpd(),
+            'availablePermissions' => User_model::getAvailablePermissions()
         ];
         $this->load->view('templates/header', $data);
         $this->load->view('master/user', $data);
@@ -291,7 +292,7 @@ class Master extends Admin_Controller
 
             $this->form_validation->set_rules('username', 'Username', 'required|min_length[4]|max_length[50]');
             $this->form_validation->set_rules('nama_lengkap', 'Nama Lengkap', 'required|max_length[150]');
-            $this->form_validation->set_rules('role', 'Role', 'required|in_list[admin,skpd,verifikator,pimpinan]');
+            $this->form_validation->set_rules('role', 'Role', 'required|in_list[admin,skpd,operator_skpd,verifikator,penetap,pimpinan]');
             if (!$id) {
                 $this->form_validation->set_rules('password', 'Password', 'required|min_length[8]|max_length[200]');
             }
@@ -301,15 +302,19 @@ class Master extends Admin_Controller
                 return;
             }
 
+            $permissions = $this->input->post('permissions');
+            $menuPermissionsJson = (is_array($permissions) && !empty($permissions)) ? json_encode(array_values($permissions)) : NULL;
+
             $data = [
-                'username'     => $this->input->post('username', TRUE),
-                'nama_lengkap' => $this->input->post('nama_lengkap', TRUE),
-                'nip'          => $this->input->post('nip', TRUE),
-                'email'        => $this->input->post('email', TRUE),
-                'jabatan'      => $this->input->post('jabatan', TRUE),
-                'role'         => $this->input->post('role', TRUE),
-                'skpd_id'      => (int) $this->input->post('skpd_id') ?: NULL,
-                'is_active'    => (int) $this->input->post('is_active')
+                'username'         => $this->input->post('username', TRUE),
+                'nama_lengkap'     => $this->input->post('nama_lengkap', TRUE),
+                'nip'              => $this->input->post('nip', TRUE),
+                'email'            => $this->input->post('email', TRUE),
+                'jabatan'          => $this->input->post('jabatan', TRUE),
+                'role'             => $this->input->post('role', TRUE),
+                'skpd_id'          => (int) $this->input->post('skpd_id') ?: NULL,
+                'is_active'        => (int) $this->input->post('is_active'),
+                'menu_permissions' => $menuPermissionsJson
             ];
 
             $password = $this->input->post('password');
@@ -320,8 +325,14 @@ class Master extends Admin_Controller
             } else {
                 $this->user_model->create($data);
             }
+
+            // Jika user yang diedit adalah akun yang sedang login, update sesi langsung
+            if ($id === (int) $this->currentUser->id) {
+                $this->session->set_userdata('menu_permissions', (is_array($permissions) && !empty($permissions)) ? array_values($permissions) : NULL);
+            }
+
             $this->logger->record($id ? 'update' : 'create', 'user', $data['username']);
-            $this->session->set_flashdata('success', 'Data user berhasil disimpan.');
+            $this->session->set_flashdata('success', 'Data user beserta hak akses menu berhasil disimpan.');
         } elseif ($action === 'delete') {
             $id = (int) $this->input->post('id');
             // Cegah hapus diri sendiri

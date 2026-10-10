@@ -17,6 +17,10 @@ class Sbu extends Auth_Controller
         $this->load->model(['ssh_model', 'master_model']);
         $this->load->library(['ssh_service', 'form_validation']);
         $this->load->helper(['app', 'form']);
+
+        if (!can_access('sbu')) {
+            show_error('Anda tidak memiliki hak akses untuk membuka modul Standar Biaya Umum (SBU). Hubungi Administrator.', 403, 'Akses Ditolak');
+        }
     }
 
     /**

@@ -54,26 +54,43 @@
             <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
         </a>
 
-        <?php if (in_array($user->role, ['admin', 'skpd', 'pimpinan'])): ?>
+        <?php 
+        $hasRkbmd = can_access('rkbmd_pengadaan') || can_access('rkbmd_pemeliharaan') || can_access('rkbmd_pemanfaatan') || can_access('rkbmd_pemindahtanganan') || can_access('rkbmd_penghapusan');
+        if ($hasRkbmd && in_array($user->role, ['admin', 'skpd', 'operator_skpd', 'pimpinan'])): 
+        ?>
         <div class="nav-section">RKBMD</div>
+        <?php if (can_access('rkbmd_pengadaan')): ?>
         <a href="<?= site_url('rkbmd/pengadaan') ?>" class="nav-link <?= $this->uri->segment(2) === 'pengadaan' ? 'active' : '' ?>">
             <i class="bi bi-cart-plus-fill"></i> <span>Pengadaan</span>
         </a>
+        <?php endif; ?>
+
+        <?php if (can_access('rkbmd_pemeliharaan')): ?>
         <a href="<?= site_url('rkbmd/pemeliharaan') ?>" class="nav-link <?= $this->uri->segment(2) === 'pemeliharaan' ? 'active' : '' ?>">
             <i class="bi bi-tools"></i> <span>Pemeliharaan</span>
         </a>
+        <?php endif; ?>
+
+        <?php if (can_access('rkbmd_pemanfaatan')): ?>
         <a href="<?= site_url('rkbmd/pemanfaatan') ?>" class="nav-link <?= $this->uri->segment(2) === 'pemanfaatan' ? 'active' : '' ?>">
             <i class="bi bi-share-fill"></i> <span>Pemanfaatan</span>
         </a>
+        <?php endif; ?>
+
+        <?php if (can_access('rkbmd_pemindahtanganan')): ?>
         <a href="<?= site_url('rkbmd/pemindahtanganan') ?>" class="nav-link <?= $this->uri->segment(2) === 'pemindahtanganan' ? 'active' : '' ?>">
             <i class="bi bi-arrow-left-right"></i> <span>Pemindahtanganan</span>
         </a>
+        <?php endif; ?>
+
+        <?php if (can_access('rkbmd_penghapusan')): ?>
         <a href="<?= site_url('rkbmd/penghapusan') ?>" class="nav-link <?= $this->uri->segment(2) === 'penghapusan' ? 'active' : '' ?>">
             <i class="bi bi-trash3-fill"></i> <span>Penghapusan</span>
         </a>
         <?php endif; ?>
+        <?php endif; ?>
 
-        <?php if (in_array($user->role, ['admin', 'verifikator'])): ?>
+        <?php if (can_access('verifikasi_rkbmd') && in_array($user->role, ['admin', 'verifikator'])): ?>
         <div class="nav-section">Verifikasi BPKAD</div>
         <a href="<?= site_url('verifikasi') ?>" class="nav-link <?= $this->uri->segment(1) === 'verifikasi' ? 'active' : '' ?>">
             <i class="bi bi-check2-square"></i> <span>Verifikasi Usulan</span>
@@ -81,6 +98,7 @@
         <?php endif; ?>
 
         <!-- ========== MODUL 1: STANDAR SATUAN HARGA (SSH) ========== -->
+        <?php if (can_access('ssh')): ?>
         <div class="nav-section">Standar Satuan Harga (SSH)</div>
 
         <?php if (in_array($user->role, ['operator_skpd', 'skpd', 'admin'])): ?>
@@ -89,13 +107,13 @@
         </a>
         <?php endif; ?>
 
-        <?php if (in_array($user->role, ['verifikator', 'admin'])): ?>
+        <?php if (can_access('verifikasi_standar') && in_array($user->role, ['verifikator', 'admin'])): ?>
         <a href="<?= site_url('ssh/verifikasi') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'verifikasi') ? 'active' : '' ?>">
             <i class="bi bi-patch-check-fill"></i> <span>Verifikasi SSH</span>
         </a>
         <?php endif; ?>
 
-        <?php if (in_array($user->role, ['penetap', 'pimpinan', 'admin'])): ?>
+        <?php if (can_access('penetapan_standar') && in_array($user->role, ['penetap', 'pimpinan', 'admin'])): ?>
         <a href="<?= site_url('ssh/penetapan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'penetapan') ? 'active' : '' ?>">
             <i class="bi bi-award-fill"></i> <span>Penetapan SSH</span>
         </a>
@@ -105,13 +123,15 @@
             <i class="bi bi-journal-check"></i> <span>Master Data SSH</span>
         </a>
 
-        <?php if (in_array($user->role, ['admin', 'verifikator'])): ?>
+        <?php if (can_access('jadwal_standar') && in_array($user->role, ['admin', 'verifikator'])): ?>
         <a href="<?= site_url('ssh/jadwal') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'jadwal') ? 'active' : '' ?>">
             <i class="bi bi-calendar-check-fill"></i> <span>Jadwal Pengusulan</span>
         </a>
         <?php endif; ?>
+        <?php endif; ?>
 
         <!-- ========== MODUL 2: STANDAR BIAYA UMUM (SBU) ========== -->
+        <?php if (can_access('sbu')): ?>
         <div class="nav-section">Standar Biaya Umum (SBU)</div>
 
         <?php if (in_array($user->role, ['operator_skpd', 'skpd', 'admin'])): ?>
@@ -120,13 +140,13 @@
         </a>
         <?php endif; ?>
 
-        <?php if (in_array($user->role, ['verifikator', 'admin'])): ?>
+        <?php if (can_access('verifikasi_standar') && in_array($user->role, ['verifikator', 'admin'])): ?>
         <a href="<?= site_url('sbu/verifikasi') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'verifikasi') ? 'active' : '' ?>">
             <i class="bi bi-check2-circle"></i> <span>Verifikasi SBU</span>
         </a>
         <?php endif; ?>
 
-        <?php if (in_array($user->role, ['penetap', 'pimpinan', 'admin'])): ?>
+        <?php if (can_access('penetapan_standar') && in_array($user->role, ['penetap', 'pimpinan', 'admin'])): ?>
         <a href="<?= site_url('sbu/penetapan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'penetapan') ? 'active' : '' ?>">
             <i class="bi bi-shield-check"></i> <span>Penetapan SBU</span>
         </a>
@@ -136,16 +156,19 @@
             <i class="bi bi-journal-bookmark-fill"></i> <span>Master Data SBU</span>
         </a>
 
-        <?php if (in_array($user->role, ['admin', 'verifikator'])): ?>
+        <?php if (can_access('jadwal_standar') && in_array($user->role, ['admin', 'verifikator'])): ?>
         <a href="<?= site_url('sbu/jadwal') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'jadwal') ? 'active' : '' ?>">
             <i class="bi bi-calendar-check-fill"></i> <span>Jadwal Pengusulan</span>
         </a>
         <?php endif; ?>
+        <?php endif; ?>
 
+        <?php if (can_access('laporan')): ?>
         <div class="nav-section">Laporan</div>
         <a href="<?= site_url('laporan') ?>" class="nav-link <?= $this->uri->segment(1) === 'laporan' ? 'active' : '' ?>">
             <i class="bi bi-file-earmark-bar-graph"></i> <span>Laporan & Rekap</span>
         </a>
+        <?php endif; ?>
 
         <?php if ($user->role === 'admin'): ?>
         <div class="nav-section">Master Data</div>

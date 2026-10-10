@@ -5,6 +5,26 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.5.0] - 2026-10-10
+
+### 🚀 Ditambahkan (Added)
+- **Pengaturan Hak Akses Menu & Modul Granular Per-User (Granular RBAC):**
+  - **Menu Checklist di Admin Master Pengguna (`/master/user`):** Admin dapat menentukan dan mencentang secara spesifik modul apa saja yang dapat diakses oleh masing-masing akun pengguna (operator SKPD maupun peran lainnya).
+  - **Dukungan Preset Cepat 1-Klik:**
+    - *Preset User A:* Khusus modul Standar Satuan Harga (`ssh`), Standar Biaya Umum (`sbu`), dan Pusat Laporan (`laporan`).
+    - *Preset User B:* Khusus modul Perencanaan RKBMD 5 instrumen (`rkbmd_pengadaan`, `rkbmd_pemeliharaan`, `rkbmd_pemanfaatan`, `rkbmd_pemindahtanganan`, `rkbmd_penghapusan`), dan Pusat Laporan (`laporan`).
+    - *Pilih Semua Menu* dan *Bersihkan Semua Centang*.
+  - **Visualisasi Status Izin pada Tabel Pengguna:** Kolom baru *"Hak Akses Menu"* yang menampilkan badge pill indikator modul aktif (`RKBMD (5)`, `SSH`, `SBU`, `Laporan`, `Verifikasi`, `Akses Penuh (Admin)`, atau `Default Role`).
+  - **Proteksi Ketat Controller-Level (HTTP 403 Forbidden):**
+    - `Rkbmd`: Validasi jenis instrumen RKBMD (`can_access('rkbmd_' . $jenis)`).
+    - `Ssh`: Pemeriksaan hak akses modul Standar Satuan Harga (`can_access('ssh')`).
+    - `Sbu`: Pemeriksaan hak akses modul Standar Biaya Umum (`can_access('sbu')`).
+    - `Laporan`: Pemeriksaan hak akses modul Pusat Laporan & Rekap (`can_access('laporan')`).
+  - **Navigasi Sidebar & Dashboard Adaptif:** Sidebar navigation drawer dan kartu aksi cepat di dashboard secara otomatis menyembunyikan modul yang tidak diizinkan untuk pengguna tersebut.
+  - **Auto-Migration & Database Schema:** Penambahan kolom `menu_permissions TEXT NULL` pada tabel `users` serta mekanisme safe auto-migration pada `User_model`.
+
+---
+
 ## [2.4.0] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

@@ -82,15 +82,17 @@ class Auth
         $this->CI->session->sess_regenerate(FALSE);
 
         // Set session data
+        $perms = !empty($user->menu_permissions) ? json_decode($user->menu_permissions, TRUE) : NULL;
         $sessionData = [
-            'user_id'      => (int) $user->id,
-            'username'     => $user->username,
-            'nama_lengkap' => $user->nama_lengkap,
-            'nip'          => $user->nip,
-            'role'         => $user->role,
-            'skpd_id'      => $user->skpd_id ? (int) $user->skpd_id : NULL,
-            'is_logged_in' => TRUE,
-            'login_time'   => time(),
+            'user_id'          => (int) $user->id,
+            'username'         => $user->username,
+            'nama_lengkap'     => $user->nama_lengkap,
+            'nip'              => $user->nip,
+            'role'             => $user->role,
+            'skpd_id'          => $user->skpd_id ? (int) $user->skpd_id : NULL,
+            'menu_permissions' => $perms,
+            'is_logged_in'     => TRUE,
+            'login_time'       => time(),
         ];
         $this->CI->session->set_userdata($sessionData);
 
@@ -177,12 +179,70 @@ class Auth
         if (!$this->check()) return NULL;
         if ($field) return $this->CI->session->userdata($field);
         return (object) [
-            'id'           => $this->CI->session->userdata('user_id'),
-            'username'     => $this->CI->session->userdata('username'),
-            'nama_lengkap' => $this->CI->session->userdata('nama_lengkap'),
-            'role'         => $this->CI->session->userdata('role'),
-            'skpd_id'      => $this->CI->session->userdata('skpd_id')
+            'id'               => $this->CI->session->userdata('user_id'),
+            'username'         => $this->CI->session->userdata('username'),
+            'nama_lengkap'     => $this->CI->session->userdata('nama_lengkap'),
+            'role'             => $this->CI->session->userdata('role'),
+            'skpd_id'          => $this->CI->session->userdata('skpd_id'),
+            'menu_permissions' => $this->CI->session->userdata('menu_permissions')
         ];
+    }
+
+    /**
+     * Memeriksa apakah user yang sedang login memiliki hak akses ke menu/modul tertentu.
+     * Admin selalu memiliki akses penuh (TRUE).
+     */
+    public function canAccess($menuKey)
+    {
+        if (!$this->check()) return FALSE;
+        $role = $this->CI->session->userdata('role');
+        if ($role === 'admin') return TRUE;
+
+        $perms = $this->CI->session->userdata('menu_permissions');
+
+        // Jika belum diset konfigurasi spesifik menu (perms is null), gunakan default role
+        if ($perms === NULL) {
+            return $this->defaultRolePermissions($role, $menuKey);
+        }
+
+        if (!is_array($perms)) {
+            return FALSE;
+        }
+
+        return in_array($menuKey, $perms, TRUE);
+    }
+
+    /**
+     * Hak akses default jika admin belum menentukan checklist khusus per-user.
+     */
+    public function defaultRolePermissions($role, $menuKey)
+    {
+        if ($role === 'admin') return TRUE;
+
+        if (in_array($role, ['skpd', 'operator_skpd'], TRUE)) {
+            return in_array($menuKey, [
+                'rkbmd_pengadaan', 'rkbmd_pemeliharaan', 'rkbmd_pemanfaatan',
+                'rkbmd_pemindahtanganan', 'rkbmd_penghapusan',
+                'ssh', 'sbu', 'laporan'
+            ], TRUE);
+        }
+
+        if ($role === 'verifikator') {
+            return in_array($menuKey, [
+                'verifikasi_rkbmd', 'verifikasi_standar', 'jadwal_standar',
+                'ssh', 'sbu', 'laporan'
+            ], TRUE);
+        }
+
+        if (in_array($role, ['penetap', 'pimpinan'], TRUE)) {
+            return in_array($menuKey, [
+                'rkbmd_pengadaan', 'rkbmd_pemeliharaan', 'rkbmd_pemanfaatan',
+                'rkbmd_pemindahtanganan', 'rkbmd_penghapusan',
+                'ssh', 'sbu', 'penetapan_standar', 'laporan'
+            ], TRUE);
+        }
+
+        return FALSE;
     }
 
     public function hasRole($roles)
@@ -204,6 +264,16 @@ class Auth
         }
         if ($roles !== NULL && !$this->hasRole($roles)) {
             show_error('Anda tidak memiliki hak akses ke halaman ini.', 403, 'Akses Ditolak');
+        }
+    }
+
+    /**
+     * Membatasi akses controller/method berdasarkan menuKey.
+     */
+    public function restrictMenu($menuKey)
+    {
+        if (!$this->canAccess($menuKey)) {
+            show_error('Anda tidak memiliki hak akses untuk membuka modul / menu ini. Hubungi Administrator.', 403, 'Akses Ditolak');
         }
     }
 

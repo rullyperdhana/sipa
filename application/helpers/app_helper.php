@@ -201,3 +201,16 @@ if (!function_exists('tanggal_id')) {
         return $tgl_indo;
     }
 }
+
+/**
+ * Pengecekan otorisasi hak akses menu / modul per user.
+ */
+if (!function_exists('can_access')) {
+    function can_access($menuKey) {
+        $CI =& get_instance();
+        if (!isset($CI->auth)) {
+            $CI->load->library('auth');
+        }
+        return $CI->auth->canAccess($menuKey);
+    }
+}

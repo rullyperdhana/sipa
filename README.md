@@ -266,6 +266,9 @@ sipa/
 
    # Migrasi v2.2.0 (Mandatori 3 Berkas Bukti Survey Pasar / Brosur Resmi)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_bukti_survey_3_files.sql
+
+   # Migrasi v2.5.0 (Pengaturan Hak Akses Menu & Modul Granular Per-User)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_menu_permissions_to_users.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
@@ -275,6 +278,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`add_menu_permissions_to_users.sql`](database/migrations/add_menu_permissions_to_users.sql) | Menambahkan kolom `menu_permissions TEXT NULL` pada tabel `users` untuk mendukung konfigurasi hak akses modul terperinci per akun pengguna. |
 | [`add_bukti_survey_3_files.sql`](database/migrations/add_bukti_survey_3_files.sql) | Menambahkan kolom `file_lampiran_2`, `file_nama_asli_2`, `file_lampiran_3`, `file_nama_asli_3` pada `standar_harga_usulan` untuk mandatori 3 berkas survey pasar / brosur resmi. |
 | [`create_master_ssh_sbu_and_jadwal.sql`](database/migrations/create_master_ssh_sbu_and_jadwal.sql) | Membuat tabel `ref_standar_harga` (Fulltext & B-Tree index), tabel `standar_harga_jadwal`, seed jadwal awal, dan kolom relasi master pada `standar_harga_usulan`. |
 | [`import_master_ssh_sbu_2027.sql`](database/migrations/import_master_ssh_sbu_2027.sql) | Impor 11.519 data resmi standar harga TA 2027 (5.786 item SSH + 5.733 item SBU) dari file SIPD RI Kab. Tapin. |
@@ -343,6 +347,10 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.5.0 (2026-10-10):** Pengaturan Hak Akses Menu Granular Per-User (Granular RBAC) via Admin Master User (`master/user`), Checklist Izin Modul & Presets Cepat (User A: SSH/SBU/Laporan, User B: RKBMD/Laporan), Proteksi Controller Level HTTP 403, Sidebar & Quick Action Adaptif.
+- **v2.4.0 (2026-10-10):** Perombakan Total Dashboard Utama Terpadu SIPA (`/dashboard`) - Live Banner Jadwal, Quick Action Bar, 4 KPI Metrics, 2 Chart Interaktif (Chart.js), Tabulasi Usulan Terbaru & Monitoring SKPD.
+- **v2.3.0 (2026-10-10):** Pusat Laporan & Dashboard Eksekutif SIPA (`/laporan`), Cetak Rekapitulasi Berita Acara & Export Excel Terpadu.
+- **v2.2.0 (2026-10-10):** Mandatori 3 Berkas Unggah Bukti Survey Pasar / Brosur Resmi pada Usulan SSH & SBU.
 - **v2.1.0 (2026-10-10):** Integrasi 11.519 Master Standar Harga TA 2027 (5.786 SSH + 5.733 SBU), Modul Penjadwalan Pengusulan (`standar_harga_jadwal`) dengan mekanisme "Menunggu Jadwal", Interkoneksi Form & Autocomplete Rekening Belanja SIPD RI, Sinkronisasi Otomatis Penetapan ke Katalog Master.
 - **v2.0.0 (2026-10-10):** Rilis Mayor Pemisahan Modul SSH & SBU, Master Referensi Akun Belanja SIPD RI, Optimasi Server-Side Paging Barang BMD, Responsive Sidebar Drawer & Collapse, Idempotent Database Migrations.
 - **v1.0.0 (2026-08-18):** Rilis Perdana Modul Perencanaan RKBMD (Pengadaan, Pemeliharaan, Pemanfaatan, Pemindahtanganan, Penghapusan), Master SKPD, Verifikasi BPKAD.

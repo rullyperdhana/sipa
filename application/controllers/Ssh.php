@@ -17,6 +17,10 @@ class Ssh extends Auth_Controller
         $this->load->model(['ssh_model', 'master_model']);
         $this->load->library(['ssh_service', 'form_validation']);
         $this->load->helper(['app', 'form']);
+
+        if (!can_access('ssh')) {
+            show_error('Anda tidak memiliki hak akses untuk membuka modul Standar Satuan Harga (SSH). Hubungi Administrator.', 403, 'Akses Ditolak');
+        }
     }
 
     /**

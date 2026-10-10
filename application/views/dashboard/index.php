@@ -178,32 +178,44 @@
         </div>
         <div class="d-flex flex-wrap gap-2">
             <?php if (in_array($this->currentUser->role, ['operator_skpd', 'skpd', 'admin'])): ?>
+                <?php if (can_access('rkbmd_pengadaan')): ?>
                 <a href="<?= site_url('rkbmd/pengadaan/create') ?>" class="btn btn-sm btn-outline-primary quick-btn">
                     <i class="bi bi-plus-circle me-1"></i> Usul RKBMD
                 </a>
+                <?php endif; ?>
+                <?php if (can_access('ssh')): ?>
                 <a href="<?= site_url('ssh/tambah') ?>" class="btn btn-sm btn-outline-success quick-btn <?= (!$isJadwalBukaSsh && $this->currentUser->role !== 'admin') ? 'disabled' : '' ?>">
                     <i class="bi bi-plus-circle me-1"></i> Usul SSH Baru
                 </a>
+                <?php endif; ?>
+                <?php if (can_access('sbu')): ?>
                 <a href="<?= site_url('sbu/tambah') ?>" class="btn btn-sm btn-outline-info quick-btn <?= (!$isJadwalBukaSbu && $this->currentUser->role !== 'admin') ? 'disabled' : '' ?>">
                     <i class="bi bi-plus-circle me-1"></i> Usul SBU Baru
                 </a>
+                <?php endif; ?>
             <?php endif; ?>
 
             <?php if (in_array($this->currentUser->role, ['verifikator', 'admin'])): ?>
+                <?php if (can_access('verifikasi_rkbmd')): ?>
                 <a href="<?= site_url('verifikasi') ?>" class="btn btn-sm btn-outline-warning quick-btn">
                     <i class="bi bi-check2-square me-1"></i> Verifikasi RKBMD
                 </a>
+                <?php endif; ?>
+                <?php if (can_access('verifikasi_standar')): ?>
                 <a href="<?= site_url('ssh/verifikasi') ?>" class="btn btn-sm btn-outline-primary quick-btn">
                     <i class="bi bi-patch-check me-1"></i> Verifikasi SSH
                 </a>
                 <a href="<?= site_url('sbu/verifikasi') ?>" class="btn btn-sm btn-outline-info quick-btn">
                     <i class="bi bi-check2-circle me-1"></i> Verifikasi SBU
                 </a>
+                <?php endif; ?>
             <?php endif; ?>
 
+            <?php if (can_access('laporan')): ?>
             <a href="<?= site_url('laporan') ?>" class="btn btn-sm btn-primary quick-btn text-white shadow-sm">
                 <i class="bi bi-file-earmark-bar-graph me-1"></i> Pusat Laporan & Rekap Eksekutif
             </a>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -327,6 +339,7 @@
 <!-- ========================================================================= -->
 
 <!-- Modul 1: Standar Satuan Harga & Biaya (SSH & SBU) -->
+<?php if (can_access('ssh') || can_access('sbu')): ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center gap-2">
         <span class="module-header-pill bg-primary-subtle text-primary">
@@ -339,7 +352,8 @@
 
 <div class="row g-3 mb-4">
     <!-- Card SSH -->
-    <div class="col-md-6">
+    <?php if (can_access('ssh')): ?>
+    <div class="<?= can_access('sbu') ? 'col-md-6' : 'col-12' ?>">
         <div class="card dash-card h-100 border-top border-4 border-primary">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -395,9 +409,11 @@
             </div>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Card SBU -->
-    <div class="col-md-6">
+    <?php if (can_access('sbu')): ?>
+    <div class="<?= can_access('ssh') ? 'col-md-6' : 'col-12' ?>">
         <div class="card dash-card h-100 border-top border-4 border-info">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -453,9 +469,15 @@
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </div>
+<?php endif; ?>
 
 <!-- Modul 2: Rencana Kebutuhan Barang Milik Daerah (RKBMD 5 Instrumen) -->
+<?php 
+$hasRkbmdDash = can_access('rkbmd_pengadaan') || can_access('rkbmd_pemeliharaan') || can_access('rkbmd_pemanfaatan') || can_access('rkbmd_pemindahtanganan') || can_access('rkbmd_penghapusan');
+if ($hasRkbmdDash): 
+?>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center gap-2">
         <span class="module-header-pill bg-success-subtle text-success">
@@ -477,6 +499,7 @@ $jenisConfig = [
 ];
 
 foreach ($rekap as $jKey => $jData):
+    if (!can_access('rkbmd_' . $jKey)) continue;
     $cfg = $jenisConfig[$jKey];
 ?>
 <div class="col-lg-4 col-md-6">
@@ -511,7 +534,7 @@ foreach ($rekap as $jKey => $jData):
 </div>
 <?php endforeach; ?>
 
-<!-- Kartu Ringkasan Rekap RKBMD (Pengisi slot ke-6 agar simetris 3x2) -->
+<!-- Kartu Ringkasan Rekap RKBMD -->
 <div class="col-lg-4 col-md-6">
     <div class="card dash-card h-100 bg-primary-subtle border border-primary-subtle d-flex flex-column justify-content-center text-center p-3">
         <div class="mb-2">
@@ -519,15 +542,18 @@ foreach ($rekap as $jKey => $jData):
         </div>
         <h6 class="fw-bold text-primary mb-1">Total Pagu RKBMD</h6>
         <h4 class="fw-bold text-dark mb-2"><?= rupiah($totalNilai) ?></h4>
-        <p class="text-muted small mb-3">Dari 5 instrumen perencanaan BMD Kabupaten Tapin TA <?= $tahun ?>.</p>
+        <p class="text-muted small mb-3">Instrumen perencanaan BMD Kabupaten Tapin TA <?= $tahun ?>.</p>
         <div>
+            <?php if (can_access('laporan')): ?>
             <a href="<?= site_url('laporan') ?>" class="btn btn-sm btn-primary shadow-sm px-3">
                 <i class="bi bi-file-earmark-bar-graph me-1"></i> Buka Rekapitulasi Lengkap
             </a>
+            <?php endif; ?>
         </div>
     </div>
 </div>
 </div>
+<?php endif; ?>
 
 <!-- ========================================================================= -->
 <!-- MONITORING SKPD & USULAN TERBARU                                          -->

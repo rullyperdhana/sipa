@@ -23,6 +23,10 @@ class Rkbmd extends Auth_Controller
         if (!in_array($jenis, $this->allowedJenis, TRUE)) {
             show_error('Jenis usulan tidak dikenali.', 404);
         }
+        $permKey = 'rkbmd_' . $jenis;
+        if (!can_access($permKey)) {
+            show_error('Anda tidak memiliki hak akses untuk membuka modul RKBMD ' . ucfirst($jenis) . '. Hubungi Administrator.', 403, 'Akses Ditolak');
+        }
         return $jenis;
     }
 
