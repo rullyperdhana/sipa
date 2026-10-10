@@ -219,6 +219,7 @@ body {
 
         <div class="text-center mt-4 small text-muted">
             Butuh bantuan? Hubungi administrator BPKAD Kabupaten Tapin.
+            <div class="mt-1 opacity-75">v<?= $this->config->item('app_version') ?> &copy; <?= date('Y') ?></div>
         </div>
     </div>
 </div>
