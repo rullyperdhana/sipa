@@ -571,6 +571,107 @@ class Sbu extends Auth_Controller
         force_download($item->$colOrig ?: $item->$colFile, file_get_contents($filePath));
     }
 
+    /**
+     * Tampilkan Berkas Bukti Survey Secara Langsung (Inline) di Browser Tanpa Download
+     */
+    public function preview_lampiran($id, $slot = 1)
+    {
+        $slot = (int) $slot;
+        if (!in_array($slot, [1, 2, 3], TRUE)) {
+            $slot = 1;
+        }
+
+        $colFile = ($slot === 1) ? 'file_lampiran' : "file_lampiran_{$slot}";
+        $colOrig = ($slot === 1) ? 'file_nama_asli' : "file_nama_asli_{$slot}";
+
+        $item = $this->ssh_model->findWithRls($id, $this->currentUser);
+        if (!$item || empty($item->$colFile)) {
+            show_404();
+        }
+
+        $filePath = FCPATH . 'uploads/ssh_sbu/' . $item->$colFile;
+        if (!file_exists($filePath)) {
+            show_404();
+        }
+
+        $ext = strtolower(pathinfo($item->$colFile, PATHINFO_EXTENSION));
+        $mimeMap = [
+            'pdf'  => 'application/pdf',
+            'jpg'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png'  => 'image/png',
+            'webp' => 'image/webp',
+            'gif'  => 'image/gif',
+            'txt'  => 'text/plain',
+            'doc'  => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xls'  => 'application/vnd.ms-excel',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ];
+
+        $mime = $mimeMap[$ext] ?? (function_exists('mime_content_type') ? mime_content_type($filePath) : 'application/octet-stream');
+        $clientName = $item->$colOrig ?: $item->$colFile;
+
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: inline; filename="' . addslashes($clientName) . '"');
+        header('Content-Length: ' . filesize($filePath));
+        header('Cache-Control: public, max-age=86400');
+        header('X-Content-Type-Options: nosniff');
+
+        readfile($filePath);
+        exit;
+    }
+
+    /**
+     * API JSON Metadata Seluruh Bukti Lampiran untuk Modal Viewer
+     */
+    public function api_lampiran($id)
+    {
+        $item = $this->ssh_model->findWithRls($id, $this->currentUser);
+        if (!$item) {
+            return $this->output->set_status_header(404)->set_output(json_encode(['success' => FALSE, 'message' => 'Usulan tidak ditemukan.']));
+        }
+
+        $lampiran = [];
+        for ($i = 1; $i <= 3; $i++) {
+            $colFile = ($i === 1) ? 'file_lampiran' : "file_lampiran_{$i}";
+            $colOrig = ($i === 1) ? 'file_nama_asli' : "file_nama_asli_{$i}";
+
+            if (!empty($item->$colFile)) {
+                $filePath = FCPATH . 'uploads/ssh_sbu/' . $item->$colFile;
+                $exists = file_exists($filePath);
+                $ext = strtolower(pathinfo($item->$colFile, PATHINFO_EXTENSION));
+                $lampiran[] = [
+                    'slot'           => $i,
+                    'label'          => "Survey {$i}",
+                    'nama_asli'      => $item->$colOrig ?: "Berkas Survey {$i}",
+                    'file_name'      => $item->$colFile,
+                    'ext'            => $ext,
+                    'is_previewable' => in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'gif'], TRUE),
+                    'size'           => $exists ? round(filesize($filePath) / 1024, 1) . ' KB' : '-',
+                    'preview_url'    => site_url("{$this->prefixUrl}/preview/{$item->id}/{$i}"),
+                    'download_url'   => site_url("{$this->prefixUrl}/download/{$item->id}/{$i}")
+                ];
+            }
+        }
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode([
+            'success'     => TRUE,
+            'id'          => $item->id,
+            'kode_usulan' => $item->kode_usulan,
+            'uraian'      => $item->uraian,
+            'spesifikasi' => $item->spesifikasi,
+            'satuan'      => $item->satuan,
+            'harga_usulan'=> rupiah($item->harga_usulan),
+            'nama_skpd'   => $item->nama_skpd ?? '',
+            'lampiran'    => $lampiran
+        ]));
+    }
+
     public function api_transisi_status()
     {
         if ($this->input->method() !== 'post') {

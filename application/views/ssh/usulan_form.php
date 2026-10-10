@@ -376,11 +376,20 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                                                     <i class="bi bi-file-earmark-check text-success me-1"></i>
                                                     <span class="fw-semibold"><?= e($slot['orig'] ?: $slot['file']) ?></span>
                                                 </div>
-                                                <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/{$idx}") ?>" 
-                                                   class="btn btn-sm btn-outline-primary py-0 px-2 flex-shrink-0" 
-                                                   title="Unduh File Saat Ini">
-                                                    <i class="bi bi-download"></i>
-                                                </a>
+                                                <div class="d-flex gap-1 flex-shrink-0">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 btn-preview-lampiran" 
+                                                            data-id="<?= $item->id ?>" 
+                                                            data-prefix="<?= $prefixUrl ?>" 
+                                                            data-slot="<?= $idx ?>" 
+                                                            title="Lihat Pratinjau Berkas (Tanpa Download)">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/{$idx}") ?>" 
+                                                       class="btn btn-sm btn-outline-secondary py-0 px-2" 
+                                                       title="Unduh File Saat Ini">
+                                                        <i class="bi bi-download"></i>
+                                                    </a>
+                                                </div>
                                             </div>
                                             <div class="text-muted text-end mt-1" style="font-size: 0.72rem;">Unggah berkas baru jika ingin mengganti</div>
                                         </div>

@@ -48,6 +48,9 @@ $route['ssh/jadwal/hapus/(:num)']           = 'ssh/hapus_jadwal/$1';
 $route['ssh/detail/(:num)']                 = 'ssh/detail/$1';
 $route['ssh/download/(:num)']               = 'ssh/download_lampiran/$1';
 $route['ssh/download/(:num)/(:num)']        = 'ssh/download_lampiran/$1/$2';
+$route['ssh/preview/(:num)']                 = 'ssh/preview_lampiran/$1';
+$route['ssh/preview/(:num)/(:num)']          = 'ssh/preview_lampiran/$1/$2';
+$route['ssh/api/lampiran/(:num)']           = 'ssh/api_lampiran/$1';
 $route['ssh/api/transisi']                  = 'ssh/api_transisi_status';
 
 // ===== Modul Standar Biaya Umum (SBU) =====
@@ -69,6 +72,9 @@ $route['sbu/jadwal/hapus/(:num)']           = 'sbu/hapus_jadwal/$1';
 $route['sbu/detail/(:num)']                 = 'sbu/detail/$1';
 $route['sbu/download/(:num)']               = 'sbu/download_lampiran/$1';
 $route['sbu/download/(:num)/(:num)']        = 'sbu/download_lampiran/$1/$2';
+$route['sbu/preview/(:num)']                 = 'sbu/preview_lampiran/$1';
+$route['sbu/preview/(:num)/(:num)']          = 'sbu/preview_lampiran/$1/$2';
+$route['sbu/api/lampiran/(:num)']           = 'sbu/api_lampiran/$1';
 $route['sbu/api/transisi']                  = 'sbu/api_transisi_status';
 
 // ===== Master Data =====

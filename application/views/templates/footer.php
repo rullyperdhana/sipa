@@ -5,6 +5,9 @@
 <!-- Global WhatsApp Notification Modal -->
 <?php $this->load->view('templates/wa_modal'); ?>
 
+<!-- Global Evidence Document Preview Modal -->
+<?php $this->load->view('templates/preview_modal'); ?>
+
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap JS -->

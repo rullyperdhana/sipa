@@ -481,6 +481,155 @@
             }
         });
 
+        // ---------------------------------------------------------------------
+        // AKSI 6: MODAL PRATINJAU BUKTI DUKUNG (INLINE VIEWER TANPA DOWNLOAD)
+        // ---------------------------------------------------------------------
+        let currentPreviewData = null;
+
+        function loadPreviewSlot(slotNumber) {
+            slotNumber = parseInt(slotNumber, 10) || 1;
+            if (!currentPreviewData || !currentPreviewData.lampiran) return;
+
+            const $loader = $('#previewLoader');
+            const $iframe = $('#previewIframe');
+            const $imgWrap = $('#previewImageWrapper');
+            const $img = $('#previewImage');
+            const $fallback = $('#previewFallbackOffice');
+            const $error = $('#previewError');
+            const $newTabBtn = $('#btnPreviewNewTab');
+            const $dlBtn = $('#btnPreviewDownload');
+            const $namaBerkas = $('#textNamaBerkasAktif');
+
+            // Set active button
+            $('.btn-slot-switch').removeClass('active');
+            $('#btnSlot' + slotNumber).addClass('active');
+
+            // Sembunyikan semua viewer
+            $iframe.addClass('d-none').attr('src', 'about:blank');
+            $imgWrap.addClass('d-none').removeClass('d-flex');
+            $img.attr('src', '');
+            $fallback.addClass('d-none');
+            $error.addClass('d-none');
+            $loader.removeClass('d-none');
+
+            // Cari berkas pada slot terkait
+            const item = currentPreviewData.lampiran.find(l => parseInt(l.slot, 10) === slotNumber);
+
+            if (!item) {
+                $loader.addClass('d-none');
+                $('#previewErrorMessage').text(`Berkas Bukti Survey ${slotNumber} tidak tersedia.`);
+                $error.removeClass('d-none');
+                $newTabBtn.addClass('disabled').attr('href', '#');
+                $dlBtn.addClass('disabled').attr('href', '#');
+                $namaBerkas.text('');
+                return;
+            }
+
+            $namaBerkas.html(`<i class="bi bi-file-earmark-check text-success me-1"></i><strong>${item.nama_asli}</strong> <span class="badge bg-secondary-subtle text-dark border ms-1">${item.size}</span>`);
+            $newTabBtn.removeClass('disabled').attr('href', item.preview_url);
+            $dlBtn.removeClass('disabled').attr('href', item.download_url);
+
+            const ext = (item.ext || '').toLowerCase();
+            const isImage = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext);
+            const isPdf = (ext === 'pdf');
+
+            if (isPdf) {
+                $iframe.attr('src', item.preview_url);
+                $iframe.off('load').on('load', function () {
+                    $loader.addClass('d-none');
+                    $iframe.removeClass('d-none');
+                });
+            } else if (isImage) {
+                $img.attr('src', item.preview_url);
+                $img.off('load error').on('load', function () {
+                    $loader.addClass('d-none');
+                    $imgWrap.removeClass('d-none').addClass('d-flex');
+                }).on('error', function () {
+                    $loader.addClass('d-none');
+                    $('#previewErrorMessage').text('Gagal memuat gambar bukti survey.');
+                    $error.removeClass('d-none');
+                });
+            } else {
+                // Dokumen Non-Previewable (Word / Excel)
+                $loader.addClass('d-none');
+                $('#fallbackExt').text('.' + ext);
+                $('#btnFallbackDownload').attr('href', item.download_url);
+                $fallback.removeClass('d-none');
+            }
+        }
+
+        SshModule.openPreview = function(id, prefix = 'ssh', defaultSlot = 1) {
+            const $modal = $('#modalPreviewBukti');
+            if (!$modal.length) return;
+
+            const url = (window.appConfig ? window.appConfig.baseUrl : '/') + prefix + '/api/lampiran/' + id;
+
+            // Reset modal awal
+            $('#badgePreviewKode').text('...');
+            $('#textPreviewSkpd').text('Memuat...');
+            $('#textPreviewUraian').text('');
+            $('#textNamaBerkasAktif').text('');
+            $('#previewLoader').removeClass('d-none');
+            $('#previewIframe').addClass('d-none').attr('src', 'about:blank');
+            $('#previewImageWrapper').addClass('d-none').removeClass('d-flex');
+            $('#previewFallbackOffice').addClass('d-none');
+            $('#previewError').addClass('d-none');
+
+            // Buka modal
+            const bsModal = bootstrap.Modal.getOrCreateInstance($modal[0]);
+            bsModal.show();
+
+            $.getJSON(url).done(function(res) {
+                if (!res.success) {
+                    $('#previewLoader').addClass('d-none');
+                    $('#previewErrorMessage').text(res.message || 'Gagal memuat data berkas.');
+                    $('#previewError').removeClass('d-none');
+                    return;
+                }
+
+                currentPreviewData = res;
+                $('#badgePreviewKode').text(res.kode_usulan || '-');
+                $('#textPreviewSkpd').text(res.nama_skpd || '-');
+                $('#textPreviewUraian').text(res.uraian || '-');
+
+                // Update size badge di button slot
+                for (let i = 1; i <= 3; i++) {
+                    const l = res.lampiran.find(x => parseInt(x.slot, 10) === i);
+                    const $btn = $('#btnSlot' + i);
+                    if (l) {
+                        $btn.removeClass('disabled text-muted').removeAttr('disabled');
+                        $btn.find('.size-badge').text(l.size).removeClass('bg-secondary text-white').addClass('bg-light text-dark');
+                    } else {
+                        $btn.addClass('disabled text-muted').attr('disabled', 'disabled');
+                        $btn.find('.size-badge').text('Kosong').addClass('bg-secondary text-white').removeClass('bg-light text-dark');
+                    }
+                }
+
+                // Muat slot yang dipilih
+                loadPreviewSlot(defaultSlot);
+            }).fail(function() {
+                $('#previewLoader').addClass('d-none');
+                $('#previewErrorMessage').text('Terjadi kesalahan saat memuat berkas dari server.');
+                $('#previewError').removeClass('d-none');
+            });
+        };
+
+        // Event switcher tab slot di dalam modal
+        $(document).on('click', '.btn-slot-switch', function (e) {
+            e.preventDefault();
+            const slot = $(this).data('slot');
+            loadPreviewSlot(slot);
+        });
+
+        // Event tombol trigger preview di tabel / detail usulan
+        $(document).on('click', '.btn-preview-lampiran', function (e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            const prefix = $(this).data('prefix') || 'ssh';
+            const slot = $(this).data('slot') || 1;
+            SshModule.openPreview(id, prefix, slot);
+        });
+
     });
 
     // Ekspos ke global window

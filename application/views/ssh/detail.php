@@ -76,26 +76,35 @@
                                 <?php if ($hasSurveyFiles): ?>
                                 <div class="d-flex flex-column gap-2">
                                     <?php if (!empty($item->file_lampiran)): ?>
-                                    <div class="d-flex align-items-center gap-2">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
                                         <span class="badge bg-primary">Survey 1</span>
-                                        <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/1") ?>" class="btn btn-sm btn-outline-primary py-0">
-                                            <i class="bi bi-download me-1"></i> <?= e($item->file_nama_asli ?: $item->file_lampiran) ?>
+                                        <button type="button" class="btn btn-sm btn-primary py-0 btn-preview-lampiran" data-id="<?= $item->id ?>" data-prefix="<?= $prefixUrl ?>" data-slot="1" title="Lihat pratinjau dokumen langsung di layar">
+                                            <i class="bi bi-eye me-1"></i> Lihat Berkas: <?= e($item->file_nama_asli ?: $item->file_lampiran) ?>
+                                        </button>
+                                        <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/1") ?>" class="btn btn-sm btn-outline-secondary py-0" title="Unduh berkas ke komputer lokal">
+                                            <i class="bi bi-download"></i>
                                         </a>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($item->file_lampiran_2)): ?>
-                                    <div class="d-flex align-items-center gap-2">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
                                         <span class="badge bg-primary">Survey 2</span>
-                                        <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/2") ?>" class="btn btn-sm btn-outline-primary py-0">
-                                            <i class="bi bi-download me-1"></i> <?= e($item->file_nama_asli_2 ?: $item->file_lampiran_2) ?>
+                                        <button type="button" class="btn btn-sm btn-primary py-0 btn-preview-lampiran" data-id="<?= $item->id ?>" data-prefix="<?= $prefixUrl ?>" data-slot="2" title="Lihat pratinjau dokumen langsung di layar">
+                                            <i class="bi bi-eye me-1"></i> Lihat Berkas: <?= e($item->file_nama_asli_2 ?: $item->file_lampiran_2) ?>
+                                        </button>
+                                        <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/2") ?>" class="btn btn-sm btn-outline-secondary py-0" title="Unduh berkas ke komputer lokal">
+                                            <i class="bi bi-download"></i>
                                         </a>
                                     </div>
                                     <?php endif; ?>
                                     <?php if (!empty($item->file_lampiran_3)): ?>
-                                    <div class="d-flex align-items-center gap-2">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
                                         <span class="badge bg-primary">Survey 3</span>
-                                        <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/3") ?>" class="btn btn-sm btn-outline-primary py-0">
-                                            <i class="bi bi-download me-1"></i> <?= e($item->file_nama_asli_3 ?: $item->file_lampiran_3) ?>
+                                        <button type="button" class="btn btn-sm btn-primary py-0 btn-preview-lampiran" data-id="<?= $item->id ?>" data-prefix="<?= $prefixUrl ?>" data-slot="3" title="Lihat pratinjau dokumen langsung di layar">
+                                            <i class="bi bi-eye me-1"></i> Lihat Berkas: <?= e($item->file_nama_asli_3 ?: $item->file_lampiran_3) ?>
+                                        </button>
+                                        <a href="<?= site_url("{$prefixUrl}/download/{$item->id}/3") ?>" class="btn btn-sm btn-outline-secondary py-0" title="Unduh berkas ke komputer lokal">
+                                            <i class="bi bi-download"></i>
                                         </a>
                                     </div>
                                     <?php endif; ?>
