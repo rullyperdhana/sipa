@@ -257,7 +257,7 @@ class Laporan extends Auth_Controller
         $kpi = $this->laporan_model->getExecutiveKpi($tahun, $skpdId);
         $skpdInfo = NULL;
         if (!empty($skpdId)) {
-            $skpdInfo = $this->master_model->getSkpdById($skpdId);
+            $skpdInfo = $this->master_model->findSkpd($skpdId);
         }
 
         $data = [

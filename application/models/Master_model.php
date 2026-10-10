@@ -15,6 +15,11 @@ class Master_model extends CI_Model
         return $this->db->get_where('skpd', ['id' => (int) $id])->row();
     }
 
+    public function getSkpdById($id)
+    {
+        return $this->findSkpd($id);
+    }
+
     public function saveSkpd($data, $id = NULL)
     {
         if ($id) {
