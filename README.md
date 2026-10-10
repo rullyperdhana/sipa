@@ -310,6 +310,9 @@ sipa/
 
    # Migrasi v2.7.0 (Pengaturan Pendaftaran Mandiri Pengguna & Security Hardening)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_user_registration_settings.sql
+
+   # Migrasi v2.8.0 (Manajemen Nomenklatur SKPD Per Tahun & Konteks Tahun Anggaran Global)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_global_fiscal_year_and_skpd_nomenklatur.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
@@ -319,6 +322,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`add_global_fiscal_year_and_skpd_nomenklatur.sql`](database/migrations/add_global_fiscal_year_and_skpd_nomenklatur.sql) | Menambahkan tabel `skpd_nomenklatur` untuk mencatat riwayat nama SKPD, kode unit, dan Kepala SKPD per Tahun Anggaran agar dokumen cetak lampau tetap otentik. |
 | [`add_user_registration_settings.sql`](database/migrations/add_user_registration_settings.sql) | Menambahkan konfigurasi default pendaftaran mandiri pengguna (`registration_enabled`, `registration_require_approval`, `registration_default_role`) pada tabel `ex_settings`. |
 | [`add_wa_notification_features.sql`](database/migrations/add_wa_notification_features.sql) | Menambahkan kolom `no_wa` pada tabel `users`, tabel konfigurasi `ex_settings`, dan nilai bawaan notifikasi WhatsApp SIPA. |
 | [`add_menu_permissions_to_users.sql`](database/migrations/add_menu_permissions_to_users.sql) | Menambahkan kolom `menu_permissions TEXT NULL` pada tabel `users` untuk mendukung konfigurasi hak akses modul terperinci per akun pengguna. |
