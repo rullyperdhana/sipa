@@ -21,6 +21,15 @@
 <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
 </head>
 <body>
+<script>
+(function() {
+    try {
+        if (localStorage.getItem('sipa_sidebar_collapsed') === '1' && window.innerWidth >= 992) {
+            document.body.classList.add('sidebar-collapsed');
+        }
+    } catch (e) {}
+})();
+</script>
 
 <?php $user = $this->auth->user(); ?>
 
@@ -30,10 +39,13 @@
         <div class="brand-icon">
             <i class="bi bi-building-fill-check"></i>
         </div>
-        <div class="brand-text">
+        <div class="brand-text flex-grow-1">
             <span class="brand-name">SIPA</span>
             <small>Kabupaten Tapin</small>
         </div>
+        <button type="button" class="btn btn-link d-lg-none ms-auto p-0" id="sidebarClose" aria-label="Tutup Menu" title="Tutup Menu">
+            <i class="bi bi-x-lg fs-5"></i>
+        </button>
     </div>
 
     <nav class="sidebar-nav">
@@ -148,7 +160,7 @@
 <!-- ========== MAIN ========== -->
 <main class="main-wrapper">
     <header class="topbar">
-        <button class="btn btn-link sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <button class="btn btn-link sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar" title="Toggle Sidebar">
             <i class="bi bi-list"></i>
         </button>
 

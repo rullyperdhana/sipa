@@ -214,8 +214,41 @@ a:hover { color: var(--primary-dark); }
 /* ===== Alerts ===== */
 .alert { border: none; border-radius: 10px; font-size: 13.5px; }
 
-/* ===== Sidebar Toggle (Mobile) ===== */
-.sidebar-toggle { font-size: 22px; color: #374151 !important; padding: 0 8px; }
+/* ===== Sidebar Toggle ===== */
+.sidebar-toggle {
+    font-size: 22px;
+    color: #374151 !important;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color .15s ease, color .15s ease;
+    text-decoration: none !important;
+    line-height: 1;
+}
+.sidebar-toggle:hover {
+    background: #f3f4f6;
+    color: var(--primary) !important;
+}
+
+#sidebarClose {
+    color: rgba(255, 255, 255, 0.65) !important;
+    text-decoration: none !important;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    transition: background-color .15s ease, color .15s ease;
+}
+#sidebarClose:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.12);
+}
 
 /* ===== Select2 Overrides ===== */
 .select2-container--bootstrap-5 .select2-selection {
@@ -227,16 +260,47 @@ a:hover { color: var(--primary-dark); }
 /* ===== DataTables ===== */
 .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter { font-size: 13px; }
 
-/* ===== Sidebar collapsed (mobile) ===== */
-@media (max-width: 991px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.open { transform: translateX(0); }
-    .main-wrapper { margin-left: 0; }
-    .sidebar-backdrop {
-        display: none;
-        position: fixed; inset: 0;
-        background: rgba(0,0,0,.4);
-        z-index: 1039;
+/* ===== Backdrop ===== */
+.sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 1039;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .25s ease, visibility .25s ease;
+}
+.sidebar-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ===== Desktop Sidebar Collapse (>= 992px) ===== */
+@media (min-width: 992px) {
+    body.sidebar-collapsed .sidebar {
+        transform: translateX(-100%);
     }
-    .sidebar-backdrop.show { display: block; }
+    body.sidebar-collapsed .main-wrapper {
+        margin-left: 0;
+    }
+}
+
+/* ===== Mobile Sidebar Drawer (< 992px) ===== */
+@media (max-width: 991px) {
+    body.sidebar-open {
+        overflow: hidden;
+    }
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: none;
+    }
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.35);
+    }
+    .main-wrapper {
+        margin-left: 0;
+    }
 }
