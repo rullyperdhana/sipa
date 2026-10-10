@@ -30,19 +30,72 @@ class Master_model extends CI_Model
     }
 
     // ===== BARANG =====
-    public function getAllBarang($filter = [])
+    private function _applyFilterBarang($filter = [])
     {
-        if (!empty($filter['kategori'])) $this->db->where('kategori', $filter['kategori']);
+        if (!empty($filter['kategori'])) {
+            $this->db->where('kategori', $filter['kategori']);
+        }
         if (!empty($filter['q'])) {
+            $q = trim($filter['q']);
             $this->db->group_start()
-                ->like('nama_barang', $filter['q'])
-                ->or_like('kode_barang', $filter['q'])
+                ->like('nama_barang', $q)
+                ->or_like('kode_barang', $q)
                 ->group_end();
         }
-        if (!empty($filter['active_only'])) $this->db->where('is_active', 1);
-        if (!empty($filter['limit'])) $this->db->limit((int) $filter['limit']);
+        if (isset($filter['is_active']) && $filter['is_active'] !== '') {
+            $this->db->where('is_active', (int) $filter['is_active']);
+        } elseif (!empty($filter['active_only'])) {
+            $this->db->where('is_active', 1);
+        }
+        if (isset($filter['has_harga']) && $filter['has_harga'] !== '') {
+            if ($filter['has_harga'] == '1') {
+                $this->db->where('harga_standar >', 0);
+            } elseif ($filter['has_harga'] == '0') {
+                $this->db->where('harga_standar <=', 0);
+            }
+        }
+    }
 
-        return $this->db->order_by('nama_barang', 'ASC')->get('barang')->result();
+    public function getAllBarang($filter = [], $limit = 0, $offset = 0)
+    {
+        $this->_applyFilterBarang($filter);
+
+        $orderCol = $filter['order_by'] ?? 'kode_barang';
+        $orderDir = (isset($filter['order_dir']) && strtoupper($filter['order_dir']) === 'DESC') ? 'DESC' : 'ASC';
+        $this->db->order_by($orderCol, $orderDir);
+
+        if ($limit > 0) {
+            $this->db->limit((int) $limit, (int) $offset);
+        } elseif (!empty($filter['limit'])) {
+            $this->db->limit((int) $filter['limit'], (int) ($filter['offset'] ?? 0));
+        }
+
+        return $this->db->get('barang')->result();
+    }
+
+    public function countBarang($filter = [])
+    {
+        $this->_applyFilterBarang($filter);
+        return $this->db->count_all_results('barang');
+    }
+
+    public function getStatistikBarang()
+    {
+        $total   = $this->db->count_all('barang');
+        $mesin   = $this->db->where('kategori', 'Peralatan dan Mesin')->count_all_results('barang');
+        $gedung  = $this->db->where('kategori', 'Gedung dan Bangunan')->count_all_results('barang');
+        $tanah   = $this->db->where('kategori', 'Tanah')->count_all_results('barang');
+        $lainnya = $this->db->where_not_in('kategori', ['Peralatan dan Mesin', 'Gedung dan Bangunan', 'Tanah'])->count_all_results('barang');
+        $aktif   = $this->db->where('is_active', 1)->count_all_results('barang');
+
+        return (object) [
+            'total'   => $total,
+            'mesin'   => $mesin,
+            'gedung'  => $gedung,
+            'tanah'   => $tanah,
+            'lainnya' => $lainnya,
+            'aktif'   => $aktif
+        ];
     }
 
     public function findBarang($id)

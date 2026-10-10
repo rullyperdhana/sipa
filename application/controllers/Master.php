@@ -72,13 +72,31 @@ class Master extends Admin_Controller
         }
 
         $filter = [];
-        if ($q = $this->input->get('q', TRUE)) $filter['q'] = $q;
-        if ($k = $this->input->get('kategori', TRUE)) $filter['kategori'] = $k;
+        if ($q = trim($this->input->get('q', TRUE) ?? '')) $filter['q'] = $q;
+        if ($k = trim($this->input->get('kategori', TRUE) ?? '')) $filter['kategori'] = $k;
+        if (($active = $this->input->get('is_active', TRUE)) !== null && $active !== '') $filter['is_active'] = (int) $active;
+        if (($hasHarga = $this->input->get('has_harga', TRUE)) !== null && $hasHarga !== '') $filter['has_harga'] = $hasHarga;
+
+        $page = max(1, (int) $this->input->get('page'));
+        $perPage = (int) ($this->input->get('per_page') ?: 25);
+        if (!in_array($perPage, [25, 50, 100])) $perPage = 25;
+        $offset = ($page - 1) * $perPage;
+
+        $totalRows  = $this->master_model->countBarang($filter);
+        $list       = $this->master_model->getAllBarang($filter, $perPage, $offset);
+        $stats      = $this->master_model->getStatistikBarang();
+        $totalPages = ceil($totalRows / $perPage);
 
         $data = [
-            'title'  => 'Master Data Barang',
-            'list'   => $this->master_model->getAllBarang($filter),
-            'filter' => $filter
+            'title'      => 'Master Data Barang BMD',
+            'list'       => $list,
+            'filter'     => $filter,
+            'stats'      => $stats,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'offset'     => $offset,
+            'totalRows'  => $totalRows,
+            'totalPages' => $totalPages
         ];
 
         $this->load->view('templates/header', $data);
