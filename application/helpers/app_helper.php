@@ -214,3 +214,50 @@ if (!function_exists('can_access')) {
         return $CI->auth->canAccess($menuKey);
     }
 }
+
+/**
+ * Mengambil nilai konfigurasi dari tabel ex_settings dengan caching statis dalam 1 siklus request.
+ */
+if (!function_exists('get_setting')) {
+    function get_setting($key, $default = null, $refresh = false) {
+        static $cachedSettings = null;
+        $CI =& get_instance();
+
+        if ($cachedSettings === null || $refresh) {
+            $cachedSettings = [];
+            try {
+                if ($CI->db->table_exists('ex_settings')) {
+                    $rows = $CI->db->get('ex_settings')->result();
+                    foreach ($rows as $r) {
+                        $cachedSettings[$r->key] = $r->value;
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        return array_key_exists($key, $cachedSettings) ? $cachedSettings[$key] : $default;
+    }
+}
+
+/**
+ * Menyimpan atau memperbarui nilai konfigurasi ke tabel ex_settings.
+ */
+if (!function_exists('set_setting')) {
+    function set_setting($key, $val) {
+        $CI =& get_instance();
+        try {
+            if ($CI->db->table_exists('ex_settings')) {
+                $exists = $CI->db->where('key', $key)->count_all_results('ex_settings');
+                if ($exists > 0) {
+                    $CI->db->where('key', $key)->update('ex_settings', ['value' => (string)$val]);
+                } else {
+                    $CI->db->insert('ex_settings', ['key' => $key, 'value' => (string)$val]);
+                }
+                // Segarkan cache
+                get_setting($key, null, true);
+                return true;
+            }
+        } catch (\Throwable $e) {}
+        return false;
+    }
+}

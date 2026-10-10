@@ -5,6 +5,28 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.7.0] - 2026-10-10
+
+### 🚀 Ditambahkan (Added)
+- **Pengaturan & Fitur Pendaftaran Mandiri Pengguna (Self-Registration) (`/register`):**
+  - **Panel Pengaturan Pendaftaran di Admin (`/master/user`):** Admin BPKAD dapat mengaktifkan atau menonaktifkan pendaftaran mandiri publik (Buka/Tutup) kapan saja.
+  - **Kebijakan Verifikasi & Persetujuan Admin (Admin Approval Workflow):** Opsi agar akun yang baru mendaftar secara mandiri berstatus *Nonaktif / Menunggu Verifikasi* (`is_active = 0`) sebelum disetujui oleh BPKAD demi keamanan instansi.
+  - **Tombol Cepat Setujui Akun (1-Klik):** Admin dapat menyetujui dan mengaktifkan akun pendaftar langsung dari tabel daftar pengguna.
+  - **Integrasi WhatsApp Notifikasi Akun Aktif:** Admin dapat langsung mengirimkan pesan WhatsApp pemberitahuan aktivasi akun ke nomor pemohon via tombol WA.
+  - **Formulir Pendaftaran Lengkap:** Menyediakan input Nama Lengkap, NIP, Username, Email, Nomor WhatsApp, Pilihan SKPD, Password (minimal 8 karakter), serta verifikasi Anti-Bot Matematika.
+  - **Penanganan Halaman Saat Pendaftaran Ditutup:** Halaman `/register` dan `/login` secara otomatis menyesuaikan tampilan informasi kedinasan jika pendaftaran sedang dinonaktifkan.
+
+### 🛡️ Keamanan & Hardening (Security Hardening):
+- **Deteksi Lingkungan Otomatis (`index.php`):** Otomatis mengatur `ENVIRONMENT = 'production'` pada domain online untuk menonaktifkan tampilan error trace PHP dan mencegah kebocoran informasi sistem (*Information Disclosure*).
+- **Proteksi Brute-Force Berbasis IP & Akun (`Auth.php`):** Memblokir percobaan login berulang jika sebuah IP gagal 10 kali dalam 15 menit.
+- **Mitigasi Timing Attack (`Auth.php`):** Menjalankan kalkulasi hash dummy saat username tidak ditemukan untuk menyamakan waktu respon server.
+- **Tantangan Anti-Bot Captcha Dinamis pada Login (`Login.php`):** Menampilkan captcha matematika otomatis apabila terdeteksi 3 kali kegagalan login berturut-turut.
+- **Header Keamanan HTTP Lengkap pada Login & Register (`MY_Controller`):** Memastikan halaman login dan register terlindungi oleh `X-Frame-Options: SAMEORIGIN` (anti-clickjacking), `X-Content-Type-Options: nosniff`, `X-XSS-Protection: 1; mode=block`, `Referrer-Policy: strict-origin-when-cross-origin`, dan `Strict-Transport-Security` (HSTS).
+- **Hardening Direktori Uploads (`uploads/.htaccess`):** Melarang eksekusi file script apapun (`.php`, `.phtml`, `.cgi`, `.sh`, `.exe`, dll.) di dalam direktori penyimpanan berkas unggahan.
+- **Hardening Root Web Server (`.htaccess`):** Mematikan *Directory Listing* (`Options -Indexes`) dan memblokir akses langsung ke file sensitif (`.env`, `.sql`, `.json`, `.lock`, `.log`, `database.local.php`).
+
+---
+
 ## [2.6.0] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

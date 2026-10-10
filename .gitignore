@@ -9,6 +9,7 @@
 
 # Uploads (user uploaded documents)
 /uploads/*
+!/uploads/.htaccess
 !/uploads/temp/
 !/uploads/temp/.gitkeep
 !/uploads/ssh_sbu/

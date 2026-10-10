@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BPKAD
 
-[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.7.0-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -272,6 +272,9 @@ sipa/
 
    # Migrasi v2.6.0 (Fitur Notifikasi & Pemberitahuan WhatsApp ke Operator SKPD)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_wa_notification_features.sql
+
+   # Migrasi v2.7.0 (Pengaturan Pendaftaran Mandiri Pengguna & Security Hardening)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_user_registration_settings.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
@@ -281,6 +284,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`add_user_registration_settings.sql`](database/migrations/add_user_registration_settings.sql) | Menambahkan konfigurasi default pendaftaran mandiri pengguna (`registration_enabled`, `registration_require_approval`, `registration_default_role`) pada tabel `ex_settings`. |
 | [`add_wa_notification_features.sql`](database/migrations/add_wa_notification_features.sql) | Menambahkan kolom `no_wa` pada tabel `users`, tabel konfigurasi `ex_settings`, dan nilai bawaan notifikasi WhatsApp SIPA. |
 | [`add_menu_permissions_to_users.sql`](database/migrations/add_menu_permissions_to_users.sql) | Menambahkan kolom `menu_permissions TEXT NULL` pada tabel `users` untuk mendukung konfigurasi hak akses modul terperinci per akun pengguna. |
 | [`add_bukti_survey_3_files.sql`](database/migrations/add_bukti_survey_3_files.sql) | Menambahkan kolom `file_lampiran_2`, `file_nama_asli_2`, `file_lampiran_3`, `file_nama_asli_3` pada `standar_harga_usulan` untuk mandatori 3 berkas survey pasar / brosur resmi. |

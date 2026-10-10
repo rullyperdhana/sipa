@@ -278,7 +278,12 @@ class Master extends Admin_Controller
             'title'                => 'Master Data User',
             'list'                 => $this->user_model->getAll(),
             'skpd'                 => $this->master_model->getAllSkpd(),
-            'availablePermissions' => User_model::getAvailablePermissions()
+            'availablePermissions' => User_model::getAvailablePermissions(),
+            'reg_settings'         => [
+                'registration_enabled'          => function_exists('get_setting') ? get_setting('registration_enabled', '1') : '1',
+                'registration_require_approval' => function_exists('get_setting') ? get_setting('registration_require_approval', '1') : '1',
+                'registration_default_role'     => function_exists('get_setting') ? get_setting('registration_default_role', 'operator_skpd') : 'operator_skpd',
+            ]
         ];
         $this->load->view('templates/header', $data);
         $this->load->view('master/user', $data);
@@ -354,6 +359,31 @@ class Master extends Admin_Controller
             $this->user_model->changePassword($id, $newPassword);
             $this->logger->record('reset_password', 'user', "Reset password user ID #{$id}");
             $this->session->set_flashdata('success', 'Password berhasil direset.');
+        } elseif ($action === 'save_reg_settings') {
+            $regEnabled = $this->input->post('registration_enabled') ? '1' : '0';
+            $requireApproval = $this->input->post('registration_require_approval') ? '1' : '0';
+            $defaultRole = $this->input->post('registration_default_role', TRUE) ?: 'operator_skpd';
+
+            set_setting('registration_enabled', $regEnabled);
+            set_setting('registration_require_approval', $requireApproval);
+            set_setting('registration_default_role', $defaultRole);
+
+            $this->logger->record('update', 'setting', "Update Pengaturan Registrasi Mandiri: Status={$regEnabled}, Approval={$requireApproval}, Role={$defaultRole}");
+            $this->session->set_flashdata('success', 'Pengaturan pendaftaran mandiri user berhasil diperbarui.');
+        } elseif ($action === 'approve') {
+            $id = (int) $this->input->post('id');
+            $this->user_model->update($id, ['is_active' => 1]);
+            $this->logger->record('approve', 'user', "Persetujuan & aktivasi user ID #{$id}");
+            $this->session->set_flashdata('success', 'Akun pengguna berhasil disetujui dan diaktifkan.');
+        } elseif ($action === 'toggle_status') {
+            $id = (int) $this->input->post('id');
+            $u = $this->user_model->find($id);
+            if ($u) {
+                $newStatus = $u->is_active ? 0 : 1;
+                $this->user_model->update($id, ['is_active' => $newStatus]);
+                $this->logger->record('update', 'user', "Ubah status aktif user ID #{$id} menjadi {$newStatus}");
+                $this->session->set_flashdata('success', 'Status aktif user berhasil diubah.');
+            }
         }
     }
 

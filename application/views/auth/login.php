@@ -201,6 +201,13 @@ body {
                 </button>
             </div>
 
+            <?php if (!empty($show_captcha)): ?>
+            <div class="form-floating mb-3">
+                <input type="number" name="captcha" id="captcha" class="form-control border-warning" placeholder="Jawaban Keamanan" required autocomplete="off">
+                <label for="captcha"><i class="bi bi-shield-check me-2 text-warning"></i>Keamanan: <?= e($captcha_question) ?></label>
+            </div>
+            <?php endif; ?>
+
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="remember" id="remember" value="1">
@@ -213,8 +220,12 @@ body {
             </button>
         </form>
 
-        <div class="text-center mt-3 small">
-            Belum punya akun? <a href="<?= site_url('register') ?>" class="text-decoration-none">Daftar di sini</a>
+        <div class="text-center mt-3 small text-muted">
+            <?php if (!empty($registration_enabled)): ?>
+                Belum punya akun? <a href="<?= site_url('register') ?>" class="text-primary fw-semibold text-decoration-none">Daftar di sini</a>
+            <?php else: ?>
+                <span>Pendaftaran akun mandiri ditutup. Hubungi administrator BPKAD.</span>
+            <?php endif; ?>
         </div>
 
         <div class="text-center mt-4 small text-muted">

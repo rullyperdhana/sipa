@@ -1,14 +1,28 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
 <div class="page-header">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div>
             <h1 class="page-title"><i class="bi bi-people-fill me-2"></i>Manajemen Pengguna</h1>
-            <p class="page-subtitle">Kelola akun pengguna sistem SIRKBMD.</p>
+            <p class="page-subtitle">Kelola akun pengguna sistem SIPA dan verifikasi pendaftaran operator.</p>
         </div>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalUser" onclick="openAddModal()">
-            <i class="bi bi-person-plus-fill me-1"></i>Tambah Pengguna
-        </button>
+        <div class="d-flex align-items-center gap-2">
+            <?php if (!empty($reg_settings['registration_enabled']) && $reg_settings['registration_enabled'] === '1'): ?>
+                <span class="badge bg-success-subtle text-success border border-success py-2 px-3 d-none d-md-inline-block" title="Pendaftaran mandiri sedang dibuka untuk operator SKPD">
+                    <i class="bi bi-person-check-fill me-1"></i>Pendaftaran Mandiri: Terbuka
+                </span>
+            <?php else: ?>
+                <span class="badge bg-secondary-subtle text-secondary border py-2 px-3 d-none d-md-inline-block" title="Pendaftaran mandiri sedang ditutup oleh Administrator">
+                    <i class="bi bi-person-x-fill me-1"></i>Pendaftaran Mandiri: Ditutup
+                </span>
+            <?php endif; ?>
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalRegSettings">
+                <i class="bi bi-gear-fill me-1"></i>Pengaturan Pendaftaran
+            </button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalUser" onclick="openAddModal()">
+                <i class="bi bi-person-plus-fill me-1"></i>Tambah Pengguna
+            </button>
+        </div>
     </div>
 </div>
 
@@ -16,7 +30,7 @@
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="dt-user">
             <thead class="table-light">
-                <tr><th>#</th><th>Username</th><th>Nama Lengkap</th><th>NIP</th><th>SKPD</th><th>Role</th><th>Hak Akses Menu</th><th class="text-center">Status</th><th class="text-center">Login Terakhir</th><th class="text-center" width="130">Aksi</th></tr>
+                <tr><th>#</th><th>Username</th><th>Nama Lengkap</th><th>NIP / WA</th><th>SKPD</th><th>Role</th><th>Hak Akses Menu</th><th class="text-center">Status</th><th class="text-center">Login Terakhir</th><th class="text-center" width="160">Aksi</th></tr>
             </thead>
             <tbody>
                 <?php if (empty($list)): ?><tr><td colspan="10" class="text-center py-4 text-muted">Belum ada pengguna.</td></tr>
@@ -27,7 +41,7 @@
                         if (!is_array($perms)) $perms = [];
                     }
                 ?>
-                <tr>
+                <tr class="<?= !$u->is_active ? 'table-warning-subtle' : '' ?>">
                     <td><?= $i+1 ?></td>
                     <td><strong><?= e($u->username) ?></strong></td>
                     <td><?= e($u->nama_lengkap) ?><?php if ($u->jabatan): ?><br><small class="text-muted"><?= e($u->jabatan) ?></small><?php endif; ?></td>
@@ -91,10 +105,40 @@
                             </div>
                         <?php endif; ?>
                     </td>
-                    <td class="text-center"><span class="badge bg-<?= $u->is_active ? 'success' : 'secondary' ?>"><?= $u->is_active ? 'Aktif' : 'Nonaktif' ?></span></td>
+                    <td class="text-center">
+                        <?php if ($u->is_active): ?>
+                            <span class="badge bg-success">Aktif</span>
+                        <?php else: ?>
+                            <span class="badge bg-warning text-dark border border-warning" title="Akun pendaftaran mandiri menunggu verifikasi admin">
+                                <i class="bi bi-clock-history me-1"></i>Menunggu Verifikasi
+                            </span>
+                        <?php endif; ?>
+                    </td>
                     <td class="text-center"><small><?= $u->last_login ? tanggal_id($u->last_login) : '-' ?></small></td>
                     <td class="text-center">
                         <div class="btn-group btn-group-sm">
+                            <?php if (!$u->is_active): ?>
+                                <form method="post" action="<?= site_url('master/user') ?>" class="d-inline" onsubmit="return confirm('Setujui dan aktifkan akun <?= e($u->nama_lengkap) ?>?')">
+                                    <?= csrf_input() ?>
+                                    <input type="hidden" name="action" value="approve">
+                                    <input type="hidden" name="id" value="<?= (int)$u->id ?>">
+                                    <button type="submit" class="btn btn-success" title="Setujui & Aktifkan Akun">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+
+                            <?php if (!empty($u->no_wa)): ?>
+                                <button type="button" class="btn btn-outline-success btn-wa-user"
+                                    data-nama="<?= e($u->nama_lengkap) ?>"
+                                    data-nowa="<?= e($u->no_wa) ?>"
+                                    data-skpd="<?= e($u->nama_skpd ?: 'SKPD') ?>"
+                                    data-active="<?= (int)$u->is_active ?>"
+                                    title="Hubungi / Kirim Info via WhatsApp">
+                                    <i class="bi bi-whatsapp"></i>
+                                </button>
+                            <?php endif; ?>
+
                             <button class="btn btn-outline-primary btn-edit-user"
                                 data-id="<?= (int)$u->id ?>"
                                 data-username="<?= e($u->username) ?>"
@@ -112,7 +156,7 @@
                             <?php if ((int)$u->id !== (int)$this->currentUser->id): ?>
                             <form method="post" action="<?= site_url('master/user') ?>" class="d-inline" onsubmit="return confirm('Hapus user ini?')">
                                 <?= csrf_input() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int)$u->id ?>">
-                                <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                <button type="submit" class="btn btn-outline-danger" title="Hapus Pengguna"><i class="bi bi-trash"></i></button>
                             </form>
                             <?php endif; ?>
                         </div>
@@ -277,6 +321,54 @@
                     <input type="password" name="new_password" class="form-control" required minlength="8" placeholder="Minimal 8 karakter">
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-warning"><i class="bi bi-key me-1"></i>Reset Password</button></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Pengaturan Pendaftaran Mandiri -->
+<div class="modal fade" id="modalRegSettings" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="post" action="<?= site_url('master/user') ?>">
+            <?= csrf_input() ?>
+            <input type="hidden" name="action" value="save_reg_settings">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title"><i class="bi bi-gear-wide-connected me-2 text-primary"></i>Pengaturan Pendaftaran Mandiri</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">Atur kebijakan registrasi akun mandiri bagi operator SKPD melalui tautan halaman publik.</p>
+
+                    <div class="card p-3 mb-3 border">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" role="switch" name="registration_enabled" id="set_reg_enabled" value="1" <?= (!empty($reg_settings['registration_enabled']) && $reg_settings['registration_enabled'] === '1') ? 'checked' : '' ?>>
+                            <label class="form-check-label fw-bold" for="set_reg_enabled">Buka Pendaftaran Mandiri</label>
+                        </div>
+                        <small class="text-muted">Jika dinonaktifkan, tautan dan formulir registrasi mandiri akan ditutup untuk publik.</small>
+                    </div>
+
+                    <div class="card p-3 mb-3 border">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" role="switch" name="registration_require_approval" id="set_reg_approval" value="1" <?= (!empty($reg_settings['registration_require_approval']) && $reg_settings['registration_require_approval'] === '1') ? 'checked' : '' ?>>
+                            <label class="form-check-label fw-bold" for="set_reg_approval">Wajib Verifikasi & Persetujuan Admin</label>
+                        </div>
+                        <small class="text-muted">Akun baru yang mendaftar mandiri akan berstatus <em>Nonaktif / Menunggu Verifikasi</em> sampai disetujui oleh Administrator BPKAD (Sangat Disarankan untuk Keamanan).</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Role Bawaan Pendaftar Baru</label>
+                        <select name="registration_default_role" class="form-select">
+                            <option value="operator_skpd" <?= ($reg_settings['registration_default_role'] === 'operator_skpd') ? 'selected' : '' ?>>Operator SKPD (operator_skpd - Rekomendasi)</option>
+                            <option value="skpd" <?= ($reg_settings['registration_default_role'] === 'skpd') ? 'selected' : '' ?>>SKPD / Unit Kerja (skpd)</option>
+                        </select>
+                        <div class="form-text">Role yang otomatis disematkan pada pengguna saat berhasil mendaftar mandiri.</div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Simpan Pengaturan</button>
+                </div>
             </div>
         </form>
     </div>
@@ -479,5 +571,43 @@ window.addEventListener('load', function() {
         $('#rp_username').text($(this).data('username'));
         new bootstrap.Modal(document.getElementById('modalResetPw')).show();
     });
+
+    // Tombol Kirim WhatsApp ke Pengguna
+    $(document).on('click', '.btn-wa-user', function() {
+        var nama   = $(this).data('nama');
+        var nowa   = String($(this).data('nowa') || '');
+        var skpd   = $(this).data('skpd');
+        var active = $(this).data('active');
+
+        var pesan = '';
+        if (active == 1) {
+            pesan = "🏛️ *PEMBERITAHUAN SIPA KABUPATEN TAPIN*\n" +
+                    "----------------------------------------\n" +
+                    "Yth. *" + nama + "* (" + skpd + ")\n\n" +
+                    "Akun Anda pada sistem SIPA telah *AKTIF* dan diverifikasi oleh Administrator BPKAD Kabupaten Tapin.\n\n" +
+                    "Silakan masuk ke aplikasi melalui:\n" +
+                    "👉 https://sipa.bkadtapinkab.online/login\n\n" +
+                    "_Pemberitahuan resmi BPKAD Kabupaten Tapin_";
+        } else {
+            pesan = "🏛️ *PEMBERITAHUAN SIPA KABUPATEN TAPIN*\n" +
+                    "----------------------------------------\n" +
+                    "Yth. *" + nama + "* (" + skpd + ")\n\n" +
+                    "Pendaftaran akun Anda pada sistem SIPA sedang dalam proses verifikasi oleh Administrator BPKAD Kabupaten Tapin.\n\n" +
+                    "_Pemberitahuan resmi BPKAD Kabupaten Tapin_";
+        }
+
+        if (window.SipaWa && typeof window.SipaWa.open === 'function') {
+            window.SipaWa.open({
+                phone: nowa,
+                recipient_name: nama + ' (' + skpd + ')',
+                message: pesan
+            });
+        } else {
+            var clean = nowa.replace(/[^0-9]/g, '');
+            if (clean.substring(0, 2) === '08') clean = '62' + clean.substring(1);
+            window.open('https://api.whatsapp.com/send?phone=' + clean + '&text=' + encodeURIComponent(pesan), '_blank');
+        }
+    });
 });
 </script>
+

@@ -15,7 +15,7 @@ class Auth
     }
 
     /**
-     * Login dengan proteksi brute-force.
+     * Login dengan proteksi brute-force (per-akun & per-IP) serta timing-attack mitigation.
      */
     public function attempt($username, $password, $remember = FALSE)
     {
@@ -26,7 +26,24 @@ class Auth
             return ['success' => FALSE, 'message' => 'Username dan password wajib diisi.'];
         }
 
-        // Ambil user
+        // 1. IP-Based Rate Limiting: Blokir IP jika ada >= 10 kegagalan login dalam 15 menit terakhir
+        $clientIp = $this->CI->input->ip_address();
+        $fifteenMinsAgo = date('Y-m-d H:i:s', time() - 900);
+        try {
+            $ipFails = $this->CI->db->where('ip_address', $clientIp)
+                ->where('aksi', 'login_failed')
+                ->where('created_at >=', $fifteenMinsAgo)
+                ->count_all_results('log_aktivitas');
+
+            if ($ipFails >= 10) {
+                return [
+                    'success' => FALSE,
+                    'message' => 'Terlalu banyak percobaan login yang gagal dari jaringan/perangkat Anda. Demi keamanan, silakan coba lagi dalam 15 menit.'
+                ];
+            }
+        } catch (\Throwable $e) {}
+
+        // 2. Ambil user
         try {
             $user = $this->CI->db->get_where('users', ['username' => $username])->row();
         } catch (\Throwable $e) {
@@ -34,31 +51,35 @@ class Auth
             return ['success' => FALSE, 'message' => 'Koneksi database/tabel bermasalah: ' . $e->getMessage()];
         }
 
+        // Timing-attack mitigation: Jalankan dummy bcrypt jika username tidak ditemukan
         if (!$user) {
+            password_verify($password, '$2y$10$abcdefghijklmnopqrstuvw1234567890abcdefghijklmnopqrstuv');
+            usleep(150000); // 150ms delay
             $this->logAttempt($username, FALSE, 'user_not_found');
             return ['success' => FALSE, 'message' => 'Username atau password salah.'];
         }
 
-        // Cek aktif
+        // 3. Cek status aktif / pending approval
         if (!$user->is_active) {
-            return ['success' => FALSE, 'message' => 'Akun Anda dinonaktifkan. Hubungi administrator.'];
+            return ['success' => FALSE, 'message' => 'Akun Anda belum aktif atau sedang menunggu persetujuan Administrator BPKAD. Silakan hubungi admin.'];
         }
 
-        // Cek lockout
+        // 4. Cek lockout per user
         if ($user->locked_until && strtotime($user->locked_until) > time()) {
             $sisaDetik = strtotime($user->locked_until) - time();
             $sisaMenit = ceil($sisaDetik / 60);
-            return ['success' => FALSE, 'message' => "Akun terkunci. Coba lagi dalam {$sisaMenit} menit."];
+            return ['success' => FALSE, 'message' => "Akun terkunci karena percobaan berulang. Coba lagi dalam {$sisaMenit} menit."];
         }
 
-        // Verifikasi password
+        // 5. Verifikasi password
         if (!password_verify($password, $user->password)) {
             $this->incrementFailedAttempts($user);
+            usleep(150000); // 150ms delay
             $this->logAttempt($username, FALSE, 'wrong_password');
             return ['success' => FALSE, 'message' => 'Username atau password salah.'];
         }
 
-        // Cek apakah perlu rehash (algoritma berubah)
+        // 6. Cek apakah perlu rehash (algoritma berubah)
         if (password_needs_rehash($user->password, PASSWORD_BCRYPT, ['cost' => 10])) {
             $newHash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
             try {
@@ -66,7 +87,7 @@ class Auth
             } catch (\Throwable $e) {}
         }
 
-        // Reset failed attempts
+        // 7. Reset failed attempts & catat login sukses
         try {
             $this->CI->db->where('id', $user->id)->update('users', [
                 'failed_attempts' => 0,
@@ -78,7 +99,7 @@ class Auth
             log_message('error', 'Auth update failed: ' . $e->getMessage());
         }
 
-        // Regenerate session ID untuk cegah session fixation
+        // 8. Regenerate session ID untuk cegah session fixation
         $this->CI->session->sess_regenerate(FALSE);
 
         // Set session data
@@ -96,7 +117,7 @@ class Auth
         ];
         $this->CI->session->set_userdata($sessionData);
 
-        // Remember-me token (opsional)
+        // 9. Remember-me token dengan hash aman
         if ($remember) {
             $token = bin2hex(random_bytes(32));
             try {
@@ -113,6 +134,83 @@ class Auth
 
         $this->logAttempt($username, TRUE, 'success');
         return ['success' => TRUE, 'message' => 'Login berhasil.', 'user' => $user];
+    }
+
+    /**
+     * Registrasi pengguna mandiri baru dengan kontrol approval dan role default
+     */
+    public function registerUser($data)
+    {
+        // Cek status pendaftaran mandiri
+        $regEnabled = function_exists('get_setting') ? get_setting('registration_enabled', '1') : '1';
+        if ($regEnabled === '0') {
+            return ['success' => FALSE, 'message' => 'Pendaftaran mandiri saat ini sedang ditutup oleh Administrator BPKAD.'];
+        }
+
+        $username = trim($data['username'] ?? '');
+        $email    = trim($data['email'] ?? '');
+        $skpdId   = (int) ($data['skpd_id'] ?? 0);
+
+        if (empty($username) || empty($data['password']) || empty($data['nama_lengkap'])) {
+            return ['success' => FALSE, 'message' => 'Nama lengkap, username, dan password wajib diisi.'];
+        }
+
+        // Cek duplikasi username
+        $existUser = $this->CI->db->get_where('users', ['username' => $username])->row();
+        if ($existUser) {
+            return ['success' => FALSE, 'message' => 'Username sudah digunakan. Silakan gunakan username lain.'];
+        }
+
+        // Cek duplikasi email jika diisi
+        if (!empty($email)) {
+            $existEmail = $this->CI->db->get_where('users', ['email' => $email])->row();
+            if ($existEmail) {
+                return ['success' => FALSE, 'message' => 'Email sudah terdaftar. Silakan gunakan email lain.'];
+            }
+        }
+
+        // Tentukan kebijakan aktivasi
+        $requireApproval = function_exists('get_setting') ? get_setting('registration_require_approval', '1') : '1';
+        $isActive = ($requireApproval === '1') ? 0 : 1;
+        $defaultRole = function_exists('get_setting') ? get_setting('registration_default_role', 'operator_skpd') : 'operator_skpd';
+
+        $insertData = [
+            'username'         => $username,
+            'nama_lengkap'     => trim($data['nama_lengkap']),
+            'nip'              => !empty($data['nip']) ? trim($data['nip']) : NULL,
+            'email'            => !empty($email) ? $email : NULL,
+            'no_wa'            => !empty($data['no_wa']) ? trim($data['no_wa']) : NULL,
+            'skpd_id'          => $skpdId ?: NULL,
+            'role'             => $defaultRole,
+            'password'         => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 10]),
+            'is_active'        => $isActive,
+            'created_at'       => date('Y-m-d H:i:s'),
+            'updated_at'       => date('Y-m-d H:i:s')
+        ];
+
+        $this->CI->db->insert('users', $insertData);
+        $newId = $this->CI->db->insert_id();
+
+        // Catat log aktivitas
+        try {
+            $this->CI->db->insert('log_aktivitas', [
+                'user_id'    => $newId,
+                'username'   => $username,
+                'aksi'       => 'register',
+                'modul'      => 'auth',
+                'keterangan' => 'Pendaftaran mandiri (' . ($isActive ? 'Aktif' : 'Menunggu Approval Admin') . ')',
+                'ip_address' => $this->CI->input->ip_address(),
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+        } catch (\Throwable $e) {}
+
+        if ($isActive === 0) {
+            $msg = 'Pendaftaran berhasil! Akun Anda sedang menunggu verifikasi dan persetujuan dari Administrator BPKAD. Anda akan dapat masuk setelah akun diverifikasi.';
+        } else {
+            $msg = 'Pendaftaran berhasil! Akun Anda telah aktif, silakan masuk ke sistem.';
+        }
+
+        return ['success' => TRUE, 'is_active' => $isActive, 'message' => $msg, 'user_id' => $newId];
     }
 
     protected function incrementFailedAttempts($user)
@@ -156,14 +254,16 @@ class Auth
     {
         $userId = $this->CI->session->userdata('user_id');
         if ($userId) {
-            $this->CI->db->insert('log_aktivitas', [
-                'user_id'    => $userId,
-                'username'   => $this->CI->session->userdata('username'),
-                'aksi'       => 'logout',
-                'modul'      => 'auth',
-                'ip_address' => $this->CI->input->ip_address(),
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
+            try {
+                $this->CI->db->insert('log_aktivitas', [
+                    'user_id'    => $userId,
+                    'username'   => $this->CI->session->userdata('username'),
+                    'aksi'       => 'logout',
+                    'modul'      => 'auth',
+                    'ip_address' => $this->CI->input->ip_address(),
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            } catch (\Throwable $e) {}
         }
         delete_cookie('rkbmd_remember');
         $this->CI->session->sess_destroy();
@@ -171,8 +271,46 @@ class Auth
 
     public function check()
     {
-        return (bool) $this->CI->session->userdata('is_logged_in');
+        if ((bool) $this->CI->session->userdata('is_logged_in')) {
+            return TRUE;
+        }
+
+        // Auto-login via remember-me cookie yang aman
+        $rememberCookie = get_cookie('rkbmd_remember');
+        if (!empty($rememberCookie) && strpos($rememberCookie, ':') !== FALSE) {
+            list($uid, $token) = explode(':', $rememberCookie, 2);
+            $user = $this->CI->db->get_where('users', ['id' => (int) $uid, 'is_active' => 1])->row();
+            if ($user && !empty($user->remember_token) && password_verify($token, $user->remember_token)) {
+                $this->CI->session->sess_regenerate(FALSE);
+                $perms = !empty($user->menu_permissions) ? json_decode($user->menu_permissions, TRUE) : NULL;
+                $this->CI->session->set_userdata([
+                    'user_id'          => (int) $user->id,
+                    'username'         => $user->username,
+                    'nama_lengkap'     => $user->nama_lengkap,
+                    'nip'              => $user->nip,
+                    'role'             => $user->role,
+                    'skpd_id'          => $user->skpd_id ? (int) $user->skpd_id : NULL,
+                    'menu_permissions' => $perms,
+                    'is_logged_in'     => TRUE,
+                    'login_time'       => time(),
+                ]);
+                // Rotate remember-me token
+                $newToken = bin2hex(random_bytes(32));
+                $this->CI->db->where('id', $user->id)->update('users', ['remember_token' => password_hash($newToken, PASSWORD_BCRYPT)]);
+                set_cookie([
+                    'name'     => 'rkbmd_remember',
+                    'value'    => $user->id . ':' . $newToken,
+                    'expire'   => 60 * 60 * 24 * 30,
+                    'httponly' => TRUE,
+                    'samesite' => 'Lax'
+                ]);
+                return TRUE;
+            }
+        }
+
+        return FALSE;
     }
+
 
     public function user($field = NULL)
     {

@@ -20,6 +20,13 @@ class MY_Controller extends CI_Controller
             ->set_header('Referrer-Policy: strict-origin-when-cross-origin')
             ->set_header('Permissions-Policy: geolocation=(), camera=(), microphone=()');
 
+        $isHttps = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+            || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https'));
+        if ($isHttps) {
+            $this->output->set_header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+        }
+
         // Cegah caching halaman setelah logout
         $this->output
             ->set_header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0')

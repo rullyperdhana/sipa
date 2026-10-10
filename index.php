@@ -1,9 +1,12 @@
 <?php
 /**
- * SiTraSu — Sistem Tracking Surat Menyurat
+ * SIPA — Sistem Informasi Pengelolaan Aset
+ * Pemerintah Kabupaten Tapin
  * CodeIgniter 3 Entry Point
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+$is_local_host = (isset($_SERVER['HTTP_HOST']) && (strpos($_SERVER['HTTP_HOST'], 'localhost') !== FALSE || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== FALSE));
+$auto_env = $is_local_host ? 'development' : 'production';
+define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : $auto_env);
 
 /*
  *---------------------------------------------------------------
