@@ -116,10 +116,19 @@ class Akun_model extends CI_Model
         $this->db->where('is_active', 1);
 
         if (!empty($term)) {
-            $this->db->group_start()
-                ->like('kode_akun', $term)
-                ->or_like('nama_akun', $term)
-                ->group_end();
+            $words = array_filter(explode(' ', $term));
+            $this->db->group_start();
+            $this->db->like('kode_akun', $term);
+            if (!empty($words)) {
+                $this->db->or_group_start();
+                foreach ($words as $w) {
+                    if (strlen($w) > 0) {
+                        $this->db->like('nama_akun', $w);
+                    }
+                }
+                $this->db->group_end();
+            }
+            $this->db->group_end();
         }
 
         $this->db->order_by('kode_akun', 'ASC');

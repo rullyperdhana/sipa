@@ -161,21 +161,76 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                     </div>
 
                     <!-- Rekening Belanja SIPD RI -->
-                    <div class="mb-3">
-                        <label for="kode_rekening" class="form-label fw-semibold">
-                            Kode Rekening Belanja SIPD RI <small class="text-muted fw-normal">(Otomatis terisi dari master)</small>
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="bi bi-journal-text text-muted"></i></span>
-                            <input type="text" class="form-control font-monospace" id="kode_rekening" name="kode_rekening" 
-                                   value="<?= $isEdit ? e($item->kode_rekening ?? '') : (!empty($masterItem) ? e($masterItem->kode_rekening) : '') ?>" 
-                                   placeholder="Contoh: 5.1.02.01.001.00038">
-                            <input type="hidden" id="nama_rekening" name="nama_rekening" 
-                                   value="<?= $isEdit ? e($item->nama_rekening ?? '') : (!empty($masterItem) ? e($masterItem->nama_rekening) : '') ?>">
+                    <?php 
+                        $curKodeRek = $isEdit ? ($item->kode_rekening ?? '') : (!empty($masterItem) ? ($masterItem->kode_rekening ?? '') : '');
+                        $curNamaRek = $isEdit ? ($item->nama_rekening ?? '') : (!empty($masterItem) ? ($masterItem->nama_rekening ?? '') : '');
+                    ?>
+                    <div class="mb-3 p-3 border rounded-3 bg-light-subtle">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="selectAkunBelanja" class="form-label fw-semibold mb-0">
+                                <i class="bi bi-journal-check text-primary me-1"></i> Rekening Belanja SIPD RI
+                            </label>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                <i class="bi bi-search me-1"></i>Cari berdasarkan Nama atau Kode
+                            </span>
                         </div>
-                        <div class="small text-muted mt-1" id="lblNamaRekening">
-                            <?= ($isEdit && !empty($item->nama_rekening)) ? e($item->nama_rekening) : (!empty($masterItem) ? e($masterItem->nama_rekening) : '') ?>
+                        
+                        <!-- Select2 Pencarian Rekening Berdasarkan Nama/Kode -->
+                        <div class="mb-2">
+                            <select id="selectAkunBelanja" class="form-select" style="width: 100%;">
+                                <?php if (!empty($curKodeRek)): ?>
+                                    <option value="<?= e($curKodeRek) ?>" selected>
+                                        <?= e($curKodeRek) ?><?= !empty($curNamaRek) ? ' - ' . e($curNamaRek) : '' ?>
+                                    </option>
+                                <?php endif; ?>
+                            </select>
+                            <div class="form-text small text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Ketik <strong>nama rekening belanja</strong> (contoh: <em>"Alat Tulis"</em>, <em>"Honorarium"</em>, <em>"Kertas"</em>, <em>"Perjalanan Dinas"</em>, <em>"Makanan Minuman"</em>) atau <strong>kode akun</strong>. Kode rekening akan otomatis keluar.
+                            </div>
                         </div>
+
+                        <!-- Card Detail Rekening Terpilih (Kode otomatis keluar di sini) -->
+                        <div id="boxRekeningTerpilih" class="p-2 px-3 border rounded bg-white <?= empty($curKodeRek) ? 'd-none' : '' ?>">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="small text-muted mb-1">
+                                        <i class="bi bi-check2-circle text-success me-1"></i>Kode Rekening Terpilih:
+                                    </div>
+                                    <div class="d-flex align-items-center flex-wrap gap-2">
+                                        <span class="badge bg-success-subtle text-success fs-6 font-monospace border border-success-subtle px-2 py-1" id="lblBadgeKodeRek">
+                                            <?= e($curKodeRek ?: '-') ?>
+                                        </span>
+                                        <span class="fw-semibold text-dark" id="lblBadgeNamaRek">
+                                            <?= e($curNamaRek ?: '') ?>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnToggleManualRek" title="Input / Edit Kode Manual">
+                                        <i class="bi bi-pencil-square"></i> Manual
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="btnClearRekening" title="Hapus / Cari Ulang">
+                                        <i class="bi bi-x-circle"></i> Hapus
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Input Values yang dikirim ke backend (Bisa dibuka untuk input kode kustom) -->
+                        <div id="boxInputManualRekening" class="mt-2 d-none">
+                            <label class="form-label small fw-semibold text-muted">Input Kode Rekening Manual:</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text font-monospace bg-light">Kode</span>
+                                <input type="text" class="form-control font-monospace" id="kode_rekening" name="kode_rekening" 
+                                       value="<?= e($curKodeRek) ?>" placeholder="Contoh: 5.1.02.01.001.00038">
+                                <span class="input-group-text bg-light">Nama</span>
+                                <input type="text" class="form-control" id="nama_rekening" name="nama_rekening" 
+                                       value="<?= e($curNamaRek) ?>" placeholder="Nama Rekening Belanja">
+                            </div>
+                            <div class="form-text small text-muted">Gunakan jika kode rekening belum ada di database referensi atau berupa multi-kode koma.</div>
+                        </div>
+
+                        <div class="small text-muted mt-1 d-none" id="lblNamaRekening"></div>
                     </div>
 
                     <!-- Uraian Item -->
@@ -359,13 +414,125 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function setRekeningBelanja(kode, nama) {
+        const inpKode = document.getElementById('kode_rekening');
+        const inpNama = document.getElementById('nama_rekening');
+        const badgeKode = document.getElementById('lblBadgeKodeRek');
+        const badgeNama = document.getElementById('lblBadgeNamaRek');
+        const boxTerpilih = document.getElementById('boxRekeningTerpilih');
+        const lblNama = document.getElementById('lblNamaRekening');
+
+        if (inpKode) inpKode.value = kode || '';
+        if (inpNama) inpNama.value = nama || '';
+        if (badgeKode) badgeKode.textContent = kode || '-';
+        if (badgeNama) badgeNama.textContent = nama || '';
+        if (boxTerpilih) {
+            if (kode) {
+                boxTerpilih.classList.remove('d-none');
+            } else {
+                boxTerpilih.classList.add('d-none');
+            }
+        }
+        if (lblNama) lblNama.textContent = nama ? (kode + ' - ' + nama) : kode;
+    }
+
+    function clearRekeningBelanja() {
+        setRekeningBelanja('', '');
+        if ($('#selectAkunBelanja').length) {
+            $('#selectAkunBelanja').val(null).trigger('change');
+        }
+    }
+
     function resetMasterAcuan() {
         document.getElementById('master_standar_id').value = '';
         document.getElementById('harga_acuan_master').value = '';
         if (cardAcuan) cardAcuan.classList.add('d-none');
-        document.getElementById('lblNamaRekening').textContent = '';
-        document.getElementById('kode_rekening').value = '';
-        document.getElementById('nama_rekening').value = '';
+        clearRekeningBelanja();
+    }
+
+    // Toggle Manual Rekening Input
+    const btnToggleManualRek = document.getElementById('btnToggleManualRek');
+    if (btnToggleManualRek) {
+        btnToggleManualRek.addEventListener('click', function() {
+            const box = document.getElementById('boxInputManualRekening');
+            if (box) box.classList.toggle('d-none');
+        });
+    }
+
+    // Clear Rekening Button
+    const btnClearRek = document.getElementById('btnClearRekening');
+    if (btnClearRek) {
+        btnClearRek.addEventListener('click', function() {
+            clearRekeningBelanja();
+        });
+    }
+
+    // Listener Manual Input Typing
+    const inputKodeRek = document.getElementById('kode_rekening');
+    const inputNamaRek = document.getElementById('nama_rekening');
+    if (inputKodeRek) {
+        inputKodeRek.addEventListener('input', function() {
+            const badgeKode = document.getElementById('lblBadgeKodeRek');
+            if (badgeKode) badgeKode.textContent = this.value || '-';
+            const boxTerpilih = document.getElementById('boxRekeningTerpilih');
+            if (boxTerpilih && this.value) boxTerpilih.classList.remove('d-none');
+        });
+    }
+    if (inputNamaRek) {
+        inputNamaRek.addEventListener('input', function() {
+            const badgeNama = document.getElementById('lblBadgeNamaRek');
+            if (badgeNama) badgeNama.textContent = this.value || '';
+        });
+    }
+
+    // Select2 Autocomplete untuk Rekening Belanja SIPD RI (Cari berdasarkan Nama atau Kode)
+    if (typeof jQuery !== 'undefined' && $('#selectAkunBelanja').length) {
+        $('#selectAkunBelanja').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Ketik nama rekening belanja (contoh: Alat Tulis, Honorarium, Kertas, Pemeliharaan) atau kode --',
+            allowClear: true,
+            ajax: {
+                url: '<?= site_url("ajax/akun_belanja/search") ?>',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term || '',
+                        all: 0
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results || []
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+            templateResult: function(repo) {
+                if (repo.loading) return repo.text;
+                if (!repo.kode) return repo.text;
+                return $(`
+                    <div class="py-1">
+                        <div class="fw-semibold text-dark">${repo.nama}</div>
+                        <div class="small text-muted d-flex align-items-center gap-2 mt-1">
+                            <span class="font-monospace text-primary fw-bold"><i class="bi bi-tag-fill me-1"></i>${repo.kode}</span>
+                            <span class="badge bg-secondary-subtle text-secondary border">${repo.kelompok || 'Belanja'}</span>
+                        </div>
+                    </div>
+                `);
+            },
+            templateSelection: function(repo) {
+                if (!repo.kode) return repo.text || '-- Pilih Rekening Belanja --';
+                return repo.kode + ' - ' + repo.nama;
+            }
+        }).on('select2:select', function(e) {
+            const data = e.params.data;
+            if (!data) return;
+            setRekeningBelanja(data.kode, data.nama);
+        }).on('select2:clear', function() {
+            clearRekeningBelanja();
+        });
     }
 
     // Select2 Autocomplete untuk Master Data 2027
@@ -417,10 +584,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // Set Rekening Belanja SIPD
-            document.getElementById('kode_rekening').value = data.kode_rekening || '';
-            document.getElementById('nama_rekening').value = data.nama_rekening || '';
-            document.getElementById('lblNamaRekening').textContent = data.nama_rekening ? (data.kode_rekening + ' - ' + data.nama_rekening) : (data.kode_rekening || '');
+            // Set Rekening Belanja SIPD (dan sinkronkan ke Select2 Akun Belanja)
+            if (data.kode_rekening) {
+                setRekeningBelanja(data.kode_rekening, data.nama_rekening || '');
+                if ($('#selectAkunBelanja').length) {
+                    const optText = data.kode_rekening + (data.nama_rekening ? ' - ' + data.nama_rekening : '');
+                    const newOpt = new Option(optText, data.kode_rekening, true, true);
+                    $('#selectAkunBelanja').empty().append(newOpt).trigger('change');
+                }
+            } else {
+                clearRekeningBelanja();
+            }
 
             // Set Harga Acuan & Default Harga Usulan
             const inputHarga = document.getElementById('harga_usulan');

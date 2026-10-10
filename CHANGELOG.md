@@ -17,6 +17,11 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - Mekanisme penguncian pengusulan SKPD: tombol dan form tambah usulan otomatis terkunci (*disabled*) dengan status *"Menunggu Pembuatan Jadwal oleh BPKAD"* jika tidak ada jadwal aktif yang dibuka.
   - Banner indikator jadwal dinamis pada daftar usulan SKPD yang menampilkan status (Buka/Tutup), periode tanggal mulai-selesai, dan catatan dari BPKAD.
   - Kemudahan saklar toggle status jadwal (Buka/Tutup) dalam satu klik oleh tim BPKAD.
+- **Pencarian Cerdas Rekening Belanja SIPD RI Berdasarkan Nama:**
+  - Antarmuka pencarian akun belanja pada formulir usulan SSH & SBU dengan dukungan pengetikan nama kebutuhan belanja (contoh: *"Alat Tulis"*, *"Kertas"*, *"Honorarium"*, *"Perjalanan Dinas"*, *"Pemeliharaan"*).
+  - Sistem otomatis menampilkan sugesti hasil dari 9.617 referensi akun belanja SIPD RI (`ref_akun_belanja`) dan langsung memunculkan **Kode Rekening Belanja** resmi dalam bentuk kartu badge visual interaktif.
+  - Peningkatan metode `searchSelect2` pada `Akun_model.php` dengan pencocokan multi-kata (*multi-word search*) fleksibel.
+  - Dukungan tombol *Manual* untuk penginputan kode rekening kustom jika diperlukan.
 - **Interkoneksi Data Menyeluruh Antar Modul:**
   - Pilihan mode pengusulan pada formulir: **Pilih dari Master Data TA 2027** atau **Input Manual Standar Baru**.
   - Autocomplete AJAX Select2 terhubung ke master katalog (`/ajax/standar_harga/search` & `/ajax/standar_harga/detail/(:num)`).
