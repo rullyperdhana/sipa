@@ -10,7 +10,6 @@ class Dokumentasi extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(['master_model', 'user_model']);
     }
 
     /**
@@ -54,7 +53,8 @@ class Dokumentasi extends Admin_Controller
             'appVersion'    => $this->config->item('app_version') ?: '2.8.1',
             'changelogList' => $changelogList,
             'readmeHtml'    => $readmeHtml,
-            'systemInfo'    => $systemInfo
+            'systemInfo'    => $systemInfo,
+            'user'          => $this->currentUser ?? $this->auth->user()
         ];
 
         $this->load->view('templates/header', $data);
@@ -63,7 +63,7 @@ class Dokumentasi extends Admin_Controller
     }
 
     /**
-     * Mengumpulkan data diagnostik lingkungan server dan aplikasi
+     * Mengumpulkan data diagnostik lingkungan server dan aplikasi secara aman
      */
     private function _getSystemDiagnostics()
     {
@@ -72,8 +72,10 @@ class Dokumentasi extends Admin_Controller
 
         $dbVersion = 'Unknown';
         try {
-            $dbVersion = $this->db->version();
-        } catch (\Exception $e) {
+            if (!empty($this->db) && method_exists($this->db, 'version')) {
+                $dbVersion = (string) $this->db->version();
+            }
+        } catch (\Throwable $e) {
             $dbVersion = 'MySQL Error';
         }
 
@@ -82,19 +84,38 @@ class Dokumentasi extends Admin_Controller
         $totalStandar = 0;
         $totalRkbmd   = 0;
 
-        try { $totalUsers   = (int) $this->db->count_all('users'); } catch (\Exception $e) {}
-        try { $totalSkpd    = (int) $this->db->count_all('skpd'); } catch (\Exception $e) {}
-        try { $totalStandar = (int) $this->db->count_all('standar_harga_usulan'); } catch (\Exception $e) {}
-        try { $totalRkbmd   = (int) $this->db->count_all('usulan_rkbmd'); } catch (\Exception $e) {}
+        try {
+            if (!empty($this->db) && $this->db->table_exists('users')) {
+                $totalUsers = (int) $this->db->count_all('users');
+            }
+        } catch (\Throwable $e) {}
+
+        try {
+            if (!empty($this->db) && $this->db->table_exists('skpd')) {
+                $totalSkpd = (int) $this->db->count_all('skpd');
+            }
+        } catch (\Throwable $e) {}
+
+        try {
+            if (!empty($this->db) && $this->db->table_exists('standar_harga_usulan')) {
+                $totalStandar = (int) $this->db->count_all('standar_harga_usulan');
+            }
+        } catch (\Throwable $e) {}
+
+        try {
+            if (!empty($this->db) && $this->db->table_exists('rkbmd_usulan')) {
+                $totalRkbmd = (int) $this->db->count_all('rkbmd_usulan');
+            }
+        } catch (\Throwable $e) {}
 
         return [
-            'app_name'           => $this->config->item('app_name'),
-            'app_version'        => $this->config->item('app_version'),
-            'app_owner'          => $this->config->item('app_owner'),
-            'app_unit'           => $this->config->item('app_unit'),
-            'environment'        => ENVIRONMENT,
-            'base_url'           => base_url(),
-            'ci_version'         => CI_VERSION,
+            'app_name'           => $this->config->item('app_name') ?: 'SIPA',
+            'app_version'        => $this->config->item('app_version') ?: '2.8.1',
+            'app_owner'          => $this->config->item('app_owner') ?: 'Pemerintah Kabupaten Tapin',
+            'app_unit'           => $this->config->item('app_unit') ?: 'BPKAD',
+            'environment'        => defined('ENVIRONMENT') ? ENVIRONMENT : 'production',
+            'base_url'           => function_exists('base_url') ? base_url() : '/',
+            'ci_version'         => defined('CI_VERSION') ? CI_VERSION : '3.1.13',
             'php_version'        => PHP_VERSION,
             'php_sapi'           => php_sapi_name(),
             'server_os'          => PHP_OS . ' (' . php_uname('m') . ')',
@@ -102,10 +123,10 @@ class Dokumentasi extends Admin_Controller
             'db_driver'          => $this->db->dbdriver ?? 'mysqli',
             'db_version'         => $dbVersion,
             'db_name'            => $this->db->database ?? '-',
-            'memory_limit'       => ini_get('memory_limit'),
-            'max_execution_time' => ini_get('max_execution_time') . ' detik',
-            'upload_max_filesize'=> ini_get('upload_max_filesize'),
-            'post_max_size'      => ini_get('post_max_size'),
+            'memory_limit'       => ini_get('memory_limit') ?: 'N/A',
+            'max_execution_time' => (ini_get('max_execution_time') ?: '0') . ' detik',
+            'upload_max_filesize'=> ini_get('upload_max_filesize') ?: 'N/A',
+            'post_max_size'      => ini_get('post_max_size') ?: 'N/A',
             'uploads_writable'   => $isUploadWritable,
             'fiscal_year'        => function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027,
             'counts'             => [

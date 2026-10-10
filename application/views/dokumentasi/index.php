@@ -357,10 +357,10 @@
                             <div class="card-body p-0">
                                 <table class="table table-sm table-striped mb-0 align-middle">
                                     <tbody>
-                                        <tr><th width="40%" class="text-muted ps-3">Total Akun Pengguna</th><td class="fw-bold text-dark"><?= number_format($systemInfo['counts']['users']) ?> Akun</td></tr>
-                                        <tr><th class="text-muted ps-3">Total Unit Kerja SKPD</th><td class="fw-bold text-dark"><?= number_format($systemInfo['counts']['skpd']) ?> SKPD</td></tr>
-                                        <tr><th class="text-muted ps-3">Usulan Standar Harga (SSH/SBU)</th><td class="fw-bold text-primary"><?= number_format($systemInfo['counts']['standar_harga']) ?> Usulan</td></tr>
-                                        <tr><th class="text-muted ps-3">Usulan Perencanaan RKBMD</th><td class="fw-bold text-info"><?= number_format($systemInfo['counts']['rkbmd']) ?> Usulan</td></tr>
+                                        <tr><th width="40%" class="text-muted ps-3">Total Akun Pengguna</th><td class="fw-bold text-dark"><?= number_format((int) ($systemInfo['counts']['users'] ?? 0)) ?> Akun</td></tr>
+                                        <tr><th class="text-muted ps-3">Total Unit Kerja SKPD</th><td class="fw-bold text-dark"><?= number_format((int) ($systemInfo['counts']['skpd'] ?? 0)) ?> SKPD</td></tr>
+                                        <tr><th class="text-muted ps-3">Usulan Standar Harga (SSH/SBU)</th><td class="fw-bold text-primary"><?= number_format((int) ($systemInfo['counts']['standar_harga'] ?? 0)) ?> Usulan</td></tr>
+                                        <tr><th class="text-muted ps-3">Usulan Perencanaan RKBMD</th><td class="fw-bold text-info"><?= number_format((int) ($systemInfo['counts']['rkbmd'] ?? 0)) ?> Usulan</td></tr>
                                     </tbody>
                                 </table>
                             </div>

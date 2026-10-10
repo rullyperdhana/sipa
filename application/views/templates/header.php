@@ -31,7 +31,10 @@
 })();
 </script>
 
-<?php $user = $this->auth->user(); ?>
+<?php 
+$user = $user ?? $this->currentUser ?? $this->auth->user(); 
+$userRole = !empty($user->role) ? $user->role : '';
+?>
 
 <!-- ========== SIDEBAR ========== -->
 <aside class="sidebar" id="sidebar">
@@ -56,7 +59,7 @@
 
         <?php 
         $hasRkbmd = can_access('rkbmd_pengadaan') || can_access('rkbmd_pemeliharaan') || can_access('rkbmd_pemanfaatan') || can_access('rkbmd_pemindahtanganan') || can_access('rkbmd_penghapusan');
-        if ($hasRkbmd && in_array($user->role, ['admin', 'skpd', 'operator_skpd', 'pimpinan'])): 
+        if ($hasRkbmd && in_array($userRole, ['admin', 'skpd', 'operator_skpd', 'pimpinan'])): 
         ?>
         <div class="nav-section">RKBMD</div>
         <?php if (can_access('rkbmd_pengadaan')): ?>
@@ -90,7 +93,7 @@
         <?php endif; ?>
         <?php endif; ?>
 
-        <?php if (can_access('verifikasi_rkbmd') && in_array($user->role, ['admin', 'verifikator'])): ?>
+        <?php if (can_access('verifikasi_rkbmd') && in_array($userRole, ['admin', 'verifikator'])): ?>
         <div class="nav-section">Verifikasi BPKAD</div>
         <a href="<?= site_url('verifikasi') ?>" class="nav-link <?= $this->uri->segment(1) === 'verifikasi' ? 'active' : '' ?>">
             <i class="bi bi-check2-square"></i> <span>Verifikasi Usulan</span>
@@ -101,19 +104,19 @@
         <?php if (can_access('ssh')): ?>
         <div class="nav-section">Standar Satuan Harga (SSH)</div>
 
-        <?php if (in_array($user->role, ['operator_skpd', 'skpd', 'admin'])): ?>
+        <?php if (in_array($userRole, ['operator_skpd', 'skpd', 'admin'])): ?>
         <a href="<?= site_url('ssh/usulan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && in_array($this->uri->segment(2), ['usulan', 'tambah', 'edit'])) ? 'active' : '' ?>">
             <i class="bi bi-box-seam-fill"></i> <span>Usulan SSH</span>
         </a>
         <?php endif; ?>
 
-        <?php if (can_access('verifikasi_standar') && in_array($user->role, ['verifikator', 'admin'])): ?>
+        <?php if (can_access('verifikasi_standar') && in_array($userRole, ['verifikator', 'admin'])): ?>
         <a href="<?= site_url('ssh/verifikasi') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'verifikasi') ? 'active' : '' ?>">
             <i class="bi bi-patch-check-fill"></i> <span>Verifikasi SSH</span>
         </a>
         <?php endif; ?>
 
-        <?php if (can_access('penetapan_standar') && in_array($user->role, ['penetap', 'pimpinan', 'admin'])): ?>
+        <?php if (can_access('penetapan_standar') && in_array($userRole, ['penetap', 'pimpinan', 'admin'])): ?>
         <a href="<?= site_url('ssh/penetapan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'penetapan') ? 'active' : '' ?>">
             <i class="bi bi-award-fill"></i> <span>Penetapan SSH</span>
         </a>
@@ -123,7 +126,7 @@
             <i class="bi bi-journal-check"></i> <span>Master Data SSH</span>
         </a>
 
-        <?php if (can_access('jadwal_standar') && in_array($user->role, ['admin', 'verifikator'])): ?>
+        <?php if (can_access('jadwal_standar') && in_array($userRole, ['admin', 'verifikator'])): ?>
         <a href="<?= site_url('ssh/jadwal') ?>" class="nav-link <?= ($this->uri->segment(1) === 'ssh' && $this->uri->segment(2) === 'jadwal') ? 'active' : '' ?>">
             <i class="bi bi-calendar-check-fill"></i> <span>Jadwal Pengusulan</span>
         </a>
@@ -134,19 +137,19 @@
         <?php if (can_access('sbu')): ?>
         <div class="nav-section">Standar Biaya Umum (SBU)</div>
 
-        <?php if (in_array($user->role, ['operator_skpd', 'skpd', 'admin'])): ?>
+        <?php if (in_array($userRole, ['operator_skpd', 'skpd', 'admin'])): ?>
         <a href="<?= site_url('sbu/usulan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && in_array($this->uri->segment(2), ['usulan', 'tambah', 'edit'])) ? 'active' : '' ?>">
             <i class="bi bi-receipt-cutoff"></i> <span>Usulan SBU</span>
         </a>
         <?php endif; ?>
 
-        <?php if (can_access('verifikasi_standar') && in_array($user->role, ['verifikator', 'admin'])): ?>
+        <?php if (can_access('verifikasi_standar') && in_array($userRole, ['verifikator', 'admin'])): ?>
         <a href="<?= site_url('sbu/verifikasi') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'verifikasi') ? 'active' : '' ?>">
             <i class="bi bi-check2-circle"></i> <span>Verifikasi SBU</span>
         </a>
         <?php endif; ?>
 
-        <?php if (can_access('penetapan_standar') && in_array($user->role, ['penetap', 'pimpinan', 'admin'])): ?>
+        <?php if (can_access('penetapan_standar') && in_array($userRole, ['penetap', 'pimpinan', 'admin'])): ?>
         <a href="<?= site_url('sbu/penetapan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'penetapan') ? 'active' : '' ?>">
             <i class="bi bi-shield-check"></i> <span>Penetapan SBU</span>
         </a>
@@ -156,7 +159,7 @@
             <i class="bi bi-journal-bookmark-fill"></i> <span>Master Data SBU</span>
         </a>
 
-        <?php if (can_access('jadwal_standar') && in_array($user->role, ['admin', 'verifikator'])): ?>
+        <?php if (can_access('jadwal_standar') && in_array($userRole, ['admin', 'verifikator'])): ?>
         <a href="<?= site_url('sbu/jadwal') ?>" class="nav-link <?= ($this->uri->segment(1) === 'sbu' && $this->uri->segment(2) === 'jadwal') ? 'active' : '' ?>">
             <i class="bi bi-calendar-check-fill"></i> <span>Jadwal Pengusulan</span>
         </a>
@@ -170,7 +173,7 @@
         </a>
         <?php endif; ?>
 
-        <?php if ($user->role === 'admin'): ?>
+        <?php if ($userRole === 'admin'): ?>
         <div class="nav-section">Master Data</div>
         <a href="<?= site_url('master/skpd') ?>" class="nav-link <?= $this->uri->segment(2) === 'skpd' ? 'active' : '' ?>">
             <i class="bi bi-bank"></i> <span>SKPD</span>
@@ -197,16 +200,16 @@
     </nav>
 
     <div class="sidebar-footer">
-        <?php if (!empty($user) && $user->role === 'admin'): ?>
+        <?php if ($userRole === 'admin'): ?>
         <a href="<?= site_url('dokumentasi') ?>" class="text-decoration-none text-muted" title="Buka Catatan Rilis & Dokumentasi Sistem">
             <small class="d-inline-flex align-items-center gap-1">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-0.5">v<?= $this->config->item('app_version') ?></span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-0.5">v<?= $this->config->item('app_version') ?: '2.8.1' ?></span>
                 <span>&copy; BPKAD <?= date('Y') ?></span>
                 <i class="bi bi-info-circle ms-0.5"></i>
             </small>
         </a>
         <?php else: ?>
-        <small>v<?= $this->config->item('app_version') ?> &copy; BPKAD <?= date('Y') ?></small>
+        <small>v<?= $this->config->item('app_version') ?: '2.8.1' ?> &copy; BPKAD <?= date('Y') ?></small>
         <?php endif; ?>
     </div>
 </aside>
@@ -281,10 +284,10 @@
             <!-- User menu -->
             <div class="dropdown">
                 <button class="btn btn-link user-menu" data-bs-toggle="dropdown">
-                    <div class="user-avatar"><?= strtoupper(substr($user->nama_lengkap, 0, 1)) ?></div>
+                    <div class="user-avatar"><?= !empty($user->nama_lengkap) ? strtoupper(substr($user->nama_lengkap, 0, 1)) : 'U' ?></div>
                     <div class="user-info d-none d-md-block">
-                        <strong><?= e($user->nama_lengkap) ?></strong>
-                        <small class="text-muted"><?= e(ucfirst($user->role)) ?></small>
+                        <strong><?= e(!empty($user->nama_lengkap) ? $user->nama_lengkap : 'Pengguna') ?></strong>
+                        <small class="text-muted"><?= e(ucfirst($userRole ?: 'User')) ?></small>
                     </div>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
