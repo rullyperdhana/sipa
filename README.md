@@ -64,10 +64,12 @@ Standarisasi pos pengeluaran non-fisik dan tarif operasional:
 - **Banner Status Dinamis:** Menampilkan status jadwal aktif (Buka/Tutup), batas tanggal mulai-selesai, dan catatan BPKAD pada halaman usulan SKPD.
 - **One-Click Status Toggle:** Kemudahan verifikator/admin mengubah status aktifitas jadwal secara instan.
 
-### 6. Interkoneksi Data Komprehensif
+### 6. Interkoneksi Data Komprehensif & Otomatisasi Cerdas
 - **Dual-Mode Pengusulan:** SKPD dapat memilih usulan dari **Katalog Master TA 2027** atau mengajukan **Item Standar Baru** secara manual.
+- **Pencarian Cerdas Rekening Belanja SIPD RI Berdasarkan Nama:** Pengguna cukup mengetik nama kebutuhan belanja (contoh: *"Alat Tulis"*, *"Kertas"*, *"Honorarium"*, *"Perjalanan Dinas"*, *"Pemeliharaan"*), dan sistem akan secara otomatis memunculkan **Kode Rekening Belanja resmi** beserta nama akunnya dalam bentuk kartu badge visual interaktif.
+- **Penyelarasan Kategori Barang & Jasa:** Dropdown kategori otomatis memuat klasifikasi aset BMD resmi (*Bahan & Persediaan Habis Pakai*, *Peralatan dan Mesin*, *Gedung dan Bangunan*, *Jalan, Irigasi dan Jaringan*, *Aset Tetap Lainnya*, *Tanah*, dll.) dan langsung ter-pilih otomatis (*auto-selected*) saat memilih item dari katalog master 2027.
 - **Otomatisasi Input Form:** Memilih item master otomatis mengisi spesifikasi teknis, satuan, kategori, akun belanja SIPD RI, serta menampilkan harga dasar 2027 sebagai acuan.
-- **Komparasi Harga Otomatis:** Perhitungan selisih dan persentase perubahan harga antara usulan SKPD terhadap harga acuan master.
+- **Komparasi Harga Otomatis:** Perhitungan selisih dan persentase perubahan harga antara usulan SKPD terhadap harga acuan master secara real-time.
 - **Sinkronisasi Otomatis ke Master:** Saat usulan disetujui dan ditetapkan oleh BPKAD, sistem otomatis memperbarui atau menambahkan item baru ke katalog `ref_standar_harga` untuk tahun anggaran berikutnya.
 
 ### 7. Modul Master Referensi Akun Belanja (SIPD RI)
@@ -223,6 +225,12 @@ sipa/
    ```bash
    git pull origin main
    ```
+   > [!TIP]
+   > Jika terdapat pesan *error: Your local changes to the following files would be overwritten by merge*, jalankan perintah pembersihan perubahan lokal terlebih dahulu:
+   > ```bash
+   > git stash && git pull origin main
+   > ```
+   > *(atau bersihkan file spesifik: `git checkout -- application/controllers/Sbu.php application/controllers/Ssh.php application/models/Ssh_model.php && git pull origin main`)*
 
 3. **Pastikan Izin Akses Folder (*File Permissions*):**
    ```bash
@@ -281,11 +289,26 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
   ```
   *Response:* `{"results": [{"id": 1, "text": "1.3.2... - Laptop", "kode": "1.3.2...", "nama": "Laptop", "satuan": "Unit", "harga": 0}]}`
 
-- **Pencarian Akun Belanja SIPD RI:**
+- **Pencarian Cerdas Akun Belanja SIPD RI (Berdasarkan Nama atau Kode):**
   ```http
   GET /ajax/akun_belanja/search?q={keyword}&all={0|1}
   ```
-  *Response:* `{"results": [{"id": "5.1.02.01.01.0024", "text": "5.1.02... - Belanja ATK", "kode": "5.1.02...", "nama": "Belanja ATK", "kelompok": "Belanja Operasi", "level": 6}]}`
+  Mendukung pencarian multi-kata berdasarkan **nama akun belanja** (contoh: *"alat tulis"*, *"honorarium narasumber"*, *"kertas hvs"*, *"makanan minuman"*) maupun nomor **kode akun** (*"5.1.02..."*).
+  *Response:*
+  ```json
+  {
+    "results": [
+      {
+        "id": "5.1.02.01.001.00025",
+        "text": "5.1.02.01.001.00025 - Belanja Alat/Bahan untuk Kegiatan Kantor- Kertas dan Cover",
+        "kode": "5.1.02.01.001.00025",
+        "nama": "Belanja Alat/Bahan untuk Kegiatan Kantor- Kertas dan Cover",
+        "kelompok": "Belanja Operasi",
+        "level": 6
+      }
+    ]
+  }
+  ```
 
 - **Daftar Notifikasi:**
   ```http
