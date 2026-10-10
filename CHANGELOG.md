@@ -21,7 +21,10 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - Antarmuka pencarian akun belanja pada formulir usulan SSH & SBU dengan dukungan pengetikan nama kebutuhan belanja (contoh: *"Alat Tulis"*, *"Kertas"*, *"Honorarium"*, *"Perjalanan Dinas"*, *"Pemeliharaan"*).
   - Sistem otomatis menampilkan sugesti hasil dari 9.617 referensi akun belanja SIPD RI (`ref_akun_belanja`) dan langsung memunculkan **Kode Rekening Belanja** resmi dalam bentuk kartu badge visual interaktif.
   - Peningkatan metode `searchSelect2` pada `Akun_model.php` dengan pencocokan multi-kata (*multi-word search*) fleksibel.
-  - Dukungan tombol *Manual* untuk penginputan kode rekening kustom jika diperlukan.
+- **Penyelarasan Kategori Barang & Jasa dengan Master Data TA 2027:**
+  - Penambahan klasifikasi aset BMD resmi (*Bahan & Persediaan Habis Pakai*, *Peralatan dan Mesin*, *Gedung dan Bangunan*, *Jalan, Irigasi dan Jaringan*, *Aset Tetap Lainnya*, *Tanah*, dll.) ke dalam daftar dropdown kategori SSH & SBU.
+  - Dropdown kategori kini bersifat dinamis menggabungkan kategori master dari database `ref_standar_harga` dan kategori fungsional.
+  - Pemilihan item master pada form usulan otomatis memilih (*auto-select*) kategori barang yang tepat tanpa perlu diubah manual oleh operator.
 - **Interkoneksi Data Menyeluruh Antar Modul:**
   - Pilihan mode pengusulan pada formulir: **Pilih dari Master Data TA 2027** atau **Input Manual Standar Baru**.
   - Autocomplete AJAX Select2 terhubung ke master katalog (`/ajax/standar_harga/search` & `/ajax/standar_harga/detail/(:num)`).

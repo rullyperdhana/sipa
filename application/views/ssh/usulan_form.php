@@ -576,11 +576,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Set kategori jika ada di opsi
             const selectKat = document.getElementById('kategori');
             if (selectKat && data.kategori) {
-                for (let i = 0; i < selectKat.options.length; i++) {
-                    if (selectKat.options[i].value === data.kategori) {
-                        selectKat.selectedIndex = i;
-                        break;
-                    }
+                selectKat.value = data.kategori;
+                if (selectKat.value !== data.kategori) {
+                    const opt = new Option(data.kategori, data.kategori, true, true);
+                    selectKat.add(opt);
+                    selectKat.value = data.kategori;
                 }
             }
 

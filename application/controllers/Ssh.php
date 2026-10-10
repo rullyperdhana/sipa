@@ -68,7 +68,7 @@ class Ssh extends Auth_Controller
             'list'         => $this->ssh_model->getUsulanBySkpd($skpdId, $filter),
             'summary'      => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
             'filter'       => $filter,
-            'kategori'     => $this->ssh_model->getKategoriSsh(),
+            'kategori'     => $this->ssh_model->getKategoriList($this->tipe),
             'skpdList'     => ($this->currentUser->role === 'admin') ? $this->master_model->getAllSkpd() : [],
             'jadwalAktif'  => $jadwalAktif,
             'isJadwalBuka' => $isJadwalBuka
@@ -139,7 +139,7 @@ class Ssh extends Auth_Controller
             'tipe'        => $this->tipe,
             'prefixUrl'   => $this->prefixUrl,
             'moduleTitle' => $this->moduleTitle,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
+            'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
             'satuan'      => $this->ssh_model->getSatuanSsh(),
             'masterItem'  => $masterItem,
             'jadwalAktif' => $jadwalAktif
@@ -209,7 +209,7 @@ class Ssh extends Auth_Controller
             'prefixUrl'   => $this->prefixUrl,
             'moduleTitle' => $this->moduleTitle,
             'item'        => $item,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
+            'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
             'satuan'      => $this->ssh_model->getSatuanSsh()
         ];
 
@@ -258,7 +258,7 @@ class Ssh extends Auth_Controller
             'moduleTitle' => $this->moduleTitle,
             'list'        => $this->ssh_model->getUsulanVerifikasi($filter),
             'filter'      => $filter,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
+            'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
             'skpdList'    => $this->master_model->getAllSkpd()
         ];
 
@@ -306,7 +306,7 @@ class Ssh extends Auth_Controller
             'moduleTitle' => $this->moduleTitle,
             'list'        => $this->ssh_model->getUsulanPenetapan($filter),
             'filter'      => $filter,
-            'kategori'    => $this->ssh_model->getKategoriSsh(),
+            'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
             'skpdList'    => $this->master_model->getAllSkpd()
         ];
 

@@ -621,14 +621,29 @@ class Ssh_model extends CI_Model
 
     public function getKategoriList($tipe = NULL)
     {
-        if ($tipe === 'SSH') return $this->getKategoriSsh();
-        if ($tipe === 'SBU') return $this->getKategoriSbu();
-        return array_merge($this->getKategoriSsh(), $this->getKategoriSbu());
+        $tipe = strtoupper($tipe ?: 'SSH');
+        $masterKat = $this->getDistinctKategoriMaster($tipe);
+        $extraKat  = ($tipe === 'SSH') ? $this->getKategoriSsh() : $this->getKategoriSbu();
+        $merged    = array_unique(array_merge($masterKat, $extraKat));
+
+        if (($key = array_search('Lainnya', $merged)) !== false) {
+            unset($merged[$key]);
+            $merged[] = 'Lainnya';
+        }
+
+        return array_values($merged);
     }
 
     public function getKategoriSsh()
     {
         return [
+            'Bahan & Persediaan Habis Pakai',
+            'Peralatan dan Mesin',
+            'Gedung dan Bangunan',
+            'Jalan, Irigasi dan Jaringan',
+            'Aset Tetap Lainnya',
+            'Tanah',
+            'Sewa, Jasa & Biaya Operasional',
             'Alat Tulis Kantor (ATK) & Kertas',
             'Peralatan Komputer & Elektronik',
             'Bahan Bangunan & Material Konstruksi',
@@ -647,6 +662,11 @@ class Ssh_model extends CI_Model
     public function getKategoriSbu()
     {
         return [
+            'Honorarium & Jasa Tenaga Ahli',
+            'Sewa, Jasa & Biaya Operasional',
+            'Bahan & Persediaan Habis Pakai',
+            'Peralatan dan Mesin',
+            'Gedung dan Bangunan',
             'Honorarium Narasumber / Pakar / Praktisi',
             'Honorarium Panitia Pelaksana / Tim Kerja',
             'Honorarium Rohaniwan / Pembaca Doa',
