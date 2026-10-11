@@ -139,16 +139,174 @@ body {
 
 .alert { border-radius: 10px; border: 0; }
 
+.login-wrapper {
+    width: 100%;
+    max-width: 980px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: auto;
+}
+
+/* ===== Schedule Active Banner with Countdown (Login Page) ===== */
+.pulse-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffffff;
+    animation: sipaPulse 1.6s infinite;
+}
+@keyframes sipaPulse {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+.sipa-countdown-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.sipa-countdown-unit {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    min-width: 50px;
+    padding: 6px 6px 4px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+.sipa-countdown-num {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+    font-size: 19px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1;
+}
+.sipa-countdown-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-top: 3px;
+    letter-spacing: 0.5px;
+}
+.sipa-countdown-sep {
+    font-size: 18px;
+    font-weight: 700;
+    color: #94a3b8;
+    align-self: center;
+    margin-top: -10px;
+}
+.sipa-countdown-wrapper.urgent .sipa-countdown-unit {
+    border-color: #fca5a5 !important;
+    background: #fff5f5 !important;
+}
+.sipa-countdown-wrapper.urgent .sipa-countdown-num {
+    color: #dc2626 !important;
+}
+.sipa-countdown-wrapper.urgent .sipa-countdown-label {
+    color: #ef4444 !important;
+}
+
 @media (max-width: 800px) {
     .login-container { grid-template-columns: 1fr; max-width: 480px; }
     .login-banner { padding: 32px; min-height: auto; }
     .login-form { padding: 32px; }
+    .login-wrapper { max-width: 480px; }
 }
 </style>
 </head>
 <body>
 
-<div class="login-container">
+<div class="login-wrapper">
+
+    <?php if (!empty($active_schedules)): ?>
+    <!-- Banner Jadwal Pengusulan Aktif (Publik SKPD) -->
+    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 16px; background: #ffffff;">
+        <div class="card-header bg-success text-white py-2.5 px-4 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <span class="pulse-dot"></span>
+                <strong class="text-uppercase" style="letter-spacing: 0.5px; font-size: 12.5px;">
+                    <i class="bi bi-broadcast me-1"></i> Jadwal Pengusulan Sedang Berjalan (Terbuka)
+                </strong>
+            </div>
+            <span class="badge bg-white text-success fw-bold px-2.5 py-1">
+                <?= count($active_schedules) ?> Jadwal Dibuka
+            </span>
+        </div>
+        <div class="card-body p-3 p-md-4">
+            <?php foreach ($active_schedules as $idx => $sch): ?>
+            <?php if ($idx > 0): ?><hr class="my-3 text-muted opacity-25"><?php endif; ?>
+            <div class="row align-items-center g-3">
+                <div class="col-lg-7">
+                    <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
+                        <span class="badge bg-<?= $sch['badge_color'] ?> text-white fw-semibold">
+                            <i class="bi <?= $sch['icon'] ?> me-1"></i><?= $sch['kategori'] ?>
+                        </span>
+                        <span class="badge bg-light text-dark border">
+                            TA <?= $sch['tahun_anggaran'] ?>
+                        </span>
+                        <span class="text-success fw-semibold small d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-unlock-fill"></i> Dibuka Resmi
+                        </span>
+                    </div>
+                    <h5 class="fw-bold mb-1 text-dark" style="font-size: 16.5px;">
+                        <?= e($sch['nama_jadwal']) ?>
+                    </h5>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-calendar2-range me-1 text-primary"></i>
+                        <?= !empty($sch['tanggal_mulai']) ? date('d M Y', strtotime($sch['tanggal_mulai'])) : '' ?> s.d 
+                        <strong><?= date('d M Y', strtotime($sch['tanggal_selesai'])) ?> (23:59 WITA)</strong>
+                        <?php if (!empty($sch['keterangan'])): ?>
+                            &bull; <span class="text-secondary"><?= e($sch['keterangan']) ?></span>
+                        <?php endif; ?>
+                    </p>
+                </div>
+                <div class="col-lg-5 text-lg-end">
+                    <div class="d-inline-flex flex-column align-items-lg-end">
+                        <div class="text-uppercase fw-bold text-muted mb-1.5" style="font-size: 10.5px; letter-spacing: 0.5px;">
+                            <i class="bi bi-hourglass-split text-warning me-1"></i> Sisa Waktu Pengusulan:
+                        </div>
+                        <div class="sipa-countdown-wrapper login-countdown" data-target="<?= $sch['target_iso'] ?>">
+                            <div class="sipa-countdown-unit">
+                                <div class="sipa-countdown-num cd-val-days">00</div>
+                                <div class="sipa-countdown-label">Hari</div>
+                            </div>
+                            <div class="sipa-countdown-sep">:</div>
+                            <div class="sipa-countdown-unit">
+                                <div class="sipa-countdown-num cd-val-hours">00</div>
+                                <div class="sipa-countdown-label">Jam</div>
+                            </div>
+                            <div class="sipa-countdown-sep">:</div>
+                            <div class="sipa-countdown-unit">
+                                <div class="sipa-countdown-num cd-val-mins">00</div>
+                                <div class="sipa-countdown-label">Menit</div>
+                            </div>
+                            <div class="sipa-countdown-sep">:</div>
+                            <div class="sipa-countdown-unit">
+                                <div class="sipa-countdown-num cd-val-secs">00</div>
+                                <div class="sipa-countdown-label">Detik</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="card-footer bg-light py-2 px-3 text-muted small border-top d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div>
+                <i class="bi bi-info-circle text-primary me-1"></i>
+                SKPD diimbau segera masuk ke sistem dan mengunggah berkas surat usulan resmi sebelum batas waktu berakhir.
+            </div>
+            <div class="d-none d-md-block text-secondary">
+                BPKAD Kabupaten Tapin
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <div class="login-container">
     <div class="login-banner">
         <div>
             <div class="banner-logo"><i class="bi bi-building-fill-check"></i></div>
@@ -253,6 +411,7 @@ body {
         </div>
     </div>
 </div>
+</div><!-- /login-wrapper -->
 
 <script>
 function togglePass() {
@@ -261,6 +420,51 @@ function togglePass() {
     if (p.type === 'password') { p.type = 'text'; i.classList.replace('bi-eye', 'bi-eye-slash'); }
     else { p.type = 'password'; i.classList.replace('bi-eye-slash', 'bi-eye'); }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const countdownEls = document.querySelectorAll('.login-countdown');
+    if (!countdownEls.length) return;
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+    function updateAllCountdowns() {
+        const now = new Date().getTime();
+        countdownEls.forEach(function (el) {
+            const targetStr = el.getAttribute('data-target');
+            if (!targetStr) return;
+            const targetTime = new Date(targetStr).getTime();
+            if (isNaN(targetTime)) return;
+
+            const diff = targetTime - now;
+            const daysEl = el.querySelector('.cd-val-days');
+            const hoursEl = el.querySelector('.cd-val-hours');
+            const minsEl = el.querySelector('.cd-val-mins');
+            const secsEl = el.querySelector('.cd-val-secs');
+
+            if (diff <= 0) {
+                el.innerHTML = '<span class="badge bg-danger px-3 py-2 fw-bold fs-6 shadow-sm"><i class="bi bi-alarm-fill me-1"></i> Batas Waktu Telah Berakhir</span>';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            if (daysEl) daysEl.textContent = pad(days);
+            if (hoursEl) hoursEl.textContent = pad(hours);
+            if (minsEl) minsEl.textContent = pad(mins);
+            if (secsEl) secsEl.textContent = pad(secs);
+
+            if (diff < 24 * 60 * 60 * 1000) {
+                el.classList.add('urgent');
+            }
+        });
+    }
+
+    updateAllCountdowns();
+    setInterval(updateAllCountdowns, 1000);
+});
 </script>
 </body>
 </html>

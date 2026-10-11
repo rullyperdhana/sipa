@@ -89,6 +89,7 @@ class Login extends MY_Controller
         $regEnabled = function_exists('get_setting') ? get_setting('registration_enabled', '1') : '1';
         $availableYears = get_daftar_tahun_anggaran();
         $selectedYear   = get_tahun_anggaran();
+        $activeSchedules = $this->_get_active_schedules();
 
         $data = [
             'title'                => 'Login - SIPA Kabupaten Tapin',
@@ -97,6 +98,7 @@ class Login extends MY_Controller
             'registration_enabled' => ($regEnabled === '1'),
             'available_years'      => $availableYears,
             'selected_year'        => $selectedYear,
+            'active_schedules'     => $activeSchedules,
         ];
         $this->load->view('auth/login', $data);
         return;
@@ -134,5 +136,68 @@ class Login extends MY_Controller
 
     protected function _get_skpd_list() {
         return $this->db->get_where('skpd', ['is_active' => 1])->result();
+    }
+
+    /**
+     * Mengambil daftar seluruh jadwal pengusulan yang sedang berstatus BUKA & aktif hari ini
+     * untuk ditampilkan secara publik pada halaman Login SIPA.
+     */
+    protected function _get_active_schedules()
+    {
+        $activeSchedules = [];
+        $today = date('Y-m-d');
+
+        // 1. Jadwal Standar Harga (SSH & SBU)
+        if ($this->db->table_exists('standar_harga_jadwal')) {
+            $rows = $this->db->from('standar_harga_jadwal')
+                ->where('status', 'buka')
+                ->where('tanggal_mulai <=', $today)
+                ->where('tanggal_selesai >=', $today)
+                ->order_by('tanggal_selesai', 'ASC')
+                ->get()->result();
+
+            foreach ($rows as $r) {
+                $kat = ($r->tipe === 'SEMUA') ? 'SSH & SBU' : $r->tipe;
+                $activeSchedules[] = [
+                    'id'              => 'standar_' . $r->id,
+                    'kategori'        => $kat,
+                    'badge_color'     => ($r->tipe === 'SBU') ? 'info' : 'success',
+                    'icon'            => ($r->tipe === 'SBU') ? 'bi-receipt-cutoff' : 'bi-box-seam-fill',
+                    'nama_jadwal'     => $r->nama_jadwal,
+                    'tahun_anggaran'  => (int)$r->tahun_anggaran,
+                    'tanggal_mulai'   => $r->tanggal_mulai,
+                    'tanggal_selesai' => $r->tanggal_selesai,
+                    'target_iso'      => date('Y-m-d\TH:i:s', strtotime($r->tanggal_selesai . ' 23:59:59')),
+                    'keterangan'      => $r->keterangan
+                ];
+            }
+        }
+
+        // 2. Periode Usulan RKBMD
+        if ($this->db->table_exists('periode_usulan')) {
+            $rows = $this->db->from('periode_usulan')
+                ->where('status', 'buka')
+                ->where('tanggal_mulai <=', $today)
+                ->where('tanggal_selesai >=', $today)
+                ->order_by('tanggal_selesai', 'ASC')
+                ->get()->result();
+
+            foreach ($rows as $r) {
+                $activeSchedules[] = [
+                    'id'              => 'rkbmd_' . $r->id,
+                    'kategori'        => 'RKBMD',
+                    'badge_color'     => 'primary',
+                    'icon'            => 'bi-clipboard-check-fill',
+                    'nama_jadwal'     => $r->nama_periode,
+                    'tahun_anggaran'  => (int)$r->tahun_anggaran,
+                    'tanggal_mulai'   => $r->tanggal_mulai,
+                    'tanggal_selesai' => $r->tanggal_selesai,
+                    'target_iso'      => date('Y-m-d\TH:i:s', strtotime($r->tanggal_selesai . ' 23:59:59')),
+                    'keterangan'      => $r->keterangan
+                ];
+            }
+        }
+
+        return $activeSchedules;
     }
 }
