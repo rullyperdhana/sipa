@@ -40,28 +40,83 @@ $role = $this->currentUser->role ?? '';
     </div>
 </div>
 
-<!-- Banner Status Jadwal Pengusulan -->
+<!-- Card Status Jadwal Pengusulan dengan Live Countdown -->
 <?php if ($isJadwalBuka && !empty($jadwalAktif)): ?>
-<div class="alert alert-success border-success shadow-sm d-flex justify-content-between align-items-center mb-4 py-2 px-3">
-    <div class="d-flex align-items-center gap-2">
-        <i class="bi bi-broadcast fs-5 text-success"></i>
-        <div>
-            <strong>Jadwal Pengusulan Aktif:</strong> <?= e($jadwalAktif->nama_jadwal) ?> (TA <?= (int)$jadwalAktif->tahun_anggaran ?>)
-            <span class="text-muted small ms-2">&bull; Batas Akhir: <strong><?= date('d M Y', strtotime($jadwalAktif->tanggal_selesai)) ?></strong></span>
+<?php 
+    $tglSelesaiFormatted = date('d F Y', strtotime($jadwalAktif->tanggal_selesai));
+    $tglMulaiFormatted   = !empty($jadwalAktif->tanggal_mulai) ? date('d M Y', strtotime($jadwalAktif->tanggal_mulai)) : '';
+    $targetIso           = date('Y-m-d\TH:i:s', strtotime($jadwalAktif->tanggal_selesai . ' 23:59:59'));
+?>
+<div class="card border-0 shadow-sm mb-4 overflow-hidden sipa-schedule-card">
+    <div class="card-body p-3 p-md-4">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-7">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge sipa-badge-pulse text-white px-2.5 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5">
+                        <span class="pulse-dot"></span>
+                        <i class="bi bi-broadcast"></i> JADWAL PENGUSULAN AKTIF
+                    </span>
+                    <span class="badge bg-light text-dark border fw-medium">
+                        TA <?= (int)$jadwalAktif->tahun_anggaran ?>
+                    </span>
+                </div>
+                <h5 class="fw-bold mb-1 text-dark">
+                    <?= e($jadwalAktif->nama_jadwal) ?>
+                </h5>
+                <p class="text-muted small mb-0 d-flex flex-wrap align-items-center gap-2">
+                    <span><i class="bi bi-calendar2-range me-1 text-success"></i> <?= $tglMulaiFormatted ?> s.d <strong><?= $tglSelesaiFormatted ?> (23:59 WITA)</strong></span>
+                    <?php if (!empty($jadwalAktif->keterangan)): ?>
+                        <span class="text-secondary">&bull; <?= e($jadwalAktif->keterangan) ?></span>
+                    <?php endif; ?>
+                </p>
+            </div>
+            <div class="col-lg-5 text-lg-end">
+                <div class="d-inline-flex flex-column align-items-lg-end">
+                    <div class="text-uppercase fw-bold text-muted mb-1.5" style="font-size: 11px; letter-spacing: 0.5px;">
+                        <i class="bi bi-hourglass-split text-warning me-1"></i> Sisa Waktu Pengusulan:
+                    </div>
+                    <div class="sipa-countdown-wrapper" id="scheduleCountdown" data-target="<?= $targetIso ?>">
+                        <div class="sipa-countdown-unit">
+                            <div class="sipa-countdown-num" id="cd-days">00</div>
+                            <div class="sipa-countdown-label">Hari</div>
+                        </div>
+                        <div class="sipa-countdown-sep">:</div>
+                        <div class="sipa-countdown-unit">
+                            <div class="sipa-countdown-num" id="cd-hours">00</div>
+                            <div class="sipa-countdown-label">Jam</div>
+                        </div>
+                        <div class="sipa-countdown-sep">:</div>
+                        <div class="sipa-countdown-unit">
+                            <div class="sipa-countdown-num" id="cd-mins">00</div>
+                            <div class="sipa-countdown-label">Menit</div>
+                        </div>
+                        <div class="sipa-countdown-sep">:</div>
+                        <div class="sipa-countdown-unit">
+                            <div class="sipa-countdown-num" id="cd-secs">00</div>
+                            <div class="sipa-countdown-label">Detik</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <span class="badge bg-success py-1.5 px-2.5"><i class="bi bi-unlock-fill me-1"></i>PENGUSULAN DIBUKA</span>
 </div>
 <?php else: ?>
-<div class="alert alert-warning border-warning shadow-sm d-flex justify-content-between align-items-center mb-4 py-2 px-3">
-    <div class="d-flex align-items-center gap-2">
-        <i class="bi bi-clock-history fs-5 text-warning"></i>
-        <div>
-            <strong>Pengusulan Ditutup / Menunggu Jadwal:</strong> Tahapan pengusulan <?= $tipe ?> saat ini belum dibuka atau telah berakhir.
-            <div class="text-muted small">Silakan menunggu pembuatan dan pengaktifan jadwal pengusulan resmi oleh BPKAD Kabupaten Tapin.</div>
+<div class="card border-0 shadow-sm mb-4 border-start border-4 border-warning bg-white">
+    <div class="card-body p-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-3 p-2 bg-warning-subtle text-warning d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                <i class="bi bi-clock-history fs-4"></i>
+            </div>
+            <div>
+                <h6 class="mb-0 fw-bold text-dark">Pengusulan Ditutup / Menunggu Jadwal Resmi</h6>
+                <div class="text-muted small">Tahapan pengusulan <?= $tipe ?> saat ini belum dibuka atau telah berakhir. Menunggu pembuatan/pembukaan jadwal resmi oleh BPKAD Kabupaten Tapin.</div>
+            </div>
         </div>
+        <span class="badge bg-danger px-3 py-2 fw-semibold">
+            <i class="bi bi-lock-fill me-1"></i> MENUNGGU JADWAL
+        </span>
     </div>
-    <span class="badge bg-danger py-1.5 px-2.5"><i class="bi bi-lock-fill me-1"></i>MENUNGGU JADWAL</span>
 </div>
 <?php endif; ?>
 
@@ -576,6 +631,53 @@ $role = $this->currentUser->role ?? '';
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Live Countdown Timer Jadwal Pengusulan
+    const cdEl = document.getElementById('scheduleCountdown');
+    if (cdEl) {
+        const targetIso = cdEl.getAttribute('data-target');
+        if (targetIso) {
+            const targetTime = new Date(targetIso).getTime();
+            const elDays = document.getElementById('cd-days');
+            const elHours = document.getElementById('cd-hours');
+            const elMins = document.getElementById('cd-mins');
+            const elSecs = document.getElementById('cd-secs');
+
+            function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    if (elDays) elDays.textContent = '00';
+                    if (elHours) elHours.textContent = '00';
+                    if (elMins) elMins.textContent = '00';
+                    if (elSecs) elSecs.textContent = '00';
+                    cdEl.innerHTML = '<span class="badge bg-danger px-3 py-2 fw-bold fs-6 shadow-sm"><i class="bi bi-alarm-fill me-1"></i> Batas Waktu Pengusulan Telah Berakhir</span>';
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                if (elDays) elDays.textContent = pad(days);
+                if (elHours) elHours.textContent = pad(hours);
+                if (elMins) elMins.textContent = pad(mins);
+                if (elSecs) elSecs.textContent = pad(secs);
+
+                // Highlight merah berkedip jika sisa waktu kurang dari 24 jam
+                if (diff < 24 * 60 * 60 * 1000) {
+                    cdEl.classList.add('urgent');
+                }
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+    }
+
     // Handler Modal Preview Surat PDF
     const btnPreviewSurat = document.querySelectorAll('.btn-preview-surat-pdf');
     const modalEl = document.getElementById('modalPreviewSuratPdf');

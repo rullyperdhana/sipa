@@ -5,6 +5,17 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.9.3] - 2026-10-11
+
+### 🚀 Ditambahkan (Added)
+- **Live Countdown Timer Interaktif pada Banner Jadwal Pengusulan yang Sedang Berjalan:**
+  - **Tampilan Kartu Informasi Jadwal Terkemuka (`.sipa-schedule-card`):** Banner jadwal pengusulan yang sedang berjalan diubah menjadi kartu informasi modern dengan latar hijau emerald lembut, aksen border tegas, dan animasi denyut (*pulse indicator*) pada badge "JADWAL PENGUSULAN AKTIF".
+  - **Penghitung Waktu Mundur Real-Time (Countdown):** Menampilkan sisa waktu pengusulan secara langsung per detik dalam 4 kotak digital presisi: **Hari, Jam, Menit, dan Detik** menuju batas akhir tanggal penutupan jadwal resmi (pukul 23:59 WITA).
+  - **Peringatan Batas Waktu Kritis (*Urgent Mode*):** Indikator countdown otomatis berubah menjadi aksen merah dengan penegasan visual ketika sisa waktu pengusulan kurang dari 24 jam.
+  - **Integrasi Menyeluruh:** Fitur live countdown diterapkan pada halaman Pengusulan SSH, Pengusulan SBU, Penyusunan RKBMD, serta indikator badge sisa hari pada dashboard utama.
+
+---
+
 ## [2.9.2] - 2026-10-11
 
 ### 🐛 Diperbaiki (Fixed)

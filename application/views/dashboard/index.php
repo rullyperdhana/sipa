@@ -133,7 +133,11 @@
                 </div>
                 <div>
                     <?php if ($isJadwalBukaRkbmd): ?>
-                        <span class="badge bg-primary"><i class="bi bi-unlock-fill me-1"></i>DIBUKA</span>
+                        <?php $sisaHariRkbmd = max(0, (int)ceil((strtotime($jadwalRkbmd->tanggal_selesai . ' 23:59:59') - time()) / 86400)); ?>
+                        <div class="text-end">
+                            <span class="badge bg-primary d-inline-flex align-items-center gap-1"><span class="pulse-dot"></span>DIBUKA</span>
+                            <div class="text-muted fw-bold mt-1" style="font-size: 10px;">SISA <?= $sisaHariRkbmd ?> HARI</div>
+                        </div>
                     <?php else: ?>
                         <span class="badge bg-secondary"><i class="bi bi-lock-fill me-1"></i>DITUTUP</span>
                     <?php endif; ?>
@@ -159,7 +163,11 @@
                 </div>
                 <div>
                     <?php if ($isJadwalBukaSsh): ?>
-                        <span class="badge bg-success"><i class="bi bi-unlock-fill me-1"></i>DIBUKA</span>
+                        <?php $sisaHariSsh = max(0, (int)ceil((strtotime($jadwalSsh->tanggal_selesai . ' 23:59:59') - time()) / 86400)); ?>
+                        <div class="text-end">
+                            <span class="badge bg-success d-inline-flex align-items-center gap-1"><span class="pulse-dot"></span>DIBUKA</span>
+                            <div class="text-muted fw-bold mt-1" style="font-size: 10px;">SISA <?= $sisaHariSsh ?> HARI</div>
+                        </div>
                     <?php else: ?>
                         <span class="badge bg-secondary"><i class="bi bi-lock-fill me-1"></i>DITUTUP</span>
                     <?php endif; ?>
@@ -185,7 +193,11 @@
                 </div>
                 <div>
                     <?php if ($isJadwalBukaSbu): ?>
-                        <span class="badge bg-info text-white"><i class="bi bi-unlock-fill me-1"></i>DIBUKA</span>
+                        <?php $sisaHariSbu = max(0, (int)ceil((strtotime($jadwalSbu->tanggal_selesai . ' 23:59:59') - time()) / 86400)); ?>
+                        <div class="text-end">
+                            <span class="badge bg-info text-white d-inline-flex align-items-center gap-1"><span class="pulse-dot"></span>DIBUKA</span>
+                            <div class="text-muted fw-bold mt-1" style="font-size: 10px;">SISA <?= $sisaHariSbu ?> HARI</div>
+                        </div>
                     <?php else: ?>
                         <span class="badge bg-secondary"><i class="bi bi-lock-fill me-1"></i>DITUTUP</span>
                     <?php endif; ?>
