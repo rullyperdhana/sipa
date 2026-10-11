@@ -187,41 +187,33 @@ $role = $this->currentUser->role ?? '';
     </div>
 </div>
 
-<!-- Navigasi Tab Tampilan: Modern Pills Style -->
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-    <ul class="nav nav-pills gap-1 bg-white p-1 rounded-3 shadow-sm border" id="usulanTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active px-3 py-1.5 fw-semibold" id="tab-surat-btn" data-bs-toggle="tab" data-bs-target="#tab-surat-content" type="button" role="tab" aria-controls="tab-surat-content" aria-selected="true">
-                <i class="bi bi-file-earmark-pdf-fill text-danger me-1.5"></i>
-                Daftar Surat Usulan Resmi
-                <span class="badge bg-primary ms-1.5"><?= count($suratList ?? []) ?></span>
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link px-3 py-1.5 fw-semibold text-secondary" id="tab-item-btn" data-bs-toggle="tab" data-bs-target="#tab-item-content" type="button" role="tab" aria-controls="tab-item-content" aria-selected="false">
-                <i class="bi bi-list-columns-reverse me-1.5"></i>
-                Semua Rincian Item (Flat View)
-                <span class="badge bg-secondary ms-1.5"><?= count($list ?? []) ?></span>
-            </button>
-        </li>
-    </ul>
-    <div class="text-muted small">
-        <i class="bi bi-info-circle me-1 text-primary"></i> Workflow: <strong>Upload Surat Resmi SKPD</strong> &rarr; <strong>Input Rincian Item</strong>
+<!-- Card Terpadu: Tab Navigasi Induk & Konten Tabel -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom pt-3 px-3 pb-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <ul class="nav nav-tabs card-header-tabs" id="usulanTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-surat-btn" data-bs-toggle="tab" data-bs-target="#tab-surat-content" type="button" role="tab" aria-controls="tab-surat-content" aria-selected="true">
+                    <i class="bi bi-file-earmark-pdf-fill text-danger me-1.5"></i>
+                    Daftar Surat Usulan Resmi
+                    <span class="badge bg-primary ms-1.5"><?= count($suratList ?? []) ?></span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-item-btn" data-bs-toggle="tab" data-bs-target="#tab-item-content" type="button" role="tab" aria-controls="tab-item-content" aria-selected="false">
+                    <i class="bi bi-list-columns-reverse text-primary me-1.5"></i>
+                    Semua Rincian Item (Flat View)
+                    <span class="badge bg-secondary ms-1.5"><?= count($list ?? []) ?></span>
+                </button>
+            </li>
+        </ul>
+        <div class="text-muted small pb-2 d-none d-md-block">
+            <i class="bi bi-info-circle me-1 text-primary"></i> Alur: <strong>Upload Surat Resmi SKPD</strong> &rarr; <strong>Input Rincian Item</strong>
+        </div>
     </div>
-</div>
-
-<div class="tab-content" id="usulanTabsContent">
-    <!-- TAB 1: DAFTAR SURAT USULAN (WORKFLOW RESMI INDUK) -->
-    <div class="tab-pane fade show active" id="tab-surat-content" role="tabpanel" aria-labelledby="tab-surat-btn">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h6 class="card-title mb-0 fw-bold">
-                    <i class="bi bi-envelope-paper me-2 <?= $isSbu ? 'text-info' : 'text-primary' ?>"></i>
-                    Daftar Berkas Surat Usulan <?= $modTitle ?>
-                </h6>
-                <span class="badge bg-light text-dark border"><?= count($suratList ?? []) ?> Surat Ditemukan</span>
-            </div>
-            <div class="card-body p-0">
+    <div class="card-body p-0">
+        <div class="tab-content" id="usulanTabsContent">
+            <!-- TAB 1: DAFTAR SURAT USULAN (WORKFLOW RESMI INDUK) -->
+            <div class="tab-pane fade show active" id="tab-surat-content" role="tabpanel" aria-labelledby="tab-surat-btn">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-muted small text-uppercase">
@@ -316,20 +308,9 @@ $role = $this->currentUser->role ?? '';
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- TAB 2: SEMUA RINCIAN ITEM (FLAT LIST VIEW) -->
-    <div class="tab-pane fade" id="tab-item-content" role="tabpanel" aria-labelledby="tab-item-btn">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h6 class="card-title mb-0 fw-bold">
-                    <i class="bi bi-table me-2 <?= $isSbu ? 'text-info' : 'text-primary' ?>"></i>
-                    Daftar Semua Rincian Item <?= $modTitle ?>
-                </h6>
-                <span class="badge bg-light text-dark border"><?= count($list) ?> Item ditemukan</span>
-            </div>
-            <div class="card-body p-0">
+            <!-- TAB 2: SEMUA RINCIAN ITEM (FLAT LIST VIEW) -->
+            <div class="tab-pane fade" id="tab-item-content" role="tabpanel" aria-labelledby="tab-item-btn">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-muted small text-uppercase">

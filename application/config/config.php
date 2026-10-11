@@ -93,7 +93,7 @@ $config['proxy_ips']        = '';
 
 // ===== Konfigurasi Aplikasi SIPA =====
 $config['app_name']         = 'SIPA - Sistem Informasi Pengelolaan Aset';
-$config['app_version']      = '2.9.1';
+$config['app_version']      = '2.9.2';
 $config['app_owner']        = 'Pemerintah Kabupaten Tapin';
 $config['app_unit']         = 'Badan Pengelolaan Keuangan dan Aset Daerah (BPKAD)';
 $config['app_provinsi']     = 'Kalimantan Selatan';

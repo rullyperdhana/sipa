@@ -5,6 +5,16 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.9.2] - 2026-10-11
+
+### 🐛 Diperbaiki (Fixed)
+- **Perbaikan Keterbacaan dan Kontras Tab Navigasi Halaman Usulan & Verifikasi:**
+  - Membatasi cakupan (*scoping*) selector CSS `.nav-link` pada sidebar (`assets/css/app.css` &rarr; `.sidebar .nav-link`), sehingga tidak lagi menimpa teks tab navigasi pada konten halaman dengan warna putih transparan (*white-on-white* yang tidak terbaca).
+  - Menerapkan komponen standar `.card-header-tabs` terpadu: teks tab inaktif berwarna abu-abu gelap tegas (`#4b5563`), tab aktif menggunakan warna biru tema SIPA (`#1e6091`) dengan latar putih solid dan garis aksen atas 3px (`border-top: 3px solid var(--primary)`).
+  - Menyempurnakan keterbacaan seluruh badge dan ikon pada tab sehingga 100% kontras tinggi dan mudah dibaca di berbagai resolusi layar.
+
+---
+
 ## [2.9.1] - 2026-10-11
 
 ### 🐛 Diperbaiki (Fixed)
