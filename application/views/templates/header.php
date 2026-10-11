@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
 <!-- Custom CSS -->
-<link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/app.css?v=' . (file_exists(FCPATH . 'assets/css/app.css') ? filemtime(FCPATH . 'assets/css/app.css') : '2.9.2')) ?>">
 </head>
 <body>
 <script>

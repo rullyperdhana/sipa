@@ -8,10 +8,11 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 ## [2.9.2] - 2026-10-11
 
 ### 🐛 Diperbaiki (Fixed)
-- **Perbaikan Keterbacaan dan Kontras Tab Navigasi Halaman Usulan & Verifikasi:**
-  - Membatasi cakupan (*scoping*) selector CSS `.nav-link` pada sidebar (`assets/css/app.css` &rarr; `.sidebar .nav-link`), sehingga tidak lagi menimpa teks tab navigasi pada konten halaman dengan warna putih transparan (*white-on-white* yang tidak terbaca).
-  - Menerapkan komponen standar `.card-header-tabs` terpadu: teks tab inaktif berwarna abu-abu gelap tegas (`#4b5563`), tab aktif menggunakan warna biru tema SIPA (`#1e6091`) dengan latar putih solid dan garis aksen atas 3px (`border-top: 3px solid var(--primary)`).
-  - Menyempurnakan keterbacaan seluruh badge dan ikon pada tab sehingga 100% kontras tinggi dan mudah dibaca di berbagai resolusi layar.
+- **Perbaikan Keterbacaan, Kontras, dan Kesimetrisan Tab Navigasi SSH & SBU:**
+  - **Desain Segmented Control Simetris (`.sipa-segmented-tabs`):** Mengganti sistem tab menjadi kapsul navigasi terpadu dengan tinggi presisi (40px), padding seragam, dan alignment sempurna. Posisi tab aktif dan inaktif kini 100% simetris tanpa perbedaan ketinggian garis tepi.
+  - **Solusi Keterbacaan & Kontras 100%:** Tab inaktif kini memiliki teks abu-abu gelap tegas (`#475569`) dengan badge netral pada kontainer kapsul slate lembut (`#f1f5f9`). Tab aktif tampil sebagai kapsul putih solid dengan teks biru resmi SIPA (`#1e6091`), bayangan halus (*soft elevation*), dan badge biru kontras. Teks tab dijamin tidak akan pernah hilang atau redup saat berpindah antar tab.
+  - **Cache-Buster Otomatis pada Stylesheet (`header.php`):** Menambahkan parameter dinamis `?v=filemtime(app.css)` pada pemanggilan stylesheet, sehingga browser pengguna dan proxy/CDN langsung menyegarkan cache dan mengeksekusi CSS terbaru tanpa perlu pembersihan cache manual.
+  - **Inline CSS Fallback:** Menyertakan deklarasi CSS prioritas tinggi langsung pada view usulan dan verifikasi sebagai perlindungan ganda dari agresivitas cache peramban klien.
 
 ---
 

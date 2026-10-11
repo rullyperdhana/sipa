@@ -133,26 +133,82 @@ $stats = $summarySurat ?? $summary;
     </div>
 </div>
 
+<style>
+/* Jaminan Tampilan Tab Simetris & Kontras Tinggi */
+.sipa-segmented-tabs {
+    display: inline-flex !important;
+    align-items: center !important;
+    background: #f1f5f9 !important;
+    padding: 4px !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    gap: 4px !important;
+    margin: 0 !important;
+}
+.sipa-segmented-tabs .nav-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 40px !important;
+    padding: 0 18px !important;
+    border-radius: 8px !important;
+    border: 1px solid transparent !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transition: all 0.15s ease-in-out !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+}
+.sipa-segmented-tabs .nav-link:hover {
+    color: #0f172a !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+}
+.sipa-segmented-tabs .nav-link.active {
+    color: #1e6091 !important;
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
+    font-weight: 700 !important;
+}
+.sipa-segmented-tabs .sipa-tab-badge {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 3px 8px !important;
+    border-radius: 20px !important;
+    background-color: #e2e8f0 !important;
+    color: #475569 !important;
+    transition: all 0.15s ease !important;
+}
+.sipa-segmented-tabs .nav-link.active .sipa-tab-badge {
+    background-color: #1e6091 !important;
+    color: #ffffff !important;
+}
+</style>
+
 <!-- Card Terpadu: Tab Navigasi Antrean & Konten Tabel -->
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white border-bottom pt-3 px-3 pb-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <ul class="nav nav-tabs card-header-tabs" id="verifTabs" role="tablist">
+    <div class="card-header bg-white border-bottom p-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <ul class="nav nav-pills sipa-segmented-tabs" id="verifTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tab-surat-btn" data-bs-toggle="tab" data-bs-target="#tab-surat-content" type="button" role="tab" aria-controls="tab-surat-content" aria-selected="true">
-                    <i class="bi bi-file-earmark-pdf-fill text-danger me-1.5"></i>
-                    Antrean Surat Usulan Resmi
-                    <span class="badge bg-primary ms-1.5"><?= count($suratList ?? []) ?></span>
+                    <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>
+                    <span>Antrean Surat Usulan Resmi</span>
+                    <span class="badge sipa-tab-badge ms-2"><?= count($suratList ?? []) ?></span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="tab-item-btn" data-bs-toggle="tab" data-bs-target="#tab-item-content" type="button" role="tab" aria-controls="tab-item-content" aria-selected="false">
-                    <i class="bi bi-list-columns-reverse text-primary me-1.5"></i>
-                    Semua Rincian Item (Flat View)
-                    <span class="badge bg-secondary ms-1.5"><?= count($list ?? []) ?></span>
+                    <i class="bi bi-list-columns-reverse text-primary me-2"></i>
+                    <span>Semua Rincian Item (Flat View)</span>
+                    <span class="badge sipa-tab-badge ms-2"><?= count($list ?? []) ?></span>
                 </button>
             </li>
         </ul>
-        <div class="text-muted small pb-2 d-none d-md-block">
+        <div class="text-muted small d-none d-md-block">
             <i class="bi bi-shield-check me-1 text-primary"></i> Telaah & verifikasi berbasis <strong>Berkas Surat Resmi</strong> dari SKPD
         </div>
     </div>
