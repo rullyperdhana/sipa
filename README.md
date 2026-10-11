@@ -167,6 +167,16 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Peringatan Batas Waktu Kritis (*Urgent Mode*):** Indikator countdown otomatis berubah menjadi aksen merah menyala dengan penegasan visual ketika sisa waktu pengusulan kurang dari 24 jam.
 - **Integrasi Menyeluruh:** Fitur live countdown diterapkan pada halaman Pengusulan SSH, Pengusulan SBU, Penyusunan RKBMD, Halaman Login Publik, serta indikator badge sisa hari pada dashboard utama.
 
+### 19. Sistem Notifikasi Internal Aplikasi (In-App Notification & Lonceng Terpadu)
+- **Autoload Global & Helper Terpadu (`Notifikasi_model`):** Mendukung pencatatan dan distribusi notifikasi otomatis lintas peran pengguna via fungsi `create()`, `sendToRoles()`, dan `sendToSkpd()`.
+- **Format Waktu Relatif Humanis (`waktu_lalu`):** Menampilkan estimasi waktu notifikasi yang informatif (*"Baru saja"*, *"5 mnt lalu"*, *"2 jam lalu"*, *"Kemarin"*, *"d M Y"*) pada daftar dropdown lonceng notifikasi header.
+- **Fitur 1-Klik "Tandai Semua Dibaca" (*Mark All as Read*):** Tombol cepat pada dropdown header notifikasi untuk mengosongkan status belum dibaca seketika melalui endpoint AJAX terproteksi `/ajax/notif/read/all`.
+- **Integrasi Penuh Siklus Bisnis:**
+  - *RKBMD:* Pengajuan usulan ke verifikator dan hasil telaah ke pembuat usulan SKPD.
+  - *SSH & SBU:* Pengajuan berkas Surat Usulan resmi dan rincian item ke Verifikator BPKAD, serta pemberitahuan otomatis ke SKPD saat usulan Disetujui, Direvisi, Ditolak, atau Ditetapkan sebagai SK.
+  - *Autentikasi & Akun:* Pendaftaran operator baru ke Admin dan konfirmasi aktivasi akun ke pengguna.
+- **Normalisasi Tautan & Keamanan CSRF:** Seluruh tautan notifikasi otomatis dinormalkan ke host aktif sistem, serta rotasi CSRF token tersinkronisasi otomatis pada setiap aksi AJAX.
+
 ---
 
 ## 👥 Matriks Hak Akses Pengguna (RBAC & RLS)

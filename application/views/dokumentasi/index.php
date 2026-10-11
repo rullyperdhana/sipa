@@ -303,6 +303,48 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Modul 7: Sistem Notifikasi Aplikasi In-App -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-info">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-info-subtle text-info fs-4"><i class="bi bi-bell-fill"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">Sistem Notifikasi Aplikasi (In-App)</h6>
+                                        <small class="text-muted">Pusat pemberitahuan realtime pada header lonceng sistem</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>Lonceng Header Interaktif:</strong> Menampilkan badge merah jumlah pesan belum dibaca dan daftar notifikasi terkini.</li>
+                                    <li class="mb-1"><strong>Waktu Relatif Humanis:</strong> Format waktu otomatis (*"Baru saja"*, *"5 mnt lalu"*, *"2 jam lalu"*, *"Kemarin"*, *"d M Y"*).</li>
+                                    <li class="mb-1"><strong>Tandai Semua Dibaca:</strong> Tombol 1-klik untuk mengosongkan status belum dibaca seketika.</li>
+                                    <li class="mb-1"><strong>Integrasi Seluruh Alur:</strong> Notifikasi otomatis saat pengajuan usulan, telaah verifikasi, penetapan SK, registrasi mandiri, dan aktivasi akun.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modul 8: Master Data Terintegrasi SIPD RI -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-dark">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-dark-subtle text-dark fs-4"><i class="bi bi-database-fill-gear"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">Master Data & Integrasi SIPD RI</h6>
+                                        <small class="text-muted">Standarisasi rekening belanja dan katalog acuan 2027</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>11.519 Master Standar Harga:</strong> 5.786 item SSH dan 5.733 item SBU resmi Kabupaten Tapin.</li>
+                                    <li class="mb-1"><strong>Pencarian Cerdas Rekening:</strong> Cukup ketik nama kebutuhan belanja dan kode akun resmi SIPD RI langsung tersaji.</li>
+                                    <li class="mb-1"><strong>Histori Nomenklatur SKPD:</strong> Rekam jejak nama dinas dan pejabat per tahun anggaran agar dokumen lampau otentik.</li>
+                                    <li class="mb-1"><strong>High-Performance DataTables:</strong> Server-side pagination hemat memori RAM (&lt; 1MB).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
