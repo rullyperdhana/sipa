@@ -1,7 +1,7 @@
 -- ============================================================================
 -- MODUL STANDAR SATUAN HARGA (SSH) & STANDAR BIAYA UMUM (SBU)
 -- SIPA (Sistem Informasi Pengelolaan Aset) - BPKAD Kabupaten Tapin
--- Migrasi: Tabel standar_harga_surat dan Relasi surat_id pada standar_harga_usulan
+-- Migrasi: Tabel standar_harga_surat dan Relasi surat_id pada standar_harga_usulan (AMAN & IDEMPOTENT)
 -- ============================================================================
 
 -- 1. Buat Tabel Induk Surat Usulan SKPD
@@ -32,12 +32,45 @@ CREATE TABLE IF NOT EXISTS `standar_harga_surat` (
   CONSTRAINT `fk_surat_verifikator` FOREIGN KEY (`verifikator_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 2. Tambah Kolom surat_id pada Tabel standar_harga_usulan
-ALTER TABLE `standar_harga_usulan`
-ADD COLUMN `surat_id` INT(10) UNSIGNED DEFAULT NULL AFTER `tipe`;
+-- 2. Tambah Kolom surat_id, Indeks, dan Foreign Key secara Idempotent
+DROP PROCEDURE IF EXISTS `AddSuratIdColumnIfNotExists`;
+DELIMITER $$
+CREATE PROCEDURE `AddSuratIdColumnIfNotExists`()
+BEGIN
+  -- Cek dan tambah kolom surat_id jika belum ada
+  IF NOT EXISTS (
+    SELECT 1 FROM `information_schema`.`COLUMNS` 
+    WHERE `TABLE_SCHEMA` = DATABASE() 
+      AND `TABLE_NAME` = 'standar_harga_usulan' 
+      AND `COLUMN_NAME` = 'surat_id'
+  ) THEN
+    ALTER TABLE `standar_harga_usulan`
+    ADD COLUMN `surat_id` INT(10) UNSIGNED DEFAULT NULL AFTER `tipe`;
+  END IF;
 
-ALTER TABLE `standar_harga_usulan`
-ADD KEY `idx_surat_id` (`surat_id`);
+  -- Cek dan tambah index idx_surat_id jika belum ada
+  IF NOT EXISTS (
+    SELECT 1 FROM `information_schema`.`STATISTICS` 
+    WHERE `TABLE_SCHEMA` = DATABASE() 
+      AND `TABLE_NAME` = 'standar_harga_usulan' 
+      AND `INDEX_NAME` = 'idx_surat_id'
+  ) THEN
+    ALTER TABLE `standar_harga_usulan`
+    ADD KEY `idx_surat_id` (`surat_id`);
+  END IF;
 
-ALTER TABLE `standar_harga_usulan`
-ADD CONSTRAINT `fk_usulan_surat` FOREIGN KEY (`surat_id`) REFERENCES `standar_harga_surat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  -- Cek dan tambah foreign key fk_usulan_surat jika belum ada
+  IF NOT EXISTS (
+    SELECT 1 FROM `information_schema`.`TABLE_CONSTRAINTS` 
+    WHERE `TABLE_SCHEMA` = DATABASE() 
+      AND `TABLE_NAME` = 'standar_harga_usulan' 
+      AND `CONSTRAINT_NAME` = 'fk_usulan_surat'
+  ) THEN
+    ALTER TABLE `standar_harga_usulan`
+    ADD CONSTRAINT `fk_usulan_surat` FOREIGN KEY (`surat_id`) REFERENCES `standar_harga_surat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END$$
+DELIMITER ;
+
+CALL `AddSuratIdColumnIfNotExists`();
+DROP PROCEDURE IF EXISTS `AddSuratIdColumnIfNotExists`;
