@@ -220,14 +220,14 @@ a:hover { color: var(--primary-dark); }
 .user-info strong { display: block; font-size: 13px; color: #374151; }
 
 /* Notifikasi dropdown */
-.notif-dropdown { width: 360px; max-height: 400px; overflow: hidden; padding: 0; }
-.notif-list { max-height: 320px; overflow-y: auto; }
-.notif-item { padding: 10px 14px; border-bottom: 1px solid #f3f4f6; cursor: pointer; }
-.notif-item:hover { background: #f9fafb; }
-.notif-item.unread { background: #eff6ff; }
-.notif-item .notif-title { font-weight: 600; font-size: 13px; }
-.notif-item .notif-msg { font-size: 12px; color: #6b7280; }
-.notif-item .notif-time { font-size: 11px; color: #9ca3af; }
+.notif-dropdown { width: 360px; max-height: 480px; overflow: hidden; padding: 0; border-radius: 10px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.08); }
+.notif-list { max-height: 360px; overflow-y: auto; }
+.notif-item { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background-color 0.15s ease; }
+.notif-item:hover { background: #f8fafc; }
+.notif-item.unread { background: #f0f9ff; border-left: 3px solid #0284c7; }
+.notif-item .notif-title { font-weight: 600; font-size: 13px; color: #1e293b; }
+.notif-item .notif-msg { font-size: 12px; color: #475569; line-height: 1.4; margin-top: 2px; }
+.notif-item .notif-time { font-size: 11px; color: #94a3b8; margin-top: 4px; }
 
 /* ===== Content Wrapper ===== */
 .content-wrapper { flex: 1; padding: 24px; }

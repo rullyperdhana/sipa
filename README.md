@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BPKAD
 
-[![Version](https://img.shields.io/badge/version-2.9.3-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.9.4-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -456,6 +456,7 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.9.4 (2026-10-11):** Perbaikan Menyeluruh & Optimalisasi Fitur Notifikasi Aplikasi (In-App Notification System) - Autoload global `notifikasi_model`, helper notifikasi (`create`, `sendToRoles`, `sendToSkpd`), format waktu relatif (*"Baru saja"*, *"5 mnt lalu"*, *"2 jam lalu"*, *"Kemarin"*), normalisasi URL notifikasi anti-domain lama, tombol 1-klik "Tandai Semua Dibaca" (*Mark All as Read*), sinkronisasi CSRF token otomatis, integrasi alur SSH & SBU, registrasi & aktivasi akun, serta penanganan respon AJAX 401/403 JSON saat sesi berakhir.
 - **v2.9.3 (2026-10-11):** Live Countdown Timer Interaktif pada Banner Jadwal Pengusulan Aktif (Hari, Jam, Menit, Detik), Mode Darurat/Urgent (< 24 jam), Pengumuman Jadwal & Countdown Terbuka di Halaman Login (`/login`) untuk SKPD tanpa login, integrasi pada SSH, SBU, RKBMD, dan Dashboard.
 - **v2.9.2 (2026-10-11):** Perbaikan Keterbacaan, Kontras, dan Kesimetrisan Tab Navigasi SSH & SBU (`.sipa-segmented-tabs`), Standar Kontras WCAG AA (teks tidak pernah redup/hilang saat berpindah tab), Automatic CSS Cache-Busting (`?v=filemtime(...)`) di `header.php`.
 - **v2.9.1 (2026-10-11):** Perbaikan Tampilan Layar Usulan & Verifikasi SSH/SBU, perbaikan fatal error helper `status_badge()` / `badge_status()`, layout recovery, proporsi tabel responsif, sinkronisasi filter SKPD dan statistik KPI tahun anggaran aktif.

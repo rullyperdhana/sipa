@@ -129,17 +129,26 @@ window.SipaWa = {
             const btn = $(this);
             btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Mengirim...');
 
+            const csrfTokenName = (window.appConfig && window.appConfig.csrfName) ? window.appConfig.csrfName : 'rkbmd_csrf_token';
+            const csrfTokenHash = (window.appConfig && window.appConfig.csrfHash) ? window.appConfig.csrfHash : '<?= $this->security->get_csrf_hash() ?>';
+
+            const postData = {
+                phone: phone,
+                message: message
+            };
+            postData[csrfTokenName] = csrfTokenHash;
+
             $.ajax({
                 url: '<?= site_url("wa/ajax_send_gateway") ?>',
                 type: 'POST',
-                data: {
-                    phone: phone,
-                    message: message,
-                    rkbmd_csrf_token: '<?= $this->security->get_csrf_hash() ?>'
-                },
+                data: postData,
                 dataType: 'json',
                 success: function(res) {
                     btn.prop('disabled', false).html('<i class="bi bi-send-check me-1"></i>Kirim via Gateway Otomatis');
+                    if (res.csrfHash && window.appConfig) {
+                        window.appConfig.csrfHash = res.csrfHash;
+                        $('meta[name="csrf-token"]').attr('content', res.csrfHash);
+                    }
                     if (res.success) {
                         alert('Berhasil: ' + res.message);
                     } else {
@@ -166,20 +175,30 @@ window.SipaWa = {
         this.bootstrapModal.show();
 
         const self = this;
+        const csrfTokenName = (window.appConfig && window.appConfig.csrfName) ? window.appConfig.csrfName : 'rkbmd_csrf_token';
+        const csrfTokenHash = (window.appConfig && window.appConfig.csrfHash) ? window.appConfig.csrfHash : '<?= $this->security->get_csrf_hash() ?>';
+
+        const reqData = {
+            module: opts.module || 'rkbmd',
+            id: opts.id,
+            action_type: opts.action_type || '',
+            catatan: opts.catatan || ''
+        };
+        reqData[csrfTokenName] = csrfTokenHash;
+
         $.ajax({
             url: '<?= site_url("wa/ajax_prepare") ?>',
             type: 'POST',
-            data: {
-                module: opts.module || 'rkbmd',
-                id: opts.id,
-                action_type: opts.action_type || '',
-                catatan: opts.catatan || '',
-                rkbmd_csrf_token: '<?= $this->security->get_csrf_hash() ?>'
-            },
+            data: reqData,
             dataType: 'json',
             success: function(res) {
                 $('#waLoadingState').addClass('d-none');
                 $('#waFormState').removeClass('d-none');
+
+                if (res.csrfHash && window.appConfig) {
+                    window.appConfig.csrfHash = res.csrfHash;
+                    $('meta[name="csrf-token"]').attr('content', res.csrfHash);
+                }
 
                 if (res.success) {
                     $('#waPenerimaNama').text(res.nama_skpd + ' (' + res.nama_operator + ')');

@@ -5,6 +5,22 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.9.4] - 2026-10-11
+
+### 🚀 Ditambahkan & Diperbaiki (Added & Fixed)
+- **Perbaikan Menyeluruh & Optimalisasi Fitur Notifikasi Aplikasi (In-App Notification System):**
+  - **Autoload Model Notifikasi:** Mendaftarkan `notifikasi_model` ke dalam `$autoload['model']` sehingga fungsi notifikasi selalu siap sedia secara global di seluruh controller tanpa kendala *undefined property*.
+  - **Helper Notifikasi Komprehensif:** Menyediakan fungsi `create()`, `sendToRoles()`, dan `sendToSkpd()` pada `Notifikasi_model` untuk mempermudah pengiriman notifikasi antar pengguna.
+  - **Format Waktu Relatif Humanis (`waktu_lalu`):** Menampilkan estimasi waktu notifikasi yang informatif (*"Baru saja"*, *"5 mnt lalu"*, *"2 jam lalu"*, *"Kemarin"*, *"d M Y"*) langsung pada daftar lonceng notifikasi header.
+  - **Normalisasi Tautan Notifikasi:** Memastikan seluruh URL tautan notifikasi selalu diarahkan ke alamat host aktif sistem dan secara otomatis memperbaiki tautan riwayat lampau yang memuat domain lama.
+  - **Fitur 1-Klik "Tandai Semua Dibaca" (*Mark All as Read*):** Menambahkan tombol cepat pada header dropdown notifikasi untuk mengosongkan seluruh tanda belum dibaca seketika melalui endpoint AJAX terproteksi (`/ajax/notif/read/all` dan `/ajax/notif/read_all`).
+  - **Sinkronisasi CSRF Token Dinamis:** Setiap interaksi notifikasi dan modal WhatsApp otomatis memperbarui token CSRF di peramban, mencegah kegagalan *403 Forbidden* pada request AJAX beruntun.
+  - **Integrasi Otomatis Modul Standar Harga (SSH & SBU):** Notifikasi sistem otomatis terkirim ke Verifikator & Admin saat SKPD mengajukan Surat Usulan resmi atau usulan mandiri, serta mengirim notifikasi balik ke operator SKPD saat usulan disetujui, direvisi, ditolak, atau ditetapkan sebagai SK.
+  - **Integrasi Pendaftaran Mandiri & Aktivasi Akun:** Mengirim notifikasi otomatis ke Admin saat operator baru mendaftar akun, serta notifikasi selamat datang ke pengguna saat akunnya disetujui dan diaktifkan.
+  - **Respon AJAX Bersih untuk Sesi Kedaluwarsa:** Endpoint AJAX mengembalikan status 401/403 JSON terstruktur jika sesi pengguna telah berakhir, mencegah crash *parseerror* akibat redirect HTML login.
+
+---
+
 ## [2.9.3] - 2026-10-11
 
 ### 🚀 Ditambahkan (Added)

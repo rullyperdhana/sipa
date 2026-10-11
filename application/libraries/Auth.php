@@ -205,6 +205,20 @@ class Auth
         } catch (\Throwable $e) {}
 
         if ($isActive === 0) {
+            // Notifikasi ke Administrator
+            try {
+                $this->CI->load->model('notifikasi_model');
+                $skpdRow = $skpdId ? $this->CI->db->get_where('skpd', ['id' => $skpdId])->row() : null;
+                $skpdNama = $skpdRow ? $skpdRow->nama_skpd : 'SKPD';
+                $this->CI->notifikasi_model->sendToRoles(
+                    ['admin'],
+                    'Pendaftaran Operator Baru',
+                    "Pengguna '{$insertData['nama_lengkap']}' ({$skpdNama}) mendaftar akun baru dan menunggu persetujuan.",
+                    site_url('master/user'),
+                    'info'
+                );
+            } catch (\Throwable $e) {}
+
             $msg = 'Pendaftaran berhasil! Akun Anda sedang menunggu verifikasi dan persetujuan dari Administrator BPKAD. Anda akan dapat masuk setelah akun diverifikasi.';
         } else {
             $msg = 'Pendaftaran berhasil! Akun Anda telah aktif, silakan masuk ke sistem.';
@@ -397,10 +411,31 @@ class Auth
     public function restrict($roles = NULL)
     {
         if (!$this->check()) {
+            if ($this->CI->input->is_ajax_request()) {
+                $this->CI->output->set_status_header(401)
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode([
+                        'success'   => false,
+                        'message'   => 'Sesi Anda telah berakhir. Silakan login kembali.',
+                        'logged_in' => false
+                    ]))
+                    ->_display();
+                exit;
+            }
             $this->CI->session->set_flashdata('warning', 'Silakan login terlebih dahulu.');
             redirect('login');
         }
         if ($roles !== NULL && !$this->hasRole($roles)) {
+            if ($this->CI->input->is_ajax_request()) {
+                $this->CI->output->set_status_header(403)
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode([
+                        'success' => false,
+                        'message' => 'Anda tidak memiliki hak akses.'
+                    ]))
+                    ->_display();
+                exit;
+            }
             show_error('Anda tidak memiliki hak akses ke halaman ini.', 403, 'Akses Ditolak');
         }
     }

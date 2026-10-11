@@ -83,19 +83,53 @@ class Ajax extends Auth_Controller
 
     public function notifikasi()
     {
-        $userId = $this->currentUser->id;
-        $list = $this->notifikasi_model->getForUser($userId, FALSE, 10);
+        if (!$this->currentUser) {
+            return $this->output->set_content_type('application/json')
+                ->set_output(json_encode(['unread' => 0, 'list' => [], 'logged_in' => false]));
+        }
+
+        $userId = (int) $this->currentUser->id;
+        $list = $this->notifikasi_model->getForUser($userId, FALSE, 15);
         $unread = $this->notifikasi_model->countUnread($userId);
 
-        $this->output->set_output(json_encode([
-            'unread' => $unread,
-            'list'   => $list
-        ], JSON_UNESCAPED_UNICODE));
+        $this->output->set_content_type('application/json')
+            ->set_output(json_encode([
+                'success'  => TRUE,
+                'unread'   => $unread,
+                'list'     => $list,
+                'csrfName' => $this->security->get_csrf_token_name(),
+                'csrfHash' => $this->security->get_csrf_hash()
+            ], JSON_UNESCAPED_UNICODE));
     }
 
     public function baca_notif($id)
     {
-        $this->notifikasi_model->markAsRead($id, $this->currentUser->id);
-        $this->output->set_output(json_encode(['success' => TRUE]));
+        if (!$this->currentUser) {
+            return $this->output->set_status_header(401)
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['success' => false, 'message' => 'Unauthorized']));
+        }
+
+        $userId = (int) $this->currentUser->id;
+        if ($id === 'all') {
+            $this->notifikasi_model->markAllAsRead($userId);
+        } else {
+            $this->notifikasi_model->markAsRead((int) $id, $userId);
+        }
+
+        $unread = $this->notifikasi_model->countUnread($userId);
+
+        $this->output->set_content_type('application/json')
+            ->set_output(json_encode([
+                'success'  => TRUE,
+                'unread'   => $unread,
+                'csrfName' => $this->security->get_csrf_token_name(),
+                'csrfHash' => $this->security->get_csrf_hash()
+            ]));
+    }
+
+    public function baca_semua_notif()
+    {
+        return $this->baca_notif('all');
     }
 }

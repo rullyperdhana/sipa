@@ -129,4 +129,5 @@ $route['ajax/akun_belanja/search']        = 'ajax/search_akun_belanja';
 $route['ajax/standar_harga/search']       = 'ajax/search_standar_harga';
 $route['ajax/standar_harga/detail/(:num)']= 'ajax/detail_standar_harga/$1';
 $route['ajax/notif/list']                 = 'ajax/notifikasi';
-$route['ajax/notif/read/(:num)']          = 'ajax/baca_notif/$1';
+$route['ajax/notif/read_all']             = 'ajax/baca_semua_notif';
+$route['ajax/notif/read/(:any)']          = 'ajax/baca_notif/$1';

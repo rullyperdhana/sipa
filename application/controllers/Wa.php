@@ -131,7 +131,9 @@ class Wa extends MY_Controller
                 'modul'           => $modulJudul,
                 'pesan'           => $pesan,
                 'wa_url'          => $waUrl,
-                'gateway_enabled' => !empty($settings['wa_gateway_token'])
+                'gateway_enabled' => !empty($settings['wa_gateway_token']),
+                'csrfName'        => $this->security->get_csrf_token_name(),
+                'csrfHash'        => $this->security->get_csrf_hash()
             ]));
     }
 
@@ -153,6 +155,8 @@ class Wa extends MY_Controller
         }
 
         $res = $this->whatsapp->sendViaGateway($phone, $message);
+        $res['csrfName'] = $this->security->get_csrf_token_name();
+        $res['csrfHash'] = $this->security->get_csrf_hash();
         return $this->output->set_content_type('application/json')->set_output(json_encode($res));
     }
 

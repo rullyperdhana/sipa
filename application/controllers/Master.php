@@ -422,6 +422,19 @@ class Master extends Admin_Controller
             $id = (int) $this->input->post('id');
             $this->user_model->update($id, ['is_active' => 1]);
             $this->logger->record('approve', 'user', "Persetujuan & aktivasi user ID #{$id}");
+
+            // Notifikasi selamat datang ke pengguna yang disetujui
+            try {
+                $this->load->model('notifikasi_model');
+                $this->notifikasi_model->create(
+                    $id,
+                    'Akun Anda Telah Diaktifkan',
+                    'Selamat datang di SIPA! Pendaftaran akun Anda telah disetujui dan diaktifkan oleh Administrator BPKAD.',
+                    site_url('dashboard'),
+                    'success'
+                );
+            } catch (\Throwable $e) {}
+
             $this->session->set_flashdata('success', 'Akun pengguna berhasil disetujui dan diaktifkan.');
         } elseif ($action === 'toggle_status') {
             $id = (int) $this->input->post('id');

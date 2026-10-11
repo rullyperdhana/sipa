@@ -266,17 +266,26 @@ $userRole = !empty($user->role) ? $user->role : '';
 
             <!-- Notifikasi -->
             <div class="dropdown">
-                <button class="btn btn-link position-relative" data-bs-toggle="dropdown" aria-label="Notifikasi">
-                    <i class="bi bi-bell-fill"></i>
-                    <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
+                <button class="btn btn-link position-relative p-2 text-secondary" data-bs-toggle="dropdown" aria-label="Notifikasi" id="dropdownNotifBtn">
+                    <i class="bi bi-bell-fill fs-5"></i>
+                    <span id="notif-badge" class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="display:none; font-size: 10px; padding: 3px 6px;">0</span>
                 </button>
-                <div class="dropdown-menu dropdown-menu-end notif-dropdown">
-                    <div class="dropdown-header d-flex justify-content-between">
-                        <strong>Notifikasi</strong>
-                        <small class="text-muted" id="notif-count">0 belum dibaca</small>
+                <div class="dropdown-menu dropdown-menu-end notif-dropdown shadow border-0" style="width: 360px; max-height: 480px; padding: 0;">
+                    <div class="dropdown-header d-flex justify-content-between align-items-center py-2.5 px-3 border-bottom bg-light">
+                        <div class="d-flex align-items-center gap-1.5">
+                            <i class="bi bi-bell-fill text-primary"></i>
+                            <strong class="text-dark">Notifikasi</strong>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-secondary-subtle text-secondary" id="notif-count">0 belum dibaca</span>
+                            <button type="button" class="btn btn-link btn-sm p-0 text-primary text-decoration-none fw-semibold" id="btn-read-all-notif" style="font-size: 11px; display: none;">Tandai semua dibaca</button>
+                        </div>
                     </div>
-                    <div id="notif-list" class="notif-list">
-                        <div class="text-center text-muted py-3 small">Memuat...</div>
+                    <div id="notif-list" class="notif-list" style="max-height: 360px; overflow-y: auto;">
+                        <div class="text-center text-muted py-4 small">
+                            <div class="spinner-border spinner-border-sm text-primary mb-1" role="status"></div>
+                            <div>Memuat notifikasi...</div>
+                        </div>
                     </div>
                 </div>
             </div>

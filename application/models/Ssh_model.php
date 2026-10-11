@@ -325,6 +325,22 @@ class Ssh_model extends CI_Model
             $this->logActivity($it->id, $user, $statusSebelum, 'Diajukan', "Usulan diajukan ke BPKAD melalui Surat Usulan #{$surat->nomor_surat}.");
         }
 
+        // Notifikasi ke verifikator dan admin
+        try {
+            $this->load->model('notifikasi_model');
+            $skpd = $this->db->get_where('skpd', ['id' => (int)$surat->id_skpd])->row();
+            $namaSkpd = $skpd ? $skpd->nama_skpd : 'SKPD';
+            $modulUrl = strtolower($surat->tipe);
+            $this->notifikasi_model->sendToRoles(
+                ['verifikator', 'admin'],
+                "Surat Usulan {$surat->tipe} Baru",
+                "Surat #{$surat->nomor_surat} dari {$namaSkpd} ({$itemCount} rincian item) telah diajukan dan menunggu verifikasi.",
+                site_url("{$modulUrl}/verifikasi/surat/{$id}"),
+                'info',
+                $user->id
+            );
+        } catch (\Throwable $e) {}
+
         return [
             'success' => TRUE, 
             'message' => "Surat Usulan <strong>{$surat->nomor_surat}</strong> beserta {$itemCount} rincian item berhasil dikirim ke BPKAD untuk diverifikasi."
@@ -913,6 +929,20 @@ class Ssh_model extends CI_Model
 
         $this->logActivity($id, $user, $statusSebelum, 'Diajukan', 'Usulan diajukan ke BPKAD untuk verifikasi.');
 
+        // Notifikasi ke verifikator dan admin
+        try {
+            $this->load->model('notifikasi_model');
+            $modulUrl = strtolower($existing->tipe);
+            $this->notifikasi_model->sendToRoles(
+                ['verifikator', 'admin'],
+                "Usulan {$existing->tipe} Baru",
+                "Usulan '{$existing->uraian}' dari {$existing->nama_skpd} telah diajukan untuk verifikasi.",
+                site_url("{$modulUrl}/verifikasi"),
+                'info',
+                $user->id
+            );
+        } catch (\Throwable $e) {}
+
         return ['success' => TRUE, 'message' => 'Usulan berhasil dikirim ke BPKAD untuk diverifikasi.'];
     }
 
@@ -968,6 +998,22 @@ class Ssh_model extends CI_Model
                 $this->syncStatusSurat($existing->surat_id);
             }
 
+            // Notifikasi ke pembuat usulan
+            try {
+                $this->load->model('notifikasi_model');
+                $modulUrl = strtolower($existing->tipe);
+                $detailLink = !empty($existing->surat_id) 
+                    ? site_url("{$modulUrl}/surat/detail/{$existing->surat_id}") 
+                    : site_url("{$modulUrl}/usulan");
+                $this->notifikasi_model->create(
+                    $existing->user_id,
+                    "Usulan {$existing->tipe} Disetujui",
+                    "Item '{$existing->uraian}' telah diverifikasi dan disetujui BPKAD.",
+                    $detailLink,
+                    'success'
+                );
+            } catch (\Throwable $e) {}
+
             return ['success' => TRUE, 'message' => 'Usulan berhasil disetujui dan berstatus Diverifikasi.'];
 
         } elseif ($action === 'revisi') {
@@ -990,6 +1036,22 @@ class Ssh_model extends CI_Model
                 $this->syncStatusSurat($existing->surat_id);
             }
 
+            // Notifikasi ke pembuat usulan
+            try {
+                $this->load->model('notifikasi_model');
+                $modulUrl = strtolower($existing->tipe);
+                $detailLink = !empty($existing->surat_id) 
+                    ? site_url("{$modulUrl}/surat/detail/{$existing->surat_id}") 
+                    : site_url("{$modulUrl}/usulan");
+                $this->notifikasi_model->create(
+                    $existing->user_id,
+                    "Usulan {$existing->tipe} Perlu Revisi",
+                    "Item '{$existing->uraian}' dikembalikan oleh BPKAD untuk direvisi: {$catatan}",
+                    $detailLink,
+                    'warning'
+                );
+            } catch (\Throwable $e) {}
+
             return ['success' => TRUE, 'message' => 'Usulan dikembalikan ke SKPD untuk dilakukan perbaikan/revisi.'];
 
         } elseif ($action === 'tolak') {
@@ -1011,6 +1073,22 @@ class Ssh_model extends CI_Model
             if (!empty($existing->surat_id)) {
                 $this->syncStatusSurat($existing->surat_id);
             }
+
+            // Notifikasi ke pembuat usulan
+            try {
+                $this->load->model('notifikasi_model');
+                $modulUrl = strtolower($existing->tipe);
+                $detailLink = !empty($existing->surat_id) 
+                    ? site_url("{$modulUrl}/surat/detail/{$existing->surat_id}") 
+                    : site_url("{$modulUrl}/usulan");
+                $this->notifikasi_model->create(
+                    $existing->user_id,
+                    "Usulan {$existing->tipe} Ditolak",
+                    "Item '{$existing->uraian}' ditolak oleh BPKAD: {$catatan}",
+                    $detailLink,
+                    'danger'
+                );
+            } catch (\Throwable $e) {}
 
             return ['success' => TRUE, 'message' => 'Usulan berhasil ditolak.'];
         }
@@ -1071,6 +1149,19 @@ class Ssh_model extends CI_Model
         if (!empty($existing->surat_id)) {
             $this->syncStatusSurat($existing->surat_id);
         }
+
+        // Notifikasi ke pembuat usulan
+        try {
+            $this->load->model('notifikasi_model');
+            $modulUrl = strtolower($existing->tipe);
+            $this->notifikasi_model->create(
+                $existing->user_id,
+                "Standar Harga {$existing->tipe} Ditetapkan",
+                "Item '{$existing->uraian}' telah resmi ditetapkan sebagai Standar Harga TA {$existing->tahun_anggaran}.",
+                site_url("{$modulUrl}/usulan"),
+                'success'
+            );
+        } catch (\Throwable $e) {}
 
         return ['success' => TRUE, 'message' => "Item '{$existing->uraian}' berhasil ditetapkan dan dikunci sebagai Master Data resmi."];
     }
