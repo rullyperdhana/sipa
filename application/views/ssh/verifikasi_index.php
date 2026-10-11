@@ -31,7 +31,7 @@ $stats = $summarySurat ?? $summary;
                 <div class="card-body p-2">
                     <small class="text-muted fw-semibold d-block text-uppercase">Menunggu Verifikasi</small>
                     <h3 class="mb-0 mt-1 fw-bold text-warning"><?= (int)($stats->diajukan ?? 0) ?></h3>
-                    <small class="text-muted" style="font-size:11px;">Perlu ditelaah BPKAD</small>
+                    <small class="text-muted" style="font-size:11px;">Perlu ditelaah BKAD</small>
                 </div>
             </div>
         </a>
@@ -486,7 +486,7 @@ $stats = $summarySurat ?? $summary;
                             <span class="input-group-text bg-light fw-bold">Rp</span>
                             <input type="text" class="form-control fw-bold fs-6 mask-rupiah" id="setujuiHarga" name="harga_ditetapkan" required>
                         </div>
-                        <div class="form-text small">Secara default diisi harga usulan SKPD. Ubah jika ada penyesuaian dari hasil survei BPKAD.</div>
+                        <div class="form-text small">Secara default diisi harga usulan SKPD. Ubah jika ada penyesuaian dari hasil survei BKAD.</div>
                     </div>
 
                     <div class="mb-3">

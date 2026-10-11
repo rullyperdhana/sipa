@@ -112,7 +112,7 @@ class Rkbmd extends Auth_Controller
 
         // Security / Schedule Guard: Operator SKPD dilarang bypass jadwal yang ditutup!
         if (!in_array($user->role, ['admin', 'pimpinan'], TRUE) && !$isPeriodeBuka) {
-            $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal penyusunan RKBMD <strong>TA {$thAktif}</strong> saat ini sedang <strong>DITUTUP</strong> oleh Administrator BPKAD.");
+            $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal penyusunan RKBMD <strong>TA {$thAktif}</strong> saat ini sedang <strong>DITUTUP</strong> oleh Administrator BKAD.");
             redirect("rkbmd/{$jenis}");
             return;
         }
@@ -130,7 +130,7 @@ class Rkbmd extends Auth_Controller
                 // Validasi ketat jadwal tahun yang di-submit via POST
                 if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
                     if (!$this->master_model->isPeriodeBuka($thInput)) {
-                        $this->session->set_flashdata('danger', "Akses Ditolak: Penyusunan usulan RKBMD untuk <strong>Tahun Anggaran {$thInput}</strong> sedang DITUTUP oleh Administrator BPKAD.");
+                        $this->session->set_flashdata('danger', "Akses Ditolak: Penyusunan usulan RKBMD untuk <strong>Tahun Anggaran {$thInput}</strong> sedang DITUTUP oleh Administrator BKAD.");
                         redirect("rkbmd/{$jenis}");
                         return;
                     }
@@ -190,7 +190,7 @@ class Rkbmd extends Auth_Controller
         $user = $this->currentUser;
         if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
             if (!$this->master_model->isPeriodeBuka($usulan->tahun_anggaran)) {
-                $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal penyusunan RKBMD <strong>TA {$usulan->tahun_anggaran}</strong> saat ini sedang <strong>DITUTUP</strong> oleh Administrator BPKAD. Usulan tidak dapat diubah.");
+                $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal penyusunan RKBMD <strong>TA {$usulan->tahun_anggaran}</strong> saat ini sedang <strong>DITUTUP</strong> oleh Administrator BKAD. Usulan tidak dapat diubah.");
                 redirect("rkbmd/{$jenis}/detail/{$id}");
                 return;
             }
@@ -247,7 +247,7 @@ class Rkbmd extends Auth_Controller
         $user = $this->currentUser;
         if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
             if (!$this->master_model->isPeriodeBuka($usulan->tahun_anggaran)) {
-                $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal penyusunan RKBMD <strong>TA {$usulan->tahun_anggaran}</strong> saat ini sedang <strong>DITUTUP</strong> oleh Administrator BPKAD. Berkas Excel tidak dapat diunggah.");
+                $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal penyusunan RKBMD <strong>TA {$usulan->tahun_anggaran}</strong> saat ini sedang <strong>DITUTUP</strong> oleh Administrator BKAD. Berkas Excel tidak dapat diunggah.");
                 redirect("rkbmd/{$jenis}/detail/{$id}");
                 return;
             }

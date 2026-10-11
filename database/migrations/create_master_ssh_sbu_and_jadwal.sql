@@ -53,7 +53,7 @@ SELECT 'SEMUA', 2027, 'Pengusulan Standar Satuan Harga (SSH) & Standar Biaya Umu
 WHERE NOT EXISTS (SELECT 1 FROM `standar_harga_jadwal` WHERE `tahun_anggaran` = 2027 AND `tipe` = 'SEMUA');
 
 INSERT INTO `standar_harga_jadwal` (`tipe`, `tahun_anggaran`, `nama_jadwal`, `tanggal_mulai`, `tanggal_selesai`, `status`, `keterangan`)
-SELECT 'SEMUA', 2028, 'Pengusulan Standar Satuan Harga & Biaya Umum TA 2028', '2027-01-01', '2027-12-31', 'tutup', 'Jadwal TA 2028 belum dibuka (Menunggu pembuatan/pembukaan jadwal resmi oleh BPKAD)'
+SELECT 'SEMUA', 2028, 'Pengusulan Standar Satuan Harga & Biaya Umum TA 2028', '2027-01-01', '2027-12-31', 'tutup', 'Jadwal TA 2028 belum dibuka (Menunggu pembuatan/pembukaan jadwal resmi oleh BKAD)'
 WHERE NOT EXISTS (SELECT 1 FROM `standar_harga_jadwal` WHERE `tahun_anggaran` = 2028 AND `tipe` = 'SEMUA');
 
 -- 4. Tambah Kolom Relasi Master & SIPD RI pada Tabel standar_harga_usulan (Idempotent)

@@ -271,7 +271,7 @@ class Rkbmd_model extends CI_Model
             if (isset($ci->master_model) && !$ci->master_model->isPeriodeBuka($usulan->tahun_anggaran)) {
                 return [
                     'success' => FALSE,
-                    'message' => "Jadwal penyusunan RKBMD TA {$usulan->tahun_anggaran} saat ini telah DITUTUP oleh Administrator BPKAD. Usulan tidak dapat diajukan."
+                    'message' => "Jadwal penyusunan RKBMD TA {$usulan->tahun_anggaran} saat ini telah DITUTUP oleh Administrator BKAD. Usulan tidak dapat diajukan."
                 ];
             }
         }
@@ -316,7 +316,7 @@ class Rkbmd_model extends CI_Model
     }
 
     /**
-     * Verifikasi/approve/reject usulan oleh BPKAD.
+     * Verifikasi/approve/reject usulan oleh BKAD.
      */
     public function verifikasi($usulanId, $aksi, $catatan = '')
     {

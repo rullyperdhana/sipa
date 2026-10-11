@@ -97,7 +97,7 @@ class Whatsapp
                 $body .= "• *Tahun Anggaran:* {$tahun}\n";
                 $body .= "• *Status Saat Ini:* ⚠️ *PERLU REVISI SKPD*\n\n";
                 if (!empty($catatan)) {
-                    $body .= "📝 *Catatan Verifikator BPKAD:*\n";
+                    $body .= "📝 *Catatan Verifikator BKAD:*\n";
                     $body .= "_{$catatan}_\n\n";
                 }
                 $body .= "Silakan login ke aplikasi SIPA untuk menyempurnakan data usulan tersebut:\n";
@@ -106,7 +106,7 @@ class Whatsapp
 
             case 'rkbmd_setuju':
                 $body .= "✅ *PEMBERITAHUAN USULAN DISETUJUI*\n\n";
-                $body .= "Kabar baik, usulan Perencanaan RKBMD berikut telah *DISETUJUI* oleh BPKAD:\n\n";
+                $body .= "Kabar baik, usulan Perencanaan RKBMD berikut telah *DISETUJUI* oleh BKAD:\n\n";
                 $body .= "• *Nomor Usulan:* {$nomorUsulan}\n";
                 $body .= "• *Instrumen:* {$modulJudul}\n";
                 $body .= "• *Tahun Anggaran:* {$tahun}\n";
@@ -137,7 +137,7 @@ class Whatsapp
                 if (!empty($uraian)) $body .= "• *Uraian:* {$uraian}\n";
                 $body .= "• *Status:* ⚠️ *DIREVISI*\n\n";
                 if (!empty($catatan)) {
-                    $body .= "📝 *Catatan Verifikator BPKAD:*\n";
+                    $body .= "📝 *Catatan Verifikator BKAD:*\n";
                     $body .= "_{$catatan}_\n\n";
                 }
                 $body .= "Silakan perbaiki data & berkas survey usulan melalui tautan:\n";
@@ -160,7 +160,7 @@ class Whatsapp
 
             case 'standar_diverifikasi':
                 $body .= "✅ *USULAN STANDAR HARGA DIVERIFIKASI*\n\n";
-                $body .= "Usulan Standar Harga/Biaya berikut telah selesai diverifikasi oleh Tim BPKAD:\n\n";
+                $body .= "Usulan Standar Harga/Biaya berikut telah selesai diverifikasi oleh Tim BKAD:\n\n";
                 $body .= "• *Kode Usulan:* {$nomorUsulan}\n";
                 if (!empty($uraian)) $body .= "• *Uraian:* {$uraian}\n";
                 $body .= "• *Status:* ✅ *DIVERIFIKASI (Siap Penetapan SK)*\n\n";
@@ -188,7 +188,7 @@ class Whatsapp
 
         $footer  = "━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
         $footer .= "Terima kasih atas kerja samanya.\n";
-        $footer .= "Bidang Pengelolaan Aset Daerah - BPKAD Kab. Tapin\n";
+        $footer .= "Bidang Pengelolaan Aset Daerah - BKAD Kab. Tapin\n";
         $footer .= "Waktu: " . date('d/m/Y H:i') . " WITA";
 
         return $header . $salam . $body . $footer;
@@ -206,7 +206,7 @@ class Whatsapp
             'wa_gateway_url'      => 'https://api.fonnte.com/send',
             'wa_gateway_token'    => '',
             'wa_auto_send'        => '0',
-            'wa_sender_footer'    => 'BPKAD Kabupaten Tapin'
+            'wa_sender_footer'    => 'BKAD Kabupaten Tapin'
         ];
 
         foreach ($rows as $r) {

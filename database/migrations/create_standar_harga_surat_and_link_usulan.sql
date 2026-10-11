@@ -1,6 +1,6 @@
 -- ============================================================================
 -- MODUL STANDAR SATUAN HARGA (SSH) & STANDAR BIAYA UMUM (SBU)
--- SIPA (Sistem Informasi Pengelolaan Aset) - BPKAD Kabupaten Tapin
+-- SIPA (Sistem Informasi Pengelolaan Aset) - BKAD Kabupaten Tapin
 -- Migrasi: Tabel standar_harga_surat dan Relasi surat_id pada standar_harga_usulan (AMAN & IDEMPOTENT)
 -- ============================================================================
 
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `standar_harga_surat` (
   `keterangan` TEXT DEFAULT NULL COMMENT 'Catatan tambahan pengantar dari SKPD',
   `status_proses` ENUM('Draft','Diajukan','Direvisi','Ditolak','Diverifikasi','Ditetapkan') NOT NULL DEFAULT 'Draft',
   `catatan_verifikator` TEXT DEFAULT NULL COMMENT 'Catatan verifikator atas berkas surat / kumpulan usulan',
-  `verifikator_id` INT(10) UNSIGNED DEFAULT NULL COMMENT 'ID user verifikator BPKAD',
+  `verifikator_id` INT(10) UNSIGNED DEFAULT NULL COMMENT 'ID user verifikator BKAD',
   `tgl_verifikasi` DATETIME DEFAULT NULL COMMENT 'Waktu verifikasi',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

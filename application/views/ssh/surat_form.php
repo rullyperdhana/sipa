@@ -48,7 +48,7 @@ $isEdit = ($mode ?? 'tambah') === 'edit';
         <ol class="mb-0 ps-3 text-secondary small">
             <li><strong>Langkah 1:</strong> SKPD membuat berkas dan mengunggah <strong>Surat Usulan Resmi</strong> (Format PDF bertanda tangan/stempel).</li>
             <li><strong>Langkah 2:</strong> Setelah Surat Usulan tersimpan, Anda dapat menambahkan <strong>satu atau banyak rincian item <?= $tipe ?></strong> beserta 3 bukti survey harga pasar ke dalam surat tersebut.</li>
-            <li><strong>Langkah 3:</strong> Periksa seluruh rincian usulan, lalu klik <strong>Kirim ke BPKAD</strong> untuk diverifikasi.</li>
+            <li><strong>Langkah 3:</strong> Periksa seluruh rincian usulan, lalu klik <strong>Kirim ke BKAD</strong> untuk diverifikasi.</li>
         </ol>
     </div>
 </div>

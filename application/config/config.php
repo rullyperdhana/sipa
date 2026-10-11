@@ -4,10 +4,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /*
 |--------------------------------------------------------------------------
 | KONFIGURASI APLIKASI RKBMD
-| Pemerintah Kabupaten Tapin - Badan Pengelolaan Keuangan dan Aset Daerah
+| Pemerintah Kabupaten Tapin - Badan Keuangan dan Aset Daerah
 | SIRKBMD - Sistem Informasi Rencana Kebutuhan Barang Milik Daerah
 | Versi 1.0.0
-| Dikembangkan oleh Tim IT BPKAD Tapin
+| Dikembangkan oleh Tim IT BKAD Tapin
 |--------------------------------------------------------------------------
 */
 date_default_timezone_set('Asia/Singapore');
@@ -95,7 +95,7 @@ $config['proxy_ips']        = '';
 $config['app_name']         = 'SIPA - Sistem Informasi Pengelolaan Aset';
 $config['app_version']      = '2.9.5';
 $config['app_owner']        = 'Pemerintah Kabupaten Tapin';
-$config['app_unit']         = 'Badan Pengelolaan Keuangan dan Aset Daerah (BPKAD)';
+$config['app_unit']         = 'Badan Keuangan dan Aset Daerah (BKAD)';
 $config['app_provinsi']     = 'Kalimantan Selatan';
 $config['app_kabupaten']    = 'Tapin';
 

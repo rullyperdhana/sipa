@@ -12,7 +12,7 @@
                 <i class="bi bi-plus-lg me-1"></i> Buat Usulan Baru
             </a>
             <?php else: ?>
-            <button type="button" class="btn btn-secondary shadow-sm" disabled title="Jadwal penyusunan RKBMD TA <?= (int)($thAktif ?? 2027) ?> sedang DITUTUP oleh Administrator BPKAD">
+            <button type="button" class="btn btn-secondary shadow-sm" disabled title="Jadwal penyusunan RKBMD TA <?= (int)($thAktif ?? 2027) ?> sedang DITUTUP oleh Administrator BKAD">
                 <i class="bi bi-lock-fill me-1"></i> Menunggu Jadwal Dibuka
             </button>
             <?php endif; ?>
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             <div>
                 <h6 class="mb-0 fw-bold text-dark">Jadwal Penyusunan RKBMD Ditutup</h6>
-                <div class="text-muted small">Pengusulan RKBMD untuk <strong>Tahun Anggaran <?= (int)($thAktif ?? 2027) ?></strong> saat ini belum dibuka atau telah berakhir. Menunggu pembukaan jadwal oleh BPKAD.</div>
+                <div class="text-muted small">Pengusulan RKBMD untuk <strong>Tahun Anggaran <?= (int)($thAktif ?? 2027) ?></strong> saat ini belum dibuka atau telah berakhir. Menunggu pembukaan jadwal oleh BKAD.</div>
             </div>
         </div>
         <span class="badge bg-danger px-3 py-2 fw-semibold">
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <?php if ($isItemJadwalBuka): ?>
                                     <a href="<?= site_url("rkbmd/{$jenis}/edit/{$u->id}") ?>" class="btn btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
                                     <?php else: ?>
-                                    <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Jadwal penyusunan RKBMD TA <?= (int)$u->tahun_anggaran ?> telah DITUTUP oleh BPKAD">
+                                    <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Jadwal penyusunan RKBMD TA <?= (int)$u->tahun_anggaran ?> telah DITUTUP oleh BKAD">
                                         <button class="btn btn-outline-secondary" disabled><i class="bi bi-lock-fill"></i></button>
                                     </span>
                                     <?php endif; ?>

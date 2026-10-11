@@ -2,7 +2,7 @@
  * ============================================================================
  * MODUL STANDAR SATUAN HARGA (SSH) & STANDAR BIAYA UMUM (SBU)
  * Frontend State Management, Form Validation, & API Transition Hooks
- * SIPA (Sistem Informasi Pengelolaan Aset) - BPKAD Kabupaten Tapin
+ * SIPA (Sistem Informasi Pengelolaan Aset) - BKAD Kabupaten Tapin
  * ============================================================================
  */
 
@@ -295,7 +295,7 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil Dikirim!',
-                                text: res.message || 'Usulan telah dikirim ke BPKAD untuk diverifikasi.',
+                                text: res.message || 'Usulan telah dikirim ke BKAD untuk diverifikasi.',
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(function () {
@@ -313,8 +313,8 @@
 
             if (Swal) {
                 Swal.fire({
-                    title: 'Kirim Usulan ke BPKAD?',
-                    html: `Usulan <strong>${kode}</strong> (${uraian}) akan dikirim ke verifikator BPKAD.<br><small class="text-muted">Setelah dikirim, data akan berstatus <strong>Diajukan</strong> dan terkunci dari perubahan.</small>`,
+                    title: 'Kirim Usulan ke BKAD?',
+                    html: `Usulan <strong>${kode}</strong> (${uraian}) akan dikirim ke verifikator BKAD.<br><small class="text-muted">Setelah dikirim, data akan berstatus <strong>Diajukan</strong> dan terkunci dari perubahan.</small>`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#198754',
@@ -326,7 +326,7 @@
                         confirmAction();
                     }
                 });
-            } else if (confirm(`Kirim usulan ${kode} ke BPKAD?`)) {
+            } else if (confirm(`Kirim usulan ${kode} ke BKAD?`)) {
                 confirmAction();
             }
         });

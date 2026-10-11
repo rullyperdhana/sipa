@@ -73,7 +73,7 @@ class User_model extends CI_Model
                 ]
             ],
             'verifikasi' => [
-                'label' => 'Verifikasi, Penetapan & Jadwal (Tim BPKAD / Pimpinan)',
+                'label' => 'Verifikasi, Penetapan & Jadwal (Tim BKAD / Pimpinan)',
                 'icon'  => 'bi-shield-check',
                 'items' => [
                     'verifikasi_rkbmd'   => ['label' => 'Verifikasi Usulan RKBMD', 'desc' => 'Menelaah & memverifikasi usulan RKBMD SKPD'],

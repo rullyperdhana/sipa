@@ -170,7 +170,7 @@ body {
             <ul class="feature-list">
                 <li><i class="bi bi-check-circle-fill"></i> Pengusulan & Perencanaan RKBMD</li>
                 <li><i class="bi bi-check-circle-fill"></i> Standar Satuan Harga (SSH) & SBU</li>
-                <li><i class="bi bi-check-circle-fill"></i> Verifikasi Online oleh Tim BPKAD</li>
+                <li><i class="bi bi-check-circle-fill"></i> Verifikasi Online oleh Tim BKAD</li>
                 <li><i class="bi bi-check-circle-fill"></i> Notifikasi WhatsApp Terintegrasi</li>
             </ul>
         </div>
@@ -188,8 +188,8 @@ body {
                 </div>
                 <h2 class="form-title">Pendaftaran Mandiri Ditutup</h2>
                 <p class="text-muted mt-2 mb-4" style="line-height: 1.6;">
-                    Pendaftaran akun secara mandiri saat ini sedang dinonaktifkan oleh Administrator BPKAD Kabupaten Tapin.<br><br>
-                    Untuk mendapatkan akun operator SKPD, silakan berkoordinasi langsung dengan <strong>Bidang Pengelolaan Aset BPKAD Kabupaten Tapin</strong>.
+                    Pendaftaran akun secara mandiri saat ini sedang dinonaktifkan oleh Administrator BKAD Kabupaten Tapin.<br><br>
+                    Untuk mendapatkan akun operator SKPD, silakan berkoordinasi langsung dengan <strong>Bidang Pengelolaan Aset BKAD Kabupaten Tapin</strong>.
                 </p>
                 <a href="<?= site_url('login') ?>" class="btn btn-auth" style="text-decoration:none; display:inline-block; width:auto; padding: 10px 24px;">
                     <i class="bi bi-arrow-left me-1"></i> Kembali ke Halaman Login
@@ -203,7 +203,7 @@ body {
                 <div class="alert alert-info py-2 px-3 mb-3 d-flex align-items-center">
                     <i class="bi bi-info-circle-fill me-2 fs-5"></i>
                     <div>
-                        <strong>Verifikasi Admin:</strong> Akun yang didaftarkan akan diperiksa dan disetujui oleh BPKAD sebelum dapat digunakan login.
+                        <strong>Verifikasi Admin:</strong> Akun yang didaftarkan akan diperiksa dan disetujui oleh BKAD sebelum dapat digunakan login.
                     </div>
                 </div>
             <?php endif; ?>

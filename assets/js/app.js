@@ -1,6 +1,6 @@
 /**
  * SIRKBMD - Main Application JavaScript
- * Pemerintah Kabupaten Purwakarta - BPKAD
+ * Pemerintah Kabupaten Tapin - BKAD
  */
 
 $(function () {

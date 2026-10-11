@@ -1,6 +1,6 @@
 -- ============================================================================
 -- MODUL STANDAR SATUAN HARGA (SSH) & STANDAR BIAYA UMUM (SBU)
--- SIPA (Sistem Informasi Pengelolaan Aset) - BPKAD Kabupaten Tapin
+-- SIPA (Sistem Informasi Pengelolaan Aset) - BKAD Kabupaten Tapin
 -- ============================================================================
 
 -- 1. Penyesuaian ENUM Role pada tabel users (jika belum memuat operator_skpd dan penetap)
@@ -78,7 +78,7 @@ VALUES
 INSERT INTO `standar_harga_log` (`usulan_id`, `user_id`, `role`, `status_sebelum`, `status_sesudah`, `catatan`, `created_at`)
 VALUES
 (1, 5, 'operator_skpd', NULL, 'Draft', 'Membuat usulan baru', NOW()),
-(2, 5, 'operator_skpd', 'Draft', 'Diajukan', 'Mengajukan usulan ke BPKAD', NOW()),
+(2, 5, 'operator_skpd', 'Draft', 'Diajukan', 'Mengajukan usulan ke BKAD', NOW()),
 (3, 3, 'verifikator', 'Diajukan', 'Direvisi', 'Mohon lampirkan survey harga dari minimal 3 distributor lokal resmi.', NOW()),
 (4, 3, 'verifikator', 'Diajukan', 'Diverifikasi', 'Disetujui untuk diteruskan ke penetapan harga', NOW()),
 (5, 1, 'penetap', 'Diverifikasi', 'Ditetapkan', 'Telah disahkan dan dikunci dalam SK Standar Satuan Harga', NOW());

@@ -1,6 +1,6 @@
 -- ============================================================================
 -- PEMBERSIHAN DUPLIKAT KODE BARANG PIPET TETES & WHITESPACE KODE BARANG
--- SIPA (Sistem Informasi Pengelolaan Aset) - BPKAD Kabupaten Tapin
+-- SIPA (Sistem Informasi Pengelolaan Aset) - BKAD Kabupaten Tapin
 -- ============================================================================
 
 -- 1. Bersihkan spasi di awal kode_barang jika ada

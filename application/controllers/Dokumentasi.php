@@ -112,7 +112,7 @@ class Dokumentasi extends Admin_Controller
             'app_name'           => $this->config->item('app_name') ?: 'SIPA',
             'app_version'        => $this->config->item('app_version') ?: '2.9.0',
             'app_owner'          => $this->config->item('app_owner') ?: 'Pemerintah Kabupaten Tapin',
-            'app_unit'           => $this->config->item('app_unit') ?: 'BPKAD',
+            'app_unit'           => $this->config->item('app_unit') ?: 'BKAD',
             'environment'        => defined('ENVIRONMENT') ? ENVIRONMENT : 'production',
             'base_url'           => function_exists('base_url') ? base_url() : '/',
             'ci_version'         => defined('CI_VERSION') ? CI_VERSION : '3.1.13',

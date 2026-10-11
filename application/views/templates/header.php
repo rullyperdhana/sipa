@@ -94,7 +94,7 @@ $userRole = !empty($user->role) ? $user->role : '';
         <?php endif; ?>
 
         <?php if (can_access('verifikasi_rkbmd') && in_array($userRole, ['admin', 'verifikator'])): ?>
-        <div class="nav-section">Verifikasi BPKAD</div>
+        <div class="nav-section">Verifikasi BKAD</div>
         <a href="<?= site_url('verifikasi') ?>" class="nav-link <?= $this->uri->segment(1) === 'verifikasi' ? 'active' : '' ?>">
             <i class="bi bi-check2-square"></i> <span>Verifikasi Usulan</span>
         </a>
@@ -204,12 +204,12 @@ $userRole = !empty($user->role) ? $user->role : '';
         <a href="<?= site_url('dokumentasi') ?>" class="text-decoration-none text-muted" title="Buka Catatan Rilis & Dokumentasi Sistem">
             <small class="d-inline-flex align-items-center gap-1">
                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-0.5">v<?= $this->config->item('app_version') ?: '2.9.0' ?></span>
-                <span>&copy; BPKAD <?= date('Y') ?></span>
+                <span>&copy; BKAD <?= date('Y') ?></span>
                 <i class="bi bi-info-circle ms-0.5"></i>
             </small>
         </a>
         <?php else: ?>
-        <small>v<?= $this->config->item('app_version') ?: '2.9.0' ?> &copy; BPKAD <?= date('Y') ?></small>
+        <small>v<?= $this->config->item('app_version') ?: '2.9.0' ?> &copy; BKAD <?= date('Y') ?></small>
         <?php endif; ?>
     </div>
 </aside>

@@ -429,7 +429,7 @@ class Master extends Admin_Controller
                 $this->notifikasi_model->create(
                     $id,
                     'Akun Anda Telah Diaktifkan',
-                    'Selamat datang di SIPA! Pendaftaran akun Anda telah disetujui dan diaktifkan oleh Administrator BPKAD.',
+                    'Selamat datang di SIPA! Pendaftaran akun Anda telah disetujui dan diaktifkan oleh Administrator BKAD.',
                     site_url('dashboard'),
                     'success'
                 );

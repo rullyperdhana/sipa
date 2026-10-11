@@ -300,7 +300,7 @@ body {
                 SKPD diimbau segera masuk ke sistem dan mengunggah berkas surat usulan resmi sebelum batas waktu berakhir.
             </div>
             <div class="d-none d-md-block text-secondary">
-                BPKAD Kabupaten Tapin
+                BKAD Kabupaten Tapin
             </div>
         </div>
     </div>
@@ -318,7 +318,7 @@ body {
             <ul class="feature-list">
                 <li><i class="bi bi-check-circle-fill"></i> Pengadaan, Pemeliharaan, Pemanfaatan</li>
                 <li><i class="bi bi-check-circle-fill"></i> Pemindahtanganan & Penghapusan</li>
-                <li><i class="bi bi-check-circle-fill"></i> Verifikasi Online oleh BPKAD</li>
+                <li><i class="bi bi-check-circle-fill"></i> Verifikasi Online oleh BKAD</li>
                 <li><i class="bi bi-check-circle-fill"></i> Rekap & Cetak Laporan Otomatis</li>
             </ul>
         </div>
@@ -329,7 +329,7 @@ body {
 
     <div class="login-form">
         <h2 class="form-title">Masuk Sistem</h2>
-        <p class="form-subtitle">Silakan masuk dengan akun yang telah diberikan oleh administrator BPKAD.</p>
+        <p class="form-subtitle">Silakan masuk dengan akun yang telah diberikan oleh administrator BKAD.</p>
 
         <?php if ($msg = $this->session->flashdata('danger')): ?>
             <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i><?= $msg ?></div>
@@ -401,12 +401,12 @@ body {
             <?php if (!empty($registration_enabled)): ?>
                 Belum punya akun? <a href="<?= site_url('register') ?>" class="text-primary fw-semibold text-decoration-none">Daftar di sini</a>
             <?php else: ?>
-                <span>Pendaftaran akun mandiri ditutup. Hubungi administrator BPKAD.</span>
+                <span>Pendaftaran akun mandiri ditutup. Hubungi administrator BKAD.</span>
             <?php endif; ?>
         </div>
 
         <div class="text-center mt-4 small text-muted">
-            Butuh bantuan? Hubungi administrator BPKAD Kabupaten Tapin.
+            Butuh bantuan? Hubungi administrator BKAD Kabupaten Tapin.
             <div class="mt-1 opacity-75">v<?= $this->config->item('app_version') ?> &copy; <?= date('Y') ?></div>
         </div>
     </div>

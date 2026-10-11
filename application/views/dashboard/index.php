@@ -301,7 +301,7 @@
         <div class="card dash-card kpi-gradient-warning h-100 p-3">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <span class="text-white-50 text-uppercase fw-semibold small d-block">Menunggu Verifikasi BPKAD</span>
+                    <span class="text-white-50 text-uppercase fw-semibold small d-block">Menunggu Verifikasi BKAD</span>
                     <h2 class="display-6 fw-bold mb-1 mt-1 text-white"><?= number_format($totalAntreanVerif) ?></h2>
                     <small class="text-white-50">
                         RKBMD: <strong><?= number_format(array_sum(array_column($rekap,'diajukan'))) ?></strong> &bull; SSH/SBU: <strong><?= number_format($rekapStandar['SSH']['diajukan'] + $rekapStandar['SBU']['diajukan']) ?></strong>

@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Migration: Penambahan Status 'Ditolak' pada Modul SSH dan SBU
--- Sistem Informasi Pengelolaan Aset (SIPA) - BPKAD Kabupaten Tapin
+-- Sistem Informasi Pengelolaan Aset (SIPA) - BKAD Kabupaten Tapin
 -- ============================================================================
 
 ALTER TABLE `standar_harga_usulan` 

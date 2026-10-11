@@ -11,7 +11,7 @@ $canEdit = in_array($usulan->status, ['draft','revisi']) && in_array($this->auth
             <div>
                 <h6 class="mb-1"><i class="bi bi-send-check"></i> Submit ke Verifikator</h6>
                 <small class="text-muted">
-                    Setelah disubmit, usulan tidak dapat diedit kecuali diminta revisi oleh BPKAD.
+                    Setelah disubmit, usulan tidak dapat diedit kecuali diminta revisi oleh BKAD.
                     Pastikan semua data sudah benar.
                 </small>
             </div>
@@ -37,7 +37,7 @@ window.addEventListener('load', function() {
         Swal.fire({
             icon: 'question',
             title: 'Submit Usulan?',
-            html: 'Usulan <strong><?= e($usulan->nomor_usulan) ?></strong> akan diteruskan ke BPKAD untuk diverifikasi.<br>Anda tidak akan dapat mengedit lagi setelah submit.',
+            html: 'Usulan <strong><?= e($usulan->nomor_usulan) ?></strong> akan diteruskan ke BKAD untuk diverifikasi.<br>Anda tidak akan dapat mengedit lagi setelah submit.',
             showCancelButton: true,
             confirmButtonText: 'Ya, Submit',
             cancelButtonText: 'Batal',

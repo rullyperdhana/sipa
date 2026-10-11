@@ -149,7 +149,7 @@ body {
             <ul class="feature-list">
                 <li><i class="bi bi-check-circle-fill"></i> Pengadaan, Pemeliharaan, Pemanfaatan</li>
                 <li><i class="bi bi-check-circle-fill"></i> Pemindahtanganan & Penghapusan</li>
-                <li><i class="bi bi-check-circle-fill"></i> Verifikasi Online oleh BPKAD</li>
+                <li><i class="bi bi-check-circle-fill"></i> Verifikasi Online oleh BKAD</li>
                 <li><i class="bi bi-check-circle-fill"></i> Rekap & Cetak Laporan Otomatis</li>
             </ul>
         </div>

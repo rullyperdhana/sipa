@@ -28,7 +28,7 @@ $role = $this->currentUser->role ?? '';
             <i class="bi bi-file-earmark-plus-fill me-1"></i> Buat Usulan Baru (Upload Surat)
         </a>
         <?php else: ?>
-        <button type="button" class="btn btn-secondary shadow-sm" disabled title="Jadwal pengusulan saat ini ditutup / belum dibuka oleh BPKAD">
+        <button type="button" class="btn btn-secondary shadow-sm" disabled title="Jadwal pengusulan saat ini ditutup / belum dibuka oleh BKAD">
             <i class="bi bi-lock-fill me-1"></i> Menunggu Jadwal Dibuka
         </button>
         <?php endif; ?>
@@ -110,7 +110,7 @@ $role = $this->currentUser->role ?? '';
             </div>
             <div>
                 <h6 class="mb-0 fw-bold text-dark">Pengusulan Ditutup / Menunggu Jadwal Resmi</h6>
-                <div class="text-muted small">Tahapan pengusulan <?= $tipe ?> saat ini belum dibuka atau telah berakhir. Menunggu pembuatan/pembukaan jadwal resmi oleh BPKAD Kabupaten Tapin.</div>
+                <div class="text-muted small">Tahapan pengusulan <?= $tipe ?> saat ini belum dibuka atau telah berakhir. Menunggu pembuatan/pembukaan jadwal resmi oleh BKAD Kabupaten Tapin.</div>
             </div>
         </div>
         <span class="badge bg-danger px-3 py-2 fw-semibold">
@@ -172,7 +172,7 @@ $role = $this->currentUser->role ?? '';
             <div class="card-body p-2">
                 <small class="text-muted fw-semibold d-block text-uppercase" style="font-size:11px;">Diverifikasi</small>
                 <h3 class="mb-0 mt-1 fw-bold text-primary"><?= (int)($stats->diverifikasi ?? 0) ?></h3>
-                <small class="text-muted" style="font-size:11px;">Disetujui BPKAD</small>
+                <small class="text-muted" style="font-size:11px;">Disetujui BKAD</small>
             </div>
         </div>
     </div>

@@ -68,7 +68,7 @@ class Skpd_Controller extends Auth_Controller
 }
 
 /**
- * Controller khusus Verifikator BPKAD.
+ * Controller khusus Verifikator BKAD.
  */
 class Verifikator_Controller extends Auth_Controller
 {

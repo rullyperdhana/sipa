@@ -89,7 +89,7 @@
                     <!-- Footer Pesan -->
                     <div class="mb-3">
                         <label class="form-label small fw-semibold">Teks Kaki Pengirim Resmi (Footer)</label>
-                        <input type="text" name="wa_sender_footer" class="form-control" value="<?= e($settings['wa_sender_footer'] ?? 'BPKAD Kabupaten Tapin') ?>">
+                        <input type="text" name="wa_sender_footer" class="form-control" value="<?= e($settings['wa_sender_footer'] ?? 'BKAD Kabupaten Tapin') ?>">
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-4">
@@ -141,7 +141,7 @@
                 <ul class="ps-3 mb-0 vstack gap-1">
                     <li>Nomor WhatsApp operator SKPD dapat didaftarkan pada menu <a href="<?= site_url('master/user') ?>" class="fw-semibold">Manajemen Pengguna</a>.</li>
                     <li>Jika user belum mengisi nomor WA pribadi, sistem otomatis menggunakan nomor telepon dinas dari tabel SKPD.</li>
-                    <li>Format pesan menyertakan nomor usulan, catatan perbaikan BPKAD, serta tautan langsung untuk mempercepat respon SKPD.</li>
+                    <li>Format pesan menyertakan nomor usulan, catatan perbaikan BKAD, serta tautan langsung untuk mempercepat respon SKPD.</li>
                 </ul>
             </div>
         </div>
@@ -177,11 +177,11 @@ window.addEventListener('load', function() {
             msg += "Terdapat usulan yang memerlukan perbaikan/revisi:\n";
             msg += "• *Nomor Usulan:* TEST-2026-0001\n";
             msg += "• *Status:* ⚠️ *PERLU REVISI SKPD*\n\n";
-            msg += "📝 *Catatan Verifikator BPKAD:*\n";
+            msg += "📝 *Catatan Verifikator BKAD:*\n";
             msg += "_Mohon lengkapi berkas survey harga pasar dan perbaiki spesifikasi teknis._\n\n";
         } else if (scn === 'setuju') {
             msg += "✅ *PEMBERITAHUAN USULAN DISETUJUI*\n\n";
-            msg += "Usulan *TEST-2026-0001* telah selesai diverifikasi dan *DISETUJUI* oleh BPKAD.\n\n";
+            msg += "Usulan *TEST-2026-0001* telah selesai diverifikasi dan *DISETUJUI* oleh BKAD.\n\n";
         } else {
             msg += "🎉 *PENETAPAN RESMI STANDAR HARGA*\n\n";
             msg += "Usulan Standar Harga telah *RESMI DITETAPKAN* menjadi Master Katalog Daerah Kab. Tapin.\n\n";
@@ -189,7 +189,7 @@ window.addEventListener('load', function() {
 
         msg += "Silakan login ke aplikasi SIPA:\n👉 <?= site_url('login') ?>\n\n";
         msg += "━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-        msg += "Bidang Pengelolaan Aset Daerah - BPKAD Kab. Tapin";
+        msg += "Bidang Pengelolaan Aset Daerah - BKAD Kab. Tapin";
 
         const url = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + encodeURIComponent(msg);
         window.open(url, '_blank');

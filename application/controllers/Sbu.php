@@ -106,7 +106,7 @@ class Sbu extends Auth_Controller
 
         $isJadwalBuka = $this->ssh_model->isJadwalBuka($this->tipe, $thAktif);
         if (!in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE) && !$isJadwalBuka) {
-            $this->session->set_flashdata('warning', "Pengusulan {$this->moduleTitle} untuk TA {$thAktif} saat ini belum dibuka atau telah ditutup. Silakan menunggu pembuatan/pembukaan jadwal pengusulan oleh BPKAD.");
+            $this->session->set_flashdata('warning', "Pengusulan {$this->moduleTitle} untuk TA {$thAktif} saat ini belum dibuka atau telah ditutup. Silakan menunggu pembuatan/pembukaan jadwal pengusulan oleh BKAD.");
             redirect("{$this->prefixUrl}/usulan");
             return;
         }
@@ -302,7 +302,7 @@ class Sbu extends Auth_Controller
     }
 
     /**
-     * Kirim Seluruh Usulan dalam 1 Surat ke BPKAD
+     * Kirim Seluruh Usulan dalam 1 Surat ke BKAD
      */
     public function surat_kirim($id)
     {
@@ -435,7 +435,7 @@ class Sbu extends Auth_Controller
         // Pengecekan Jadwal Pengusulan Aktif (Khusus role SKPD)
         $isJadwalBuka = $this->ssh_model->isJadwalBuka($this->tipe, $thAktif);
         if (!in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE) && !$isJadwalBuka) {
-            $this->session->set_flashdata('warning', "Pengusulan {$this->moduleTitle} untuk TA {$thAktif} saat ini belum dibuka atau telah ditutup. Silakan menunggu pembuatan/pembukaan jadwal pengusulan oleh BPKAD.");
+            $this->session->set_flashdata('warning', "Pengusulan {$this->moduleTitle} untuk TA {$thAktif} saat ini belum dibuka atau telah ditutup. Silakan menunggu pembuatan/pembukaan jadwal pengusulan oleh BKAD.");
             redirect("{$this->prefixUrl}/usulan");
             return;
         }
@@ -478,7 +478,7 @@ class Sbu extends Auth_Controller
 
             $thPost = !empty($post['tahun_anggaran']) ? (int)$post['tahun_anggaran'] : $thAktif;
             if (!in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE) && !$this->ssh_model->isJadwalBuka($this->tipe, $thPost)) {
-                $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal pengusulan {$this->moduleTitle} untuk TA {$thPost} sedang DITUTUP oleh Administrator BPKAD.");
+                $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal pengusulan {$this->moduleTitle} untuk TA {$thPost} sedang DITUTUP oleh Administrator BKAD.");
                 redirect("{$this->prefixUrl}/surat/detail/{$suratId}");
                 return;
             }
@@ -588,7 +588,7 @@ class Sbu extends Auth_Controller
         // Security / Schedule Guard: Operator SKPD dilarang edit usulan pada jadwal yang ditutup
         $thUsulan = !empty($item->tahun_anggaran) ? (int)$item->tahun_anggaran : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027);
         if (!in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE) && !$this->ssh_model->isJadwalBuka($this->tipe, $thUsulan)) {
-            $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal pengusulan {$this->moduleTitle} TA {$thUsulan} saat ini sedang DITUTUP oleh Administrator BPKAD. Usulan tidak dapat diubah.");
+            $this->session->set_flashdata('danger', "Akses Ditolak: Jadwal pengusulan {$this->moduleTitle} TA {$thUsulan} saat ini sedang DITUTUP oleh Administrator BKAD. Usulan tidak dapat diubah.");
             redirect("{$this->prefixUrl}/usulan");
             return;
         }

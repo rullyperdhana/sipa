@@ -351,7 +351,7 @@ $progressPercent = ($totalItems > 0) ? round(($sudahDiproses / $totalItems) * 10
                             <span class="input-group-text bg-light fw-bold">Rp</span>
                             <input type="text" name="harga_ditetapkan" id="inputHargaDitetapkan" class="form-control fw-bold fs-6 mask-rupiah" placeholder="0">
                         </div>
-                        <div class="form-text small text-muted">Sesuaikan jika ada penyesuaian dari hasil survei BPKAD.</div>
+                        <div class="form-text small text-muted">Sesuaikan jika ada penyesuaian dari hasil survei BKAD.</div>
                     </div>
 
                     <!-- Catatan Verifikator -->

@@ -243,7 +243,7 @@ class Laporan extends Auth_Controller
     }
 
     /**
-     * Lembar Cetak Rekapitulasi Resmi Pemerintah Kabupaten Tapin & BPKAD
+     * Lembar Cetak Rekapitulasi Resmi Pemerintah Kabupaten Tapin & BKAD
      */
     public function cetak()
     {

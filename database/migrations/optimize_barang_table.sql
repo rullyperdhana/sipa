@@ -1,6 +1,6 @@
 -- ============================================================================
 -- OPTIMASI INDEKS TABEL BARANG UNTUK PERFORMA TINGGI (AMAN & IDEMPOTENT)
--- SIPA (Sistem Informasi Pengelolaan Aset) - BPKAD Kabupaten Tapin
+-- SIPA (Sistem Informasi Pengelolaan Aset) - BKAD Kabupaten Tapin
 -- ============================================================================
 
 DROP PROCEDURE IF EXISTS `AddIndexIfNotExists`;

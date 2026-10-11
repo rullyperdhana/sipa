@@ -21,7 +21,7 @@
 <div class="alert alert-<?= $usulan->status === 'ditolak' ? 'danger' : ($usulan->status === 'revisi' ? 'warning' : 'info') ?> d-flex gap-3">
     <i class="bi bi-chat-left-text-fill fs-4"></i>
     <div>
-        <strong>Catatan Verifikator BPKAD:</strong>
+        <strong>Catatan Verifikator BKAD:</strong>
         <div class="mt-1"><?= nl2br(e($usulan->catatan_verifikator)) ?></div>
         <?php if ($usulan->verified_at): ?><small class="text-muted">Diverifikasi: <?= tanggal_id($usulan->verified_at) ?></small><?php endif; ?>
     </div>

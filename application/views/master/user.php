@@ -193,7 +193,7 @@
                             <select name="role" id="u_role" class="form-select" required>
                                 <option value="admin">Admin (Akses Penuh)</option>
                                 <option value="skpd" selected>Operator SKPD</option>
-                                <option value="verifikator">Verifikator BPKAD</option>
+                                <option value="verifikator">Verifikator BKAD</option>
                                 <option value="penetap">Penetap Standar Harga</option>
                                 <option value="pimpinan">Pimpinan</option>
                             </select>
@@ -353,7 +353,7 @@
                             <input class="form-check-input" type="checkbox" role="switch" name="registration_require_approval" id="set_reg_approval" value="1" <?= (!empty($reg_settings['registration_require_approval']) && $reg_settings['registration_require_approval'] === '1') ? 'checked' : '' ?>>
                             <label class="form-check-label fw-bold" for="set_reg_approval">Wajib Verifikasi & Persetujuan Admin</label>
                         </div>
-                        <small class="text-muted">Akun baru yang mendaftar mandiri akan berstatus <em>Nonaktif / Menunggu Verifikasi</em> sampai disetujui oleh Administrator BPKAD (Sangat Disarankan untuk Keamanan).</small>
+                        <small class="text-muted">Akun baru yang mendaftar mandiri akan berstatus <em>Nonaktif / Menunggu Verifikasi</em> sampai disetujui oleh Administrator BKAD (Sangat Disarankan untuk Keamanan).</small>
                     </div>
 
                     <div class="mb-3">
@@ -486,7 +486,7 @@ window.addEventListener('load', function() {
                 'laporan'
             ]);
         } else if (val === 'verifikator') {
-            // Preset Verifikator BPKAD
+            // Preset Verifikator BKAD
             setPresetPermissions([
                 'verifikasi_rkbmd',
                 'verifikasi_standar',
@@ -584,16 +584,16 @@ window.addEventListener('load', function() {
             pesan = "🏛️ *PEMBERITAHUAN SIPA KABUPATEN TAPIN*\n" +
                     "----------------------------------------\n" +
                     "Yth. *" + nama + "* (" + skpd + ")\n\n" +
-                    "Akun Anda pada sistem SIPA telah *AKTIF* dan diverifikasi oleh Administrator BPKAD Kabupaten Tapin.\n\n" +
+                    "Akun Anda pada sistem SIPA telah *AKTIF* dan diverifikasi oleh Administrator BKAD Kabupaten Tapin.\n\n" +
                     "Silakan masuk ke aplikasi melalui:\n" +
                     "👉 https://sipa.bkadtapinkab.online/login\n\n" +
-                    "_Pemberitahuan resmi BPKAD Kabupaten Tapin_";
+                    "_Pemberitahuan resmi BKAD Kabupaten Tapin_";
         } else {
             pesan = "🏛️ *PEMBERITAHUAN SIPA KABUPATEN TAPIN*\n" +
                     "----------------------------------------\n" +
                     "Yth. *" + nama + "* (" + skpd + ")\n\n" +
-                    "Pendaftaran akun Anda pada sistem SIPA sedang dalam proses verifikasi oleh Administrator BPKAD Kabupaten Tapin.\n\n" +
-                    "_Pemberitahuan resmi BPKAD Kabupaten Tapin_";
+                    "Pendaftaran akun Anda pada sistem SIPA sedang dalam proses verifikasi oleh Administrator BKAD Kabupaten Tapin.\n\n" +
+                    "_Pemberitahuan resmi BKAD Kabupaten Tapin_";
         }
 
         if (window.SipaWa && typeof window.SipaWa.open === 'function') {

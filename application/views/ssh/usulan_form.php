@@ -48,7 +48,7 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
     <div class="d-flex align-items-start gap-2">
         <i class="bi bi-exclamation-triangle-fill fs-5 text-warning flex-shrink-0 mt-1"></i>
         <div>
-            <h6 class="alert-heading fw-bold mb-1">Catatan Koreksi dari Verifikator BPKAD:</h6>
+            <h6 class="alert-heading fw-bold mb-1">Catatan Koreksi dari Verifikator BKAD:</h6>
             <p class="mb-0"><?= nl2br(e($item->catatan_verifikator)) ?></p>
             <small class="text-muted mt-1 d-block">Silakan perbaiki data di bawah ini, simpan, lalu klik tombol <strong>Kirim Ulang</strong> pada halaman daftar usulan.</small>
         </div>
@@ -290,7 +290,7 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                         <textarea class="form-control" id="spesifikasi" name="spesifikasi" rows="4" 
                                   placeholder="<?= $isSbu ? 'Tingkat pendidikan minimal, sertifikasi keahlian, durasi/jam kerja, kapasitas tempat, dasar regulasi PMK/Perbup terkait...' : 'Rincian merek, tipe, kapasitas, dimensi, daya listrik, bahan, standar SNI, atau detail teknis barang...' ?>" 
                                   required><?= $isEdit ? e($item->spesifikasi) : '' ?></textarea>
-                        <div class="form-text">Rincian spesifikasi teknis yang jelas mempermudah dan mempercepat persetujuan verifikator BPKAD.</div>
+                        <div class="form-text">Rincian spesifikasi teknis yang jelas mempermudah dan mempercepat persetujuan verifikator BKAD.</div>
                         <div class="invalid-feedback">Spesifikasi teknis wajib diisi.</div>
                     </div>
 

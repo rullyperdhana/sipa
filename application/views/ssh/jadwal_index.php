@@ -34,7 +34,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
         <strong>Aturan Pembukaan Jadwal Pengusulan:</strong>
         <ul class="mb-0 ps-3 mt-1">
             <li>SKPD hanya dapat membuat dan mengirim usulan <?= $tipe ?> baru jika terdapat jadwal pengusulan yang berstatus <strong>Buka</strong> dan tanggal saat ini berada dalam rentang tanggal mulai s.d. selesai.</li>
-            <li>Jika jadwal berstatus <strong>Tutup</strong>, tombol pengusulan bagi SKPD akan terkunci otomatis dan berstatus <em>"Menunggu Pembuatan Jadwal oleh BPKAD"</em>.</li>
+            <li>Jika jadwal berstatus <strong>Tutup</strong>, tombol pengusulan bagi SKPD akan terkunci otomatis dan berstatus <em>"Menunggu Pembuatan Jadwal oleh BKAD"</em>.</li>
             <li>Administrator dan Verifikator dapat membuka atau menutup jadwal sewaktu-waktu sesuai tahapan penganggaran daerah.</li>
         </ul>
     </div>

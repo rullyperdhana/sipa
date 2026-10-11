@@ -1,14 +1,14 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
-### Pemerintah Kabupaten Tapin &bull; BPKAD
+### Pemerintah Kabupaten Tapin &bull; BKAD
 
 [![Version](https://img.shields.io/badge/version-2.9.4-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Bootstrap](https://img.shields.io/badge/Frontend-Bootstrap%205.3-7952B3.svg?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
-[![License](https://img.shields.io/badge/License-Proprietary%20%2F%20BPKAD%20Tapin-green.svg)](#)
+[![License](https://img.shields.io/badge/License-Proprietary%20%2F%20BKAD%20Tapin-green.svg)](#)
 
-**SIPA** (Sistem Informasi Pengelolaan Aset) adalah platform web terpadu milik **Badan Pengelolaan Keuangan dan Aset Daerah (BPKAD) Pemerintah Kabupaten Tapin** yang dirancang untuk mengelola siklus perencanaan aset daerah (RKBMD), standarisasi harga belanja fisik (SSH), standarisasi biaya operasional dan tarif jasa (SBU), penjadwalan periode pengusulan standar harga, katalog master TA 2027, serta integrasi referensi rekening belanja daerah sesuai ketentuan **SIPD RI (Permendagri No. 90 Tahun 2019 dan Kepmendagri No. 050-5888)**.
+**SIPA** (Sistem Informasi Pengelolaan Aset) adalah platform web terpadu milik **Badan Keuangan dan Aset Daerah (BKAD) Pemerintah Kabupaten Tapin** yang dirancang untuk mengelola siklus perencanaan aset daerah (RKBMD), standarisasi harga belanja fisik (SSH), standarisasi biaya operasional dan tarif jasa (SBU), penjadwalan periode pengusulan standar harga, katalog master TA 2027, serta integrasi referensi rekening belanja daerah sesuai ketentuan **SIPD RI (Permendagri No. 90 Tahun 2019 dan Kepmendagri No. 050-5888)**.
 
 ---
 
@@ -42,7 +42,7 @@ Standarisasi harga satuan barang fisik dan material baru:
 - **Formulir Khusus SSH:** Input barang fisik, perlengkapan kantor, material bangunan, kendaraan dinas, alat kesehatan.
 - **Alur 6 Tahapan Status:** `Draft` &rarr; `Diajukan` &rarr; `Direvisi` / `Ditolak` &rarr; `Diverifikasi` &rarr; `Ditetapkan`.
 - **Row-Level Security (RLS):** SKPD hanya dapat melihat dan mengelola usulannya sendiri saat berstatus `Draft` atau `Direvisi`. Data terkunci otomatis saat berstatus `Diajukan`, `Ditolak`, `Diverifikasi`, atau `Ditetapkan`.
-- **Verifikasi BPKAD:** Tim verifikator dapat menyetujui, meminta revisi ke SKPD, atau menolak usulan dengan wajib mencantumkan alasan penolakan.
+- **Verifikasi BKAD:** Tim verifikator dapat menyetujui, meminta revisi ke SKPD, atau menolak usulan dengan wajib mencantumkan alasan penolakan.
 - **Penetapan Harga:** Pimpinan/Penetap menetapkan harga final dan menerbitkan surat keputusan standar satuan harga.
 
 ### 3. Modul Standar Biaya Umum (SBU)
@@ -58,10 +58,10 @@ Standarisasi pos pengeluaran non-fisik dan tarif operasional:
 - **Pencarian Cepat & Filter:** Fulltext search dan filter kategori multi-kriteria.
 - **Tombol Cepat "Usulkan":** SKPD dapat langsung mengajukan usulan penyesuaian dari baris katalog master.
 
-### 5. Modul Penjadwalan Pengusulan Standar Harga (Jadwal BPKAD)
-- **Kontrol Periode Terpusat:** BPKAD dapat membuka dan menutup jadwal pengusulan SSH & SBU per tahun anggaran (`/ssh/jadwal` dan `/sbu/jadwal`).
-- **Mekanisme Penguncian Usulan:** Jika jadwal belum dibuka atau telah berakhir, formulir dan tombol tambah usulan otomatis terkunci (*disabled*) dengan keterangan *"Menunggu Pembuatan Jadwal oleh BPKAD"*.
-- **Banner Status Dinamis:** Menampilkan status jadwal aktif (Buka/Tutup), batas tanggal mulai-selesai, dan catatan BPKAD pada halaman usulan SKPD.
+### 5. Modul Penjadwalan Pengusulan Standar Harga (Jadwal BKAD)
+- **Kontrol Periode Terpusat:** BKAD dapat membuka dan menutup jadwal pengusulan SSH & SBU per tahun anggaran (`/ssh/jadwal` dan `/sbu/jadwal`).
+- **Mekanisme Penguncian Usulan:** Jika jadwal belum dibuka atau telah berakhir, formulir dan tombol tambah usulan otomatis terkunci (*disabled*) dengan keterangan *"Menunggu Pembuatan Jadwal oleh BKAD"*.
+- **Banner Status Dinamis:** Menampilkan status jadwal aktif (Buka/Tutup), batas tanggal mulai-selesai, dan catatan BKAD pada halaman usulan SKPD.
 - **One-Click Status Toggle:** Kemudahan verifikator/admin mengubah status aktifitas jadwal secara instan.
 
 ### 6. Interkoneksi Data Komprehensif & Otomatisasi Cerdas
@@ -70,7 +70,7 @@ Standarisasi pos pengeluaran non-fisik dan tarif operasional:
 - **Penyelarasan Kategori Barang & Jasa:** Dropdown kategori otomatis memuat klasifikasi aset BMD resmi (*Bahan & Persediaan Habis Pakai*, *Peralatan dan Mesin*, *Gedung dan Bangunan*, *Jalan, Irigasi dan Jaringan*, *Aset Tetap Lainnya*, *Tanah*, dll.) dan langsung ter-pilih otomatis (*auto-selected*) saat memilih item dari katalog master 2027.
 - **Otomatisasi Input Form:** Memilih item master otomatis mengisi spesifikasi teknis, satuan, kategori, akun belanja SIPD RI, serta menampilkan harga dasar 2027 sebagai acuan.
 - **Komparasi Harga Otomatis:** Perhitungan selisih dan persentase perubahan harga antara usulan SKPD terhadap harga acuan master secara real-time.
-- **Sinkronisasi Otomatis ke Master:** Saat usulan disetujui dan ditetapkan oleh BPKAD, sistem otomatis memperbarui atau menambahkan item baru ke katalog `ref_standar_harga` untuk tahun anggaran berikutnya.
+- **Sinkronisasi Otomatis ke Master:** Saat usulan disetujui dan ditetapkan oleh BKAD, sistem otomatis memperbarui atau menambahkan item baru ke katalog `ref_standar_harga` untuk tahun anggaran berikutnya.
 
 ### 7. Modul Master Referensi Akun Belanja (SIPD RI)
 Referensi kodefikasi rekening belanja terintegrasi SIPD RI:
@@ -106,17 +106,17 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
   - **Tab 3: Matriks Kepatuhan SKPD:** Monitoring partisipasi dan kepatuhan 66 SKPD se-Kabupaten Tapin dengan status (*Lengkap*, *Sebagian*, *Belum Ada Usulan*).
 - **Ekspor & Cetak Laporan Resmi:**
   - Ekspor Spreadsheet Excel/CSV per modul (`/laporan/export/{modul}/excel`).
-  - Lembar cetak laporan resmi ber-kop Pemerintah Kabupaten Tapin & BPKAD (`/laporan/cetak`) siap ditandatangani Kepala BPKAD.
+  - Lembar cetak laporan resmi ber-kop Pemerintah Kabupaten Tapin & BKAD (`/laporan/cetak`) siap ditandatangani Kepala BKAD.
 
 ### 11. Modul Integrasi WhatsApp & Notifikasi Cepat Operator (`/wa`)
 - **Pemberitahuan 1-Klik:** Tombol aksi langsung WhatsApp pada lembar verifikasi RKBMD (`/verifikasi/detail`) dan verifikasi Standar Harga (`/ssh/verifikasi` & `/sbu/verifikasi`).
-- **Format Pesan Kedinasan Otomatis (Markdown WA):** Otomatis menyusun kop instansi resmi BPKAD Kab. Tapin, nama operator/SKPD, nomor usulan, status usulan (⚠️ *Perlu Perbaikan*, ✅ *Selesai / Disetujui*, ❌ *Ditolak*), catatan verifikator, serta tautan langsung untuk perbaikan data.
+- **Format Pesan Kedinasan Otomatis (Markdown WA):** Otomatis menyusun kop instansi resmi BKAD Kab. Tapin, nama operator/SKPD, nomor usulan, status usulan (⚠️ *Perlu Perbaikan*, ✅ *Selesai / Disetujui*, ❌ *Ditolak*), catatan verifikator, serta tautan langsung untuk perbaikan data.
 - **Pencarian Nomor Kontak Cerdas:** Mengambil nomor WhatsApp akun pengguna operator SKPD secara otomatis (`users.no_wa`) dengan fallback ke nomor kontak dinas SKPD (`skpd.telepon`).
 - **Modal Interaktif Notifikasi WhatsApp Global (`templates/wa_modal`):** Memungkinkan verifikator memeriksa nomor tujuan, mengedit isi pesan leluasa sebelum dikirim, menyalin teks, atau langsung membuka WhatsApp Web / Desktop / HP.
 - **Dua Mode Integrasi:** Mode *Direct Click-to-Chat* (100% gratis tanpa biaya gateway pihak ketiga) dan mode *WhatsApp Gateway API* (opsional latar belakang via Fonnte / Webhook).
 
 ### 12. Modul Pendaftaran Mandiri & Persetujuan Akun Operator (`/register`)
-- **Kendali Penuh Administrator (Buka/Tutup Pendaftaran):** Admin BPKAD dapat mengaktifkan atau menonaktifkan registrasi mandiri publik sewaktu-waktu melalui modal pengaturan di `/master/user`.
+- **Kendali Penuh Administrator (Buka/Tutup Pendaftaran):** Admin BKAD dapat mengaktifkan atau menonaktifkan registrasi mandiri publik sewaktu-waktu melalui modal pengaturan di `/master/user`.
 - **Alur Persetujuan Bertingkat (Admin Approval Workflow):** Pendaftar mandiri otomatis berstatus *Nonaktif / Menunggu Verifikasi* (`is_active = 0`) agar keamanan data aset daerah tetap terjaga dari pihak yang tidak berwenang.
 - **Aktivasi Cepat 1-Klik:** Tombol *Setujui & Aktifkan* langsung pada tabel pengguna admin untuk mengesahkan akun pemohon.
 - **Notifikasi Sambutan Akun Aktif via WA:** Tombol WhatsApp khusus pada baris pengguna untuk mengirimkan konfirmasi aktivasi akun ke pemohon secara instan.
@@ -148,7 +148,7 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 ### 16. Modul Dokumentasi & Pembaruan Sistem di Aplikasi (`/dokumentasi`)
 - **Akses Khusus Administrator (Role: admin):** Halaman dokumentasi terpadu yang dapat diakses langsung oleh admin melalui menu sidebar *"Dokumentasi & Update"* atau mengklik badge versi pada sidebar footer.
 - **Log Rilis & Changelog Interaktif:** Otomatis membaca riwayat rilis dari `CHANGELOG.md` dengan visual timeline modern dan fitur pencarian keyword cepat.
-- **Panduan Alur Modul Kedinasan:** Rangkuman alur 6 status usulan SSH & SBU (termasuk status *Ditolak*), 5 instrumen perencanaan RKBMD, penjadwalan BPKAD, dan notifikasi WhatsApp.
+- **Panduan Alur Modul Kedinasan:** Rangkuman alur 6 status usulan SSH & SBU (termasuk status *Ditolak*), 5 instrumen perencanaan RKBMD, penjadwalan BKAD, dan notifikasi WhatsApp.
 - **Panel Diagnostik & Status Server:** Menampilkan runtime PHP, versi MySQL, batas memori, izin direktori upload (`/uploads`), dan rekap total data sistem.
 - **Tampilan Manual Teknis (README):** Menampilkan dokumentasi manual teknis arsitektur sistem secara rapi di dalam dashboard dengan dukungan cetak halaman (*print-friendly*).
 
@@ -156,8 +156,8 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Prasyarat Unggah Surat Pengantar Resmi (Format PDF):** Sebelum SKPD dapat mengusulkan rincian item barang/biaya (SSH/SBU), SKPD diwajibkan terlebih dahulu membuat berkas Surat Usulan resmi dengan mengunggah pindaian (*scan*) surat pengantar bertanda tangan Kepala SKPD dan berstempel dinas dalam format PDF.
 - **Struktur Induk-Rincian (Header-Detail):** Satu Surat Usulan resmi (`standar_harga_surat`) menampung banyak rincian item usulan (`standar_harga_usulan.surat_id`). Seluruh item usulan terikat langsung pada dokumen surat resmi dinas pengusul.
 - **Pratinjau Langsung Berkas Surat Usulan PDF di Browser:** Tersedia modal viewer interaktif dan endpoint inline preview (`/ssh/surat/preview/(:num)` & `/sbu/surat/preview/(:num)`) untuk membaca berkas surat usulan secara langsung di layar tanpa memaksa pengunduhan.
-- **Halaman Detail & Manajemen Surat Usulan (`/ssh/surat/detail/(:num)` & `/sbu/surat/detail/(:num)`):** Menampilkan kartu informasi surat dinas resmi, tombol pratinjau inline dokumen PDF, ringkasan jumlah item dan akumulasi total nominal usulan, tabel rincian item di dalam surat, form tambah rincian item, serta tombol satu klik *"Kirim ke BPKAD"*.
-- **Ruang Kerja Verifikator BPKAD Berbasis Berkas Surat:** Verifikator menelaah surat dinas SKPD dan memverifikasi item di dalamnya secara komprehensif, dilengkapi bilah progres verifikasi real-time (*real-time progress bar*) serta otomatisasi sinkronisasi status induk surat (`syncStatusSurat`).
+- **Halaman Detail & Manajemen Surat Usulan (`/ssh/surat/detail/(:num)` & `/sbu/surat/detail/(:num)`):** Menampilkan kartu informasi surat dinas resmi, tombol pratinjau inline dokumen PDF, ringkasan jumlah item dan akumulasi total nominal usulan, tabel rincian item di dalam surat, form tambah rincian item, serta tombol satu klik *"Kirim ke BKAD"*.
+- **Ruang Kerja Verifikator BKAD Berbasis Berkas Surat:** Verifikator menelaah surat dinas SKPD dan memverifikasi item di dalamnya secara komprehensif, dilengkapi bilah progres verifikasi real-time (*real-time progress bar*) serta otomatisasi sinkronisasi status induk surat (`syncStatusSurat`).
 - **Antarmuka Tab Kapsul Simetris Modern (`.sipa-segmented-tabs`):** Desain navigasi tab terpadu dengan standar kontras WCAG AA yang simetris dan jelas terbaca, diperkuat dengan *automatic CSS cache-busting* (`?v=filemtime(...)`) pada header aplikasi.
 
 ### 18. Live Countdown Timer Interaktif & Pengumuman Jadwal Halaman Login
@@ -173,7 +173,7 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Fitur 1-Klik "Tandai Semua Dibaca" (*Mark All as Read*):** Tombol cepat pada dropdown header notifikasi untuk mengosongkan status belum dibaca seketika melalui endpoint AJAX terproteksi `/ajax/notif/read/all`.
 - **Integrasi Penuh Siklus Bisnis:**
   - *RKBMD:* Pengajuan usulan ke verifikator dan hasil telaah ke pembuat usulan SKPD.
-  - *SSH & SBU:* Pengajuan berkas Surat Usulan resmi dan rincian item ke Verifikator BPKAD, serta pemberitahuan otomatis ke SKPD saat usulan Disetujui, Direvisi, Ditolak, atau Ditetapkan sebagai SK.
+  - *SSH & SBU:* Pengajuan berkas Surat Usulan resmi dan rincian item ke Verifikator BKAD, serta pemberitahuan otomatis ke SKPD saat usulan Disetujui, Direvisi, Ditolak, atau Ditetapkan sebagai SK.
   - *Autentikasi & Akun:* Pendaftaran operator baru ke Admin dan konfirmasi aktivasi akun ke pengguna.
 - **Normalisasi Tautan & Keamanan CSRF:** Seluruh tautan notifikasi otomatis dinormalkan ke host aktif sistem, serta rotasi CSRF token tersinkronisasi otomatis pada setiap aksi AJAX.
 
@@ -211,7 +211,7 @@ sipa/
 │   │   ├── Rkbmd.php                # Controller induk 5 modul perencanaan RKBMD
 │   │   ├── Ssh.php                  # Controller modul Standar Satuan Harga fisik & jadwal
 │   │   ├── Sbu.php                  # Controller modul Standar Biaya Umum non-fisik & jadwal
-│   │   ├── Verifikasi.php           # Modul verifikasi RKBMD BPKAD
+│   │   ├── Verifikasi.php           # Modul verifikasi RKBMD BKAD
 │   │   └── Wa.php                   # Controller integrasi WhatsApp & pengaturan gateway
 │   ├── core/
 │   │   └── MY_Controller.php        # Base controller dengan HTTP Security Headers & HSTS
@@ -466,12 +466,12 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
-- **v2.9.5 (2026-10-11):** Pembaruan Menyeluruh Fitur Cetak Katalog Master Data Standar Harga (SSH & SBU) - Lembar Dokumen Resmi Kedinasan (`cetak_master`) lengkap dengan Kop Surat Pemkab Tapin & BPKAD, Judul Resmi, Ringkasan Parameter Filter, Tabel Landscape Berulang (*repeating thead*), dan Blok Tanda Tangan Kepala BPKAD. Menu Dropdown Cetak Fleksibel (*Cetak Halaman Ini*, *Cetak 250 Data*, *Cetak 500 Data*, *Cetak Tampilan Web*), Toolbar Layar Interaktif (`.no-print-toolbar`), dan Global CSS Media Print (`@media print`) Anti-Sidebar/Navbar.
+- **v2.9.5 (2026-10-11):** Pembaruan Menyeluruh Fitur Cetak Katalog Master Data Standar Harga (SSH & SBU) - Lembar Dokumen Resmi Kedinasan (`cetak_master`) lengkap dengan Kop Surat Pemkab Tapin & BKAD, Judul Resmi, Ringkasan Parameter Filter, Tabel Landscape Berulang (*repeating thead*), dan Blok Tanda Tangan Kepala BKAD. Menu Dropdown Cetak Fleksibel (*Cetak Halaman Ini*, *Cetak 250 Data*, *Cetak 500 Data*, *Cetak Tampilan Web*), Toolbar Layar Interaktif (`.no-print-toolbar`), dan Global CSS Media Print (`@media print`) Anti-Sidebar/Navbar.
 - **v2.9.4 (2026-10-11):** Perbaikan Menyeluruh & Optimalisasi Fitur Notifikasi Aplikasi (In-App Notification System) - Autoload global `notifikasi_model`, helper notifikasi (`create`, `sendToRoles`, `sendToSkpd`), format waktu relatif (*"Baru saja"*, *"5 mnt lalu"*, *"2 jam lalu"*, *"Kemarin"*), normalisasi URL notifikasi anti-domain lama, tombol 1-klik "Tandai Semua Dibaca" (*Mark All as Read*), sinkronisasi CSRF token otomatis, integrasi alur SSH & SBU, registrasi & aktivasi akun, serta penanganan respon AJAX 401/403 JSON saat sesi berakhir.
 - **v2.9.3 (2026-10-11):** Live Countdown Timer Interaktif pada Banner Jadwal Pengusulan Aktif (Hari, Jam, Menit, Detik), Mode Darurat/Urgent (< 24 jam), Pengumuman Jadwal & Countdown Terbuka di Halaman Login (`/login`) untuk SKPD tanpa login, integrasi pada SSH, SBU, RKBMD, dan Dashboard.
 - **v2.9.2 (2026-10-11):** Perbaikan Keterbacaan, Kontras, dan Kesimetrisan Tab Navigasi SSH & SBU (`.sipa-segmented-tabs`), Standar Kontras WCAG AA (teks tidak pernah redup/hilang saat berpindah tab), Automatic CSS Cache-Busting (`?v=filemtime(...)`) di `header.php`.
 - **v2.9.1 (2026-10-11):** Perbaikan Tampilan Layar Usulan & Verifikasi SSH/SBU, perbaikan fatal error helper `status_badge()` / `badge_status()`, layout recovery, proporsi tabel responsif, sinkronisasi filter SKPD dan statistik KPI tahun anggaran aktif.
-- **v2.9.0 (2026-10-11):** Workflow Baru Pengusulan SSH & SBU Berbasis Berkas Surat Usulan Resmi SKPD (Format PDF), Struktur Induk-Rincian (Header-Detail via tabel `standar_harga_surat` dan foreign key `surat_id`), Pratinjau Langsung PDF di Browser (*Inline PDF Preview*), Ruang Kerja Verifikator BPKAD Berbasis Berkas Surat dengan Real-Time Progress Bar dan otomatisasi sinkronisasi status surat (`syncStatusSurat`).
+- **v2.9.0 (2026-10-11):** Workflow Baru Pengusulan SSH & SBU Berbasis Berkas Surat Usulan Resmi SKPD (Format PDF), Struktur Induk-Rincian (Header-Detail via tabel `standar_harga_surat` dan foreign key `surat_id`), Pratinjau Langsung PDF di Browser (*Inline PDF Preview*), Ruang Kerja Verifikator BKAD Berbasis Berkas Surat dengan Real-Time Progress Bar dan otomatisasi sinkronisasi status surat (`syncStatusSurat`).
 - **v2.8.1 (2026-10-10):** Penambahan Status "Ditolak" pada Modul Standar Satuan Harga (SSH) & Standar Biaya Umum (SBU) sebagai terminal state, Modal Alasan Penolakan, Audit Trail Log, Banner Transparansi Penolakan untuk SKPD, Integrasi Notifikasi WhatsApp Penolakan, dan Modul Dokumentasi & Pembaruan Sistem di Aplikasi (`/dokumentasi`).
 - **v2.8.0 (2026-10-10):** Fitur Konteks Tahun Periode Anggaran Global (Dropdown Login & Quick Year Switcher di Header), Manajemen Nomenklatur & Histori SKPD Per Tahun Anggaran (`skpd_nomenklatur`), Penghapusan Berkas Spreadsheet Mentah dari Repositori, dan Pengetatan `.gitignore`.
 - **v2.7.0 (2026-10-10):** Fitur & Pengaturan Pendaftaran Mandiri Operator SKPD (`/register`), Kontrol Buka/Tutup Registrasi di Admin (`master/user`), Alur Persetujuan Verifikasi Admin (Admin Approval Workflow), Verifikasi Anti-Bot Captcha, Notifikasi Aktivasi Akun via WhatsApp, Auto-Environment Detection Production (`index.php`), Rate Limiting IP Brute-Force Protection (`Auth.php`), Anti-Bot Login (`Login.php`), HTTP Security Headers Lengkap (`MY_Controller`), dan Hardening Folder Berkas (`uploads/.htaccess`).
@@ -482,12 +482,12 @@ Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.
 - **v2.2.0 (2026-10-10):** Mandatori 3 Berkas Unggah Bukti Survey Pasar / Brosur Resmi pada Usulan SSH & SBU.
 - **v2.1.0 (2026-10-10):** Integrasi 11.519 Master Standar Harga TA 2027 (5.786 SSH + 5.733 SBU), Modul Penjadwalan Pengusulan (`standar_harga_jadwal`) dengan mekanisme "Menunggu Jadwal", Interkoneksi Form & Autocomplete Rekening Belanja SIPD RI, Sinkronisasi Otomatis Penetapan ke Katalog Master.
 - **v2.0.0 (2026-10-10):** Rilis Mayor Pemisahan Modul SSH & SBU, Master Referensi Akun Belanja SIPD RI, Optimasi Server-Side Paging Barang BMD, Responsive Sidebar Drawer & Collapse, Idempotent Database Migrations.
-- **v1.0.0 (2026-08-18):** Rilis Perdana Modul Perencanaan RKBMD (Pengadaan, Pemeliharaan, Pemanfaatan, Pemindahtanganan, Penghapusan), Master SKPD, Verifikasi BPKAD.
+- **v1.0.0 (2026-08-18):** Rilis Perdana Modul Perencanaan RKBMD (Pengadaan, Pemeliharaan, Pemanfaatan, Pemindahtanganan, Penghapusan), Master SKPD, Verifikasi BKAD.
 
 ---
 
 ## 🏛️ Kontak & Pengembang
 
-- **Instansi:** Badan Pengelolaan Keuangan dan Aset Daerah (BPKAD)
+- **Instansi:** Badan Keuangan dan Aset Daerah (BKAD)
 - **Pemerintah:** Pemerintah Kabupaten Tapin, Provinsi Kalimantan Selatan
 - **Situs Resmi:** [https://sipa.bkadtapinkab.online](https://sipa.bkadtapinkab.online)

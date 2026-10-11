@@ -101,7 +101,7 @@
                     <li>Setelah header tersimpan, anda akan diarahkan ke halaman pengisian item.</li>
                     <li>Tambahkan satu per satu item barang sesuai kebutuhan.</li>
                     <li>Setelah semua item lengkap, klik "Submit ke Verifikator".</li>
-                    <li>Usulan akan diteruskan ke BPKAD untuk diverifikasi.</li>
+                    <li>Usulan akan diteruskan ke BKAD untuk diverifikasi.</li>
                 </ol>
             </div>
         </div>

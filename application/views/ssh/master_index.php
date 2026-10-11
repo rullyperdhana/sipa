@@ -64,7 +64,7 @@ $endItem = min($totalRows, $page * $perPage);
 <div class="print-only-header d-none mb-3">
     <div class="text-center">
         <h5 class="fw-bold mb-0">PEMERINTAH KABUPATEN TAPIN</h5>
-        <h4 class="fw-bold mb-1">BADAN PENGELOLAAN KEUANGAN DAN ASET DAERAH</h4>
+        <h4 class="fw-bold mb-1">BADAN KEUANGAN DAN ASET DAERAH</h4>
         <p class="small mb-0">Kawasan Rantau Baru, Jl. Datu Nuraya, Rantau, Kalimantan Selatan</p>
         <div style="border-bottom: 2px solid #000; margin: 8px 0 12px 0;"></div>
         <h6 class="fw-bold text-uppercase mb-1">KATALOG RESMI <?= e($modTitle) ?> TA <?= (int)($filter['tahun'] ?? 2027) ?></h6>
@@ -103,14 +103,14 @@ $endItem = min($totalRows, $page * $perPage);
             <a href="<?= site_url("{$prefixUrl}/master_data/cetak?" . http_build_query(array_merge($filter, ['limit' => 250]))) ?>" 
                target="_blank" 
                class="btn btn-primary"
-               title="Buka Lembar Dokumen Katalog Resmi Lengkap dengan Kop Surat & Tanda Tangan BPKAD">
+               title="Buka Lembar Dokumen Katalog Resmi Lengkap dengan Kop Surat & Tanda Tangan BKAD">
                 <i class="bi bi-printer me-1"></i> Cetak Katalog
             </a>
             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" title="Pilihan Cetak Katalog">
                 <span class="visually-hidden">Toggle Cetak</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width: 290px;">
-                <li><h6 class="dropdown-header text-uppercase small fw-bold text-muted"><i class="bi bi-file-earmark-pdf me-1"></i> Format Cetak Resmi (Kop BPKAD)</h6></li>
+                <li><h6 class="dropdown-header text-uppercase small fw-bold text-muted"><i class="bi bi-file-earmark-pdf me-1"></i> Format Cetak Resmi (Kop BKAD)</h6></li>
                 <li>
                     <a class="dropdown-item py-2" href="<?= site_url("{$prefixUrl}/master_data/cetak?" . http_build_query(array_merge($filter, ['mode' => 'current_page', 'page' => $page, 'per_page' => $perPage]))) ?>" target="_blank">
                         <i class="bi bi-file-earmark-text text-primary me-2"></i> Cetak Halaman Ini (<?= count($list) ?> Data)

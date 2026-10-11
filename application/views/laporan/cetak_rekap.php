@@ -33,9 +33,9 @@
     <!-- Kop Surat -->
     <div class="kop-header">
         <h4>PEMERINTAH KABUPATEN TAPIN</h4>
-        <h3>BADAN PENGELOLAAN KEUANGAN DAN ASET DAERAH</h3>
+        <h3>BADAN KEUANGAN DAN ASET DAERAH</h3>
         <p>Jl. Datu Nuraya Kawasan Rantau Baru, Rantau, Kabupaten Tapin, Kalimantan Selatan</p>
-        <p>Laman: <em>sipa.bkadtapinkab.online</em> &bull; Email: <em>bpkad@tapinkab.go.id</em></p>
+        <p>Laman: <em>sipa.bkadtapinkab.online</em> &bull; Email: <em>bkad@tapinkab.go.id</em></p>
     </div>
 
     <!-- Judul Dokumen -->
@@ -184,7 +184,7 @@
         <div class="col-7"></div>
         <div class="col-5 text-center">
             <p class="mb-1">Rantau, <?= tanggal_id(date('Y-m-d')) ?></p>
-            <p class="mb-5"><strong>KEPALA BADAN PENGELOLAAN KEUANGAN<br>DAN ASET DAERAH KABUPATEN TAPIN</strong></p>
+            <p class="mb-5"><strong>KEPALA BADAN KEUANGAN<br>DAN ASET DAERAH KABUPATEN TAPIN</strong></p>
             <br><br>
             <p class="mb-0 text-decoration-underline fw-bold">HARVEY, S.E., M.M.</p>
             <p class="mb-0">NIP. 19740512 199803 1 005</p>

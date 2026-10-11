@@ -61,7 +61,7 @@ class Auth
 
         // 3. Cek status aktif / pending approval
         if (!$user->is_active) {
-            return ['success' => FALSE, 'message' => 'Akun Anda belum aktif atau sedang menunggu persetujuan Administrator BPKAD. Silakan hubungi admin.'];
+            return ['success' => FALSE, 'message' => 'Akun Anda belum aktif atau sedang menunggu persetujuan Administrator BKAD. Silakan hubungi admin.'];
         }
 
         // 4. Cek lockout per user
@@ -144,7 +144,7 @@ class Auth
         // Cek status pendaftaran mandiri
         $regEnabled = function_exists('get_setting') ? get_setting('registration_enabled', '1') : '1';
         if ($regEnabled === '0') {
-            return ['success' => FALSE, 'message' => 'Pendaftaran mandiri saat ini sedang ditutup oleh Administrator BPKAD.'];
+            return ['success' => FALSE, 'message' => 'Pendaftaran mandiri saat ini sedang ditutup oleh Administrator BKAD.'];
         }
 
         $username = trim($data['username'] ?? '');
@@ -219,7 +219,7 @@ class Auth
                 );
             } catch (\Throwable $e) {}
 
-            $msg = 'Pendaftaran berhasil! Akun Anda sedang menunggu verifikasi dan persetujuan dari Administrator BPKAD. Anda akan dapat masuk setelah akun diverifikasi.';
+            $msg = 'Pendaftaran berhasil! Akun Anda sedang menunggu verifikasi dan persetujuan dari Administrator BKAD. Anda akan dapat masuk setelah akun diverifikasi.';
         } else {
             $msg = 'Pendaftaran berhasil! Akun Anda telah aktif, silakan masuk ke sistem.';
         }

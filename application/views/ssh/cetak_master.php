@@ -197,9 +197,9 @@
     <!-- Kop Surat Resmi -->
     <div class="kop-header">
         <h4>PEMERINTAH KABUPATEN TAPIN</h4>
-        <h3>BADAN PENGELOLAAN KEUANGAN DAN ASET DAERAH</h3>
+        <h3>BADAN KEUANGAN DAN ASET DAERAH</h3>
         <p>Kawasan Rantau Baru, Jl. Datu Nuraya, Rantau, Kabupaten Tapin, Kalimantan Selatan (71114)</p>
-        <p>Laman Resmi: <em>https://sipa.bkadtapinkab.online</em> &bull; Pos-el: <em>bpkad@tapinkab.go.id</em></p>
+        <p>Laman Resmi: <em>https://sipa.bkadtapinkab.online</em> &bull; Pos-el: <em>bkad@tapinkab.go.id</em></p>
         <div class="kop-divider"></div>
     </div>
 
@@ -293,7 +293,7 @@
         </tbody>
     </table>
 
-    <!-- Blok Tanda Tangan Resmi Kepala BPKAD -->
+    <!-- Blok Tanda Tangan Resmi Kepala BKAD -->
     <div class="row ttd-box">
         <div class="col-7">
             <div class="small text-muted fst-italic pt-4">
@@ -305,7 +305,7 @@
         </div>
         <div class="col-5 text-center">
             <p class="mb-1">Rantau, <?= tanggal_id(date('Y-m-d')) ?></p>
-            <p class="mb-0"><strong>KEPALA BADAN PENGELOLAAN KEUANGAN</strong></p>
+            <p class="mb-0"><strong>KEPALA BADAN KEUANGAN</strong></p>
             <p class="mb-4"><strong>DAN ASET DAERAH KABUPATEN TAPIN</strong></p>
             <div class="ttd-space"></div>
             <p class="mb-0 text-decoration-underline fw-bold">HARVEY, S.E., M.M.</p>

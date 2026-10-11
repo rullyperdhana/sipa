@@ -107,7 +107,7 @@ class Ssh_model extends CI_Model
     }
 
     /**
-     * Mengambil daftar Surat Usulan untuk antrean Verifikator BPKAD
+     * Mengambil daftar Surat Usulan untuk antrean Verifikator BKAD
      */
     public function getSuratVerifikasi($filter = [])
     {
@@ -176,7 +176,7 @@ class Ssh_model extends CI_Model
             if (!$this->isJadwalBuka($tipe, $tahun)) {
                 return [
                     'success' => FALSE,
-                    'message' => "Akses Ditolak: Jadwal pengusulan {$tipe} TA {$tahun} saat ini DITUTUP oleh Administrator BPKAD."
+                    'message' => "Akses Ditolak: Jadwal pengusulan {$tipe} TA {$tahun} saat ini DITUTUP oleh Administrator BKAD."
                 ];
             }
         }
@@ -276,7 +276,7 @@ class Ssh_model extends CI_Model
     }
 
     /**
-     * Kirim Surat Usulan ke BPKAD (Draft / Direvisi -> Diajukan)
+     * Kirim Surat Usulan ke BKAD (Draft / Direvisi -> Diajukan)
      */
     public function kirimSurat($id, $user)
     {
@@ -298,7 +298,7 @@ class Ssh_model extends CI_Model
         if ($itemCount < 1) {
             return [
                 'success' => FALSE,
-                'message' => 'Surat Usulan belum memiliki rincian item. Silakan tambahkan minimal 1 rincian item usulan sebelum mengirim berkas ke BPKAD.'
+                'message' => 'Surat Usulan belum memiliki rincian item. Silakan tambahkan minimal 1 rincian item usulan sebelum mengirim berkas ke BKAD.'
             ];
         }
 
@@ -322,7 +322,7 @@ class Ssh_model extends CI_Model
         // Catat log untuk tiap item
         $items = $this->db->get_where($this->table, ['surat_id' => (int)$id])->result();
         foreach ($items as $it) {
-            $this->logActivity($it->id, $user, $statusSebelum, 'Diajukan', "Usulan diajukan ke BPKAD melalui Surat Usulan #{$surat->nomor_surat}.");
+            $this->logActivity($it->id, $user, $statusSebelum, 'Diajukan', "Usulan diajukan ke BKAD melalui Surat Usulan #{$surat->nomor_surat}.");
         }
 
         // Notifikasi ke verifikator dan admin
@@ -343,7 +343,7 @@ class Ssh_model extends CI_Model
 
         return [
             'success' => TRUE, 
-            'message' => "Surat Usulan <strong>{$surat->nomor_surat}</strong> beserta {$itemCount} rincian item berhasil dikirim ke BPKAD untuk diverifikasi."
+            'message' => "Surat Usulan <strong>{$surat->nomor_surat}</strong> beserta {$itemCount} rincian item berhasil dikirim ke BKAD untuk diverifikasi."
         ];
     }
 
@@ -753,7 +753,7 @@ class Ssh_model extends CI_Model
             if (!$this->isJadwalBuka($tipe, $tahun)) {
                 return [
                     'success' => FALSE,
-                    'message' => "Akses Ditolak: Jadwal pengusulan {$tipe} TA {$tahun} saat ini DITUTUP oleh Administrator BPKAD. Usulan tidak dapat dibuat."
+                    'message' => "Akses Ditolak: Jadwal pengusulan {$tipe} TA {$tahun} saat ini DITUTUP oleh Administrator BKAD. Usulan tidak dapat dibuat."
                 ];
             }
         }
@@ -846,7 +846,7 @@ class Ssh_model extends CI_Model
             if (!$this->isJadwalBuka($existing->tipe, $thUsulan)) {
                 return [
                     'success' => FALSE, 
-                    'message' => "Akses Ditolak: Jadwal pengusulan {$existing->tipe} TA {$thUsulan} saat ini DITUTUP oleh Administrator BPKAD. Usulan tidak dapat diubah."
+                    'message' => "Akses Ditolak: Jadwal pengusulan {$existing->tipe} TA {$thUsulan} saat ini DITUTUP oleh Administrator BKAD. Usulan tidak dapat diubah."
                 ];
             }
         }
@@ -916,7 +916,7 @@ class Ssh_model extends CI_Model
             if (!$this->isJadwalBuka($existing->tipe, $thUsulan)) {
                 return [
                     'success' => FALSE, 
-                    'message' => "Akses Ditolak: Jadwal pengusulan {$existing->tipe} TA {$thUsulan} saat ini DITUTUP oleh Administrator BPKAD. Usulan tidak dapat diajukan."
+                    'message' => "Akses Ditolak: Jadwal pengusulan {$existing->tipe} TA {$thUsulan} saat ini DITUTUP oleh Administrator BKAD. Usulan tidak dapat diajukan."
                 ];
             }
         }
@@ -927,7 +927,7 @@ class Ssh_model extends CI_Model
             'updated_at'    => date('Y-m-d H:i:s')
         ]);
 
-        $this->logActivity($id, $user, $statusSebelum, 'Diajukan', 'Usulan diajukan ke BPKAD untuk verifikasi.');
+        $this->logActivity($id, $user, $statusSebelum, 'Diajukan', 'Usulan diajukan ke BKAD untuk verifikasi.');
 
         // Notifikasi ke verifikator dan admin
         try {
@@ -943,7 +943,7 @@ class Ssh_model extends CI_Model
             );
         } catch (\Throwable $e) {}
 
-        return ['success' => TRUE, 'message' => 'Usulan berhasil dikirim ke BPKAD untuk diverifikasi.'];
+        return ['success' => TRUE, 'message' => 'Usulan berhasil dikirim ke BKAD untuk diverifikasi.'];
     }
 
     /**
@@ -1008,7 +1008,7 @@ class Ssh_model extends CI_Model
                 $this->notifikasi_model->create(
                     $existing->user_id,
                     "Usulan {$existing->tipe} Disetujui",
-                    "Item '{$existing->uraian}' telah diverifikasi dan disetujui BPKAD.",
+                    "Item '{$existing->uraian}' telah diverifikasi dan disetujui BKAD.",
                     $detailLink,
                     'success'
                 );
@@ -1046,7 +1046,7 @@ class Ssh_model extends CI_Model
                 $this->notifikasi_model->create(
                     $existing->user_id,
                     "Usulan {$existing->tipe} Perlu Revisi",
-                    "Item '{$existing->uraian}' dikembalikan oleh BPKAD untuk direvisi: {$catatan}",
+                    "Item '{$existing->uraian}' dikembalikan oleh BKAD untuk direvisi: {$catatan}",
                     $detailLink,
                     'warning'
                 );
@@ -1084,7 +1084,7 @@ class Ssh_model extends CI_Model
                 $this->notifikasi_model->create(
                     $existing->user_id,
                     "Usulan {$existing->tipe} Ditolak",
-                    "Item '{$existing->uraian}' ditolak oleh BPKAD: {$catatan}",
+                    "Item '{$existing->uraian}' ditolak oleh BKAD: {$catatan}",
                     $detailLink,
                     'danger'
                 );

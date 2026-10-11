@@ -9,7 +9,7 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ### 🚀 Ditambahkan & Diperbaiki (Added & Fixed)
 - **Pembaruan Menyeluruh Fitur Cetak Katalog Master Data Standar Harga (SSH & SBU):**
-  - **Lembar Cetak Dokumen Kedinasan Resmi (`cetak_master`):** Menyediakan template cetak mandiri berstandar resmi Pemerintah Kabupaten Tapin & BPKAD lengkap dengan Kop Surat resmi berkepala ganda, judul katalog resmi, ringkasan metadata parameter/filter (Tahun Anggaran, Kategori, Kata Kunci Pencarian, Total Data, Waktu Cetak), tabel data rapi berulang (*repeating header*), dan blok tanda tangan Kepala BPKAD Kabupaten Tapin.
+  - **Lembar Cetak Dokumen Kedinasan Resmi (`cetak_master`):** Menyediakan template cetak mandiri berstandar resmi Pemerintah Kabupaten Tapin & BKAD lengkap dengan Kop Surat resmi berkepala ganda, judul katalog resmi, ringkasan metadata parameter/filter (Tahun Anggaran, Kategori, Kata Kunci Pencarian, Total Data, Waktu Cetak), tabel data rapi berulang (*repeating header*), dan blok tanda tangan Kepala BKAD Kabupaten Tapin.
   - **Menu Pilihan Cetak Fleksibel (*Print Dropdown Actions*):** Tombol *"Cetak Katalog"* pada halaman `ssh/master_data` dan `sbu/master_data` kini dilengkapi menu opsi cepat:
     - *Cetak Halaman Ini:* Mencetak baris katalog yang sedang aktif di halaman saat ini (25-100 item).
     - *Cetak Sesuai Filter (Maks. 250 Data):* Membuka dokumen cetak katalog hasil filter hingga 250 data.
@@ -17,6 +17,7 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
     - *Cetak Langsung Tampilan Web:* Pilihan cetak langsung dari peramban (*window.print()*).
   - **Toolbar Pratinjau Interaktif Layar (`.no-print-toolbar`):** Halaman cetak dilengkapi bilah alat atas elegan untuk berpindah batas kuota data (100, 250, 500, 1.000 item), memicu cetak ulang, atau menutup tab.
   - **Optimalisasi Media Cetak Global (`@media print`):** Menambahkan aturan CSS cetak terintegrasi yang secara otomatis menyembunyikan sidebar, bilah atas (*topbar*), filter form, badge interaktif, kartu usulan, tombol aksi per baris, dan kontrol paginasi saat pengguna menekan cetak langsung dari peramban atau pintasan keyboard (Ctrl+P).
+  - **Penyesuaian Nomenklatur Resmi Instansi ke BKAD:** Menyeragamkan seluruh sebutan instansi di seluruh sistem (Kop Surat, footer, alert, pesan WhatsApp, label verifikator, dokumen cetak, dan dokumentasi aplikasi) menjadi **BKAD (Badan Keuangan dan Aset Daerah)** menggantikan sebutan lama BPKAD.
   - **Rute URL Cetak:** Mendaftarkan endpoint ramah cetak `/ssh/master_data/cetak`, `/ssh/cetak_master`, `/sbu/master_data/cetak`, dan `/sbu/cetak_master`.
 
 ---
@@ -78,13 +79,13 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 - **Workflow Baru Pengusulan SSH & SBU Berbasis Surat Usulan Resmi SKPD:**
   - **Prasyarat Unggah Surat Usulan Resmi (Format PDF):** Sebelum SKPD dapat mengusulkan rincian barang/biaya (SSH/SBU), SKPD diwajibkan terlebih dahulu membuat berkas Surat Usulan resmi dengan mengunggah pindaian (scan) surat pengantar bertanda tangan Kepala SKPD dan berstempel dinas (format PDF).
   - **Struktur Induk-Rincian (Header-Detail):** Satu Surat Usulan resmi menampung banyak rincian item barang/biaya SSH/SBU. Seluruh item usulan terikat langsung pada entitas Surat Usulan (`standar_harga_surat`).
-  - **Halaman Detail & Manajemen Surat Usulan (`/ssh/surat/detail/(:num)` & `/sbu/surat/detail/(:num)`):** Menampilkan kartu informasi surat dinas resmi, tombol pratinjau inline dokumen PDF tanpa unduh, statistik jumlah item dan akumulasi total nominal usulan, tabel rincian item di dalam surat, tombol tambah rincian item, serta tombol satu klik *"Kirim ke BPKAD"*.
+  - **Halaman Detail & Manajemen Surat Usulan (`/ssh/surat/detail/(:num)` & `/sbu/surat/detail/(:num)`):** Menampilkan kartu informasi surat dinas resmi, tombol pratinjau inline dokumen PDF tanpa unduh, statistik jumlah item dan akumulasi total nominal usulan, tabel rincian item di dalam surat, tombol tambah rincian item, serta tombol satu klik *"Kirim ke BKAD"*.
   - **Pratinjau Langsung Berkas Surat Usulan PDF di Browser:** Tersedia modal viewer interaktif dan endpoint inline preview (`/ssh/surat/preview/(:num)`) untuk membaca berkas surat usulan secara langsung di layar tanpa memaksa pengunduhan.
   - **Antarmuka Tab Ganda pada Dashboard Usulan SKPD (`/ssh/usulan` & `/sbu/usulan`):**
     - Tab 1: *Daftar Surat Usulan Resmi* (Tampilan utama berorientasi berkas surat dinas SKPD).
     - Tab 2: *Semua Rincian Item (Flat View)* (Tampilan komprehensif seluruh item usulan lintas surat).
-  - **Ruang Kerja Verifikator BPKAD Berbasis Surat Usulan (`/ssh/verifikasi/surat/(:num)` & `/sbu/verifikasi/surat/(:num)`):**
-    - Verifikator BPKAD menelaah surat usulan resmi SKPD terlebih dahulu (melalui penampil PDF), lalu memverifikasi (Setujui / Revisi / Tolak) setiap item usulan di dalam surat tersebut.
+  - **Ruang Kerja Verifikator BKAD Berbasis Surat Usulan (`/ssh/verifikasi/surat/(:num)` & `/sbu/verifikasi/surat/(:num)`):**
+    - Verifikator BKAD menelaah surat usulan resmi SKPD terlebih dahulu (melalui penampil PDF), lalu memverifikasi (Setujui / Revisi / Tolak) setiap item usulan di dalam surat tersebut.
     - Dilengkapi bilah progres verifikasi real-time (*real-time progress bar*) dan ringkasan status putusan per surat.
     - Otomatis melakukan sinkronisasi status induk surat (`syncStatusSurat`) saat rincian item disetujui, direvisi, atau ditolak.
   - **Migrasi Basis Data:** Tabel baru `standar_harga_surat` dan penambahan kolom `surat_id` dengan indeks serta foreign key pada tabel `standar_harga_usulan` (`database/migrations/create_standar_harga_surat_and_link_usulan.sql`).
@@ -99,7 +100,7 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - **Tombol & Modal Aksi Penolakan (Verifikasi SSH/SBU):** Verifikator dapat menolak usulan langsung melalui tombol merah *"Tolak"* dengan modal dialog konfirmasi yang mewajibkan pengisian alasan/catatan penolakan secara spesifik (`#modalTolak`).
   - **Audit Trail & Jejak Aktivitas:** Setiap penolakan dicatat otomatis ke log aktivitas sistem (`standar_harga_log`) lengkap dengan username, timestamp, status sebelum/sesudah, dan alasan penolakan.
   - **Kartu Rekap Statistik & Filter:** Menambahkan kartu ringkasan antrean *"Ditolak"* berwarna merah pada header antrean verifikasi serta dashboard usulan SKPD, lengkap dengan opsi filter status *"Ditolak"*.
-  - **Transparansi Alasan Penolakan untuk SKPD:** Tampilan baris usulan pada dashboard SKPD dan detail item otomatis memunculkan banner alert merah berisi alasan penolakan dari BPKAD.
+  - **Transparansi Alasan Penolakan untuk SKPD:** Tampilan baris usulan pada dashboard SKPD dan detail item otomatis memunculkan banner alert merah berisi alasan penolakan dari BKAD.
   - **Integrasi Notifikasi WhatsApp Kedinasan (`standar_tolak`):** Verifikator dapat mengirim draf notifikasi penolakan resmi secara instan ke nomor WhatsApp operator SKPD pengusul.
 - **Modul Dokumentasi & Pembaruan Sistem di Dalam Aplikasi (`/dokumentasi`):**
   - **Akses Khusus Administrator (Role: admin):** Menyediakan halaman dokumentasi terpadu yang dapat diakses langsung oleh admin melalui menu sidebar *"Dokumentasi & Update"* atau mengklik badge versi pada sidebar footer.
@@ -134,8 +135,8 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ### 🚀 Ditambahkan (Added)
 - **Pengaturan & Fitur Pendaftaran Mandiri Pengguna (Self-Registration) (`/register`):**
-  - **Panel Pengaturan Pendaftaran di Admin (`/master/user`):** Admin BPKAD dapat mengaktifkan atau menonaktifkan pendaftaran mandiri publik (Buka/Tutup) kapan saja.
-  - **Kebijakan Verifikasi & Persetujuan Admin (Admin Approval Workflow):** Opsi agar akun yang baru mendaftar secara mandiri berstatus *Nonaktif / Menunggu Verifikasi* (`is_active = 0`) sebelum disetujui oleh BPKAD demi keamanan instansi.
+  - **Panel Pengaturan Pendaftaran di Admin (`/master/user`):** Admin BKAD dapat mengaktifkan atau menonaktifkan pendaftaran mandiri publik (Buka/Tutup) kapan saja.
+  - **Kebijakan Verifikasi & Persetujuan Admin (Admin Approval Workflow):** Opsi agar akun yang baru mendaftar secara mandiri berstatus *Nonaktif / Menunggu Verifikasi* (`is_active = 0`) sebelum disetujui oleh BKAD demi keamanan instansi.
   - **Tombol Cepat Setujui Akun (1-Klik):** Admin dapat menyetujui dan mengaktifkan akun pendaftar langsung dari tabel daftar pengguna.
   - **Integrasi WhatsApp Notifikasi Akun Aktif:** Admin dapat langsung mengirimkan pesan WhatsApp pemberitahuan aktivasi akun ke nomor pemohon via tombol WA.
   - **Formulir Pendaftaran Lengkap:** Menyediakan input Nama Lengkap, NIP, Username, Email, Nomor WhatsApp, Pilihan SKPD, Password (minimal 8 karakter), serta verifikasi Anti-Bot Matematika.
@@ -158,7 +159,7 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 - **Fitur Notifikasi & Pemberitahuan WhatsApp ke Operator SKPD (`/wa`):**
   - **Integrasi Langsung pada Verifikasi RKBMD (`/verifikasi/detail`):** Tombol aksi *"Notifikasi WA"* untuk langsung menyiapkan dan mengirim pesan WhatsApp saat usulan memerlukan revisi/perbaikan, disetujui, maupun ditolak.
   - **Integrasi pada Verifikasi Standar Satuan Harga & Biaya (`/ssh/verifikasi` & `/sbu/verifikasi`):** Tombol icon WhatsApp pada baris tabel antrean serta tombol *"Draf Notif WA"* di modal pengembalian revisi usulan.
-  - **Draf Pesan Resmi Otomatis (WhatsApp Markdown):** Menghasilkan teks resmi berformat indah dengan kop instansi SIPA Kab. Tapin, nama operator dan SKPD, nomor/kode usulan, status usulan, catatan verifikator BPKAD, serta tautan login/detail untuk tindak lanjut cepat.
+  - **Draf Pesan Resmi Otomatis (WhatsApp Markdown):** Menghasilkan teks resmi berformat indah dengan kop instansi SIPA Kab. Tapin, nama operator dan SKPD, nomor/kode usulan, status usulan, catatan verifikator BKAD, serta tautan login/detail untuk tindak lanjut cepat.
   - **Modal Interaktif Notifikasi WhatsApp Global (`templates/wa_modal`):**
     - Otomatis mendeteksi nomor kontak WhatsApp operator SKPD (fallback ke nomor dinas SKPD).
     - Menampilkan pratinjau teks pesan yang dapat diedit langsung.
@@ -193,9 +194,9 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 ### 🚀 Ditambahkan (Added)
 - **Perombakan Total Dashboard Utama Terpadu SIPA (`/dashboard`):**
   - **Integrasi Penuh Modul Standar Harga (SSH & SBU):** Mengakhiri keterisolasian data Standar Harga, kini dipantau secara real-time bersama dengan modul RKBMD.
-  - **Banner Live Jadwal Pengusulan:** Indikator dinamis status jadwal pengusulan SSH & SBU (apakah jadwal sedang DIBUKA beserta tanggal batas akhir, atau DITUTUP oleh BPKAD).
-  - **Quick Action Bar (Akses Cepat):** Tombol aksi cepat kontekstual berdasarkan peran pengguna (`+ Usul RKBMD`, `+ Usul SSH`, `+ Usul SBU`, `Verifikasi BPKAD`, `Pusat Laporan & Rekap Eksekutif`).
-  - **4 Kartu Metrik KPI Modern Bergradien:** Total Seluruh Usulan Terpadu, Total Pagu Usulan Terpadu, Antrean Menunggu Verifikasi BPKAD, dan Kepatuhan Partisipasi SKPD (dengan bubble glassmorphism icons).
+  - **Banner Live Jadwal Pengusulan:** Indikator dinamis status jadwal pengusulan SSH & SBU (apakah jadwal sedang DIBUKA beserta tanggal batas akhir, atau DITUTUP oleh BKAD).
+  - **Quick Action Bar (Akses Cepat):** Tombol aksi cepat kontekstual berdasarkan peran pengguna (`+ Usul RKBMD`, `+ Usul SSH`, `+ Usul SBU`, `Verifikasi BKAD`, `Pusat Laporan & Rekap Eksekutif`).
+  - **4 Kartu Metrik KPI Modern Bergradien:** Total Seluruh Usulan Terpadu, Total Pagu Usulan Terpadu, Antrean Menunggu Verifikasi BKAD, dan Kepatuhan Partisipasi SKPD (dengan bubble glassmorphism icons).
   - **Dua Visualisasi Grafik Interaktif (Chart.js):**
     - *Grafik Batang:* Distribusi Alokasi Anggaran Terpadu per Modul (Pengadaan, Pemeliharaan, Pemanfaatan, Pemindahtanganan, Penghapusan, SSH, dan SBU).
     - *Grafik Donat:* Proporsi Status Usulan (Draft, Diajukan/Verifikasi, Disetujui/Ditetapkan, Ditolak/Revisi).
@@ -224,7 +225,7 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
     - **Tab 3: Matriks Kepatuhan SKPD:** Monitoring komprehensif 66 SKPD se-Kabupaten Tapin dengan status kepatuhan (*Lengkap*, *Sebagian*, *Belum Ada Usulan*).
   - **Fitur Ekspor & Cetak Laporan Resmi:**
     - Ekspor Spreadsheet Excel/CSV per modul (`/laporan/export/rkbmd/excel`, `/laporan/export/ssh_sbu/excel`, `/laporan/export/kepatuhan/excel`).
-    - Halaman cetak laporan resmi ber-kop Pemerintah Kabupaten Tapin & BPKAD (`/laporan/cetak`) siap ditandatangani Kepala BPKAD.
+    - Halaman cetak laporan resmi ber-kop Pemerintah Kabupaten Tapin & BKAD (`/laporan/cetak`) siap ditandatangani Kepala BKAD.
   - **Peningkatan Filter & UX:** Filter Tahun Anggaran, SKPD, Status Usulan, Kata Kunci, dan tombol *Reset Filter* satu klik.
 
 ---
@@ -254,10 +255,10 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - Pembuatan tabel katalog `ref_standar_harga` lengkap dengan kode kelompok, kode standar, nama barang/standar, spesifikasi teknis rinci, satuan, harga satuan 2027, kode rekening belanja SIPD RI, nama rekening belanja, dan tahun anggaran.
   - Halaman antarmuka katalog Master Data SSH (`/ssh/master_data`) dan SBU (`/sbu/master_data`) dengan Server-Side Pagination cepat (< 30ms), kartu KPI statistik, pencarian Fulltext, filter kategori, dan tombol cepat *"Usulkan"*.
 - **Modul Penjadwalan Pengusulan Standar Harga (`standar_harga_jadwal`):**
-  - Manajemen periode pengusulan oleh BPKAD (Admin/Verifikator) untuk SSH dan SBU per tahun anggaran (`/ssh/jadwal` dan `/sbu/jadwal`).
-  - Mekanisme penguncian pengusulan SKPD: tombol dan form tambah usulan otomatis terkunci (*disabled*) dengan status *"Menunggu Pembuatan Jadwal oleh BPKAD"* jika tidak ada jadwal aktif yang dibuka.
-  - Banner indikator jadwal dinamis pada daftar usulan SKPD yang menampilkan status (Buka/Tutup), periode tanggal mulai-selesai, dan catatan dari BPKAD.
-  - Kemudahan saklar toggle status jadwal (Buka/Tutup) dalam satu klik oleh tim BPKAD.
+  - Manajemen periode pengusulan oleh BKAD (Admin/Verifikator) untuk SSH dan SBU per tahun anggaran (`/ssh/jadwal` dan `/sbu/jadwal`).
+  - Mekanisme penguncian pengusulan SKPD: tombol dan form tambah usulan otomatis terkunci (*disabled*) dengan status *"Menunggu Pembuatan Jadwal oleh BKAD"* jika tidak ada jadwal aktif yang dibuka.
+  - Banner indikator jadwal dinamis pada daftar usulan SKPD yang menampilkan status (Buka/Tutup), periode tanggal mulai-selesai, dan catatan dari BKAD.
+  - Kemudahan saklar toggle status jadwal (Buka/Tutup) dalam satu klik oleh tim BKAD.
 - **Pencarian Cerdas Rekening Belanja SIPD RI Berdasarkan Nama:**
   - Antarmuka pencarian akun belanja pada formulir usulan SSH & SBU dengan dukungan pengetikan nama kebutuhan belanja (contoh: *"Alat Tulis"*, *"Kertas"*, *"Honorarium"*, *"Perjalanan Dinas"*, *"Pemeliharaan"*).
   - Sistem otomatis menampilkan sugesti hasil dari 9.617 referensi akun belanja SIPD RI (`ref_akun_belanja`) dan langsung memunculkan **Kode Rekening Belanja** resmi dalam bentuk kartu badge visual interaktif.
@@ -338,7 +339,7 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - Usulan Pemindahtanganan Barang BMD.
   - Usulan Penghapusan Barang BMD.
 - Modul Master Data SKPD, Master Data Barang, Master Periode RKBMD.
-- Modul Verifikasi RKBMD oleh tim aset BPKAD.
+- Modul Verifikasi RKBMD oleh tim aset BKAD.
 - Autentikasi pengguna berbasis peran (Admin, SKPD, Verifikator, Pimpinan).
 - Modul Notifikasi internal dan log aktivitas audit.
 - Fitur ekspor laporan RKBMD format Excel dan PDF.

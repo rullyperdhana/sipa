@@ -52,8 +52,8 @@ $isLocked = !in_array($surat->status_proses, ['Draft', 'Direvisi'], TRUE);
                class="btn btn-success shadow-sm btn-confirm-kirim-surat"
                data-nomor="<?= e($surat->nomor_surat) ?>"
                data-total="<?= count($items) ?>"
-               title="Kirim surat usulan beserta seluruh rincian item ke BPKAD">
-                <i class="bi bi-send-fill me-1"></i> <?= $surat->status_proses === 'Draft' ? 'Kirim ke BPKAD' : 'Kirim Ulang ke BPKAD' ?>
+               title="Kirim surat usulan beserta seluruh rincian item ke BKAD">
+                <i class="bi bi-send-fill me-1"></i> <?= $surat->status_proses === 'Draft' ? 'Kirim ke BKAD' : 'Kirim Ulang ke BKAD' ?>
             </a>
             <?php endif; ?>
 
@@ -135,18 +135,18 @@ $isLocked = !in_array($surat->status_proses, ['Draft', 'Direvisi'], TRUE);
         </div>
 
         <?php if ($surat->status_proses === 'Direvisi' && !empty($surat->catatan_verifikator)): ?>
-        <!-- Catatan Revisi BPKAD -->
+        <!-- Catatan Revisi BKAD -->
         <div class="alert alert-warning border-warning shadow-sm mt-3 mb-0 d-flex align-items-center gap-2">
             <i class="bi bi-exclamation-triangle-fill fs-5 text-warning flex-shrink-0"></i>
             <div>
-                <strong>Catatan Koreksi dari Verifikator BPKAD:</strong>
+                <strong>Catatan Koreksi dari Verifikator BKAD:</strong>
                 <div><?= e($surat->catatan_verifikator) ?></div>
             </div>
         </div>
         <?php endif; ?>
 
         <?php if ($surat->status_proses === 'Ditolak' && !empty($surat->catatan_verifikator)): ?>
-        <!-- Alasan Penolakan BPKAD -->
+        <!-- Alasan Penolakan BKAD -->
         <div class="alert alert-danger border-danger shadow-sm mt-3 mb-0 d-flex align-items-center gap-2">
             <i class="bi bi-x-circle-fill fs-5 text-danger flex-shrink-0"></i>
             <div>
@@ -424,8 +424,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
-                    title: 'Kirim Usulan ke BPKAD?',
-                    html: 'Surat Usulan No. <strong>' + nomor + '</strong> beserta <strong>' + total + ' rincian item</strong> akan diajukan ke BPKAD untuk diverifikasi.<br><br><small class="text-muted">Setelah dikirim, data akan terkunci dari pengeditan selama proses telaah.</small>',
+                    title: 'Kirim Usulan ke BKAD?',
+                    html: 'Surat Usulan No. <strong>' + nomor + '</strong> beserta <strong>' + total + ' rincian item</strong> akan diajukan ke BKAD untuk diverifikasi.<br><br><small class="text-muted">Setelah dikirim, data akan terkunci dari pengeditan selama proses telaah.</small>',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#198754',
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
             } else {
-                if (confirm('Kirim Surat Usulan ' + nomor + ' beserta ' + total + ' rincian item ke BPKAD?')) {
+                if (confirm('Kirim Surat Usulan ' + nomor + ' beserta ' + total + ' rincian item ke BKAD?')) {
                     window.location.href = href;
                 }
             }

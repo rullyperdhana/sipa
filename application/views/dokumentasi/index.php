@@ -152,7 +152,7 @@
             <div class="tab-pane fade <?= ($activeTab === 'panduan') ? 'show active' : '' ?>" id="tab-panduan" role="tabpanel">
                 <div class="mb-4">
                     <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-diagram-3-fill text-info me-2"></i>Panduan Alur Kerja & Modul Kedinasan</h5>
-                    <p class="text-muted small mb-0">Penjelasan alur proses bisnis antar role (Operator SKPD, Verifikator BPKAD, Penetap, Pimpinan, dan Administrator).</p>
+                    <p class="text-muted small mb-0">Penjelasan alur proses bisnis antar role (Operator SKPD, Verifikator BKAD, Penetap, Pimpinan, dan Administrator).</p>
                 </div>
 
                 <div class="row g-4">
@@ -182,9 +182,9 @@
                                 </div>
                                 <ul class="small text-secondary ps-3 mb-0">
                                     <li class="mb-1"><strong>Draft:</strong> SKPD menyusun spesifikasi, rekening belanja SIPD RI, dan mengunggah mandatori bukti survey harga.</li>
-                                    <li class="mb-1"><strong>Diajukan:</strong> Berkas dikirim ke BPKAD, data otomatis terkunci (RLS Guard).</li>
+                                    <li class="mb-1"><strong>Diajukan:</strong> Berkas dikirim ke BKAD, data otomatis terkunci (RLS Guard).</li>
                                     <li class="mb-1"><strong>Direvisi / Ditolak:</strong> Verifikator mengembalikan berkas perbaikan atau menolak usulan dengan wajib mengisi catatan alasan.</li>
-                                    <li class="mb-1"><strong>Diverifikasi:</strong> Usulan disetujui tim telaah BPKAD dan siap disahkan menjadi SK Bupati.</li>
+                                    <li class="mb-1"><strong>Diverifikasi:</strong> Usulan disetujui tim telaah BKAD dan siap disahkan menjadi SK Bupati.</li>
                                 </ul>
                             </div>
                         </div>
@@ -277,7 +277,7 @@
                                     <li class="mb-1"><strong>Prasyarat Berkas Surat (PDF):</strong> SKPD wajib membuat berkas surat usulan resmi bertanda tangan Kepala SKPD dan berstempel dinas sebelum merinci item.</li>
                                     <li class="mb-1"><strong>Struktur Induk-Rincian:</strong> Satu surat dinas menampung banyak rincian item SSH/SBU yang terikat dalam satu kesatuan dokumen usulan.</li>
                                     <li class="mb-1"><strong>Pratinjau PDF di Browser:</strong> Operator dan verifikator dapat menelaah dokumen surat secara instan di layar tanpa harus mengunduh file.</li>
-                                    <li class="mb-1"><strong>Verifikasi Berbasis Berkas:</strong> Verifikator BPKAD memeriksa keabsahan surat dan item usulan dengan progress bar dan sinkronisasi status otomatis.</li>
+                                    <li class="mb-1"><strong>Verifikasi Berbasis Berkas:</strong> Verifikator BKAD memeriksa keabsahan surat dan item usulan dengan progress bar dan sinkronisasi status otomatis.</li>
                                 </ul>
                             </div>
                         </div>
@@ -290,12 +290,12 @@
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-secondary-subtle text-secondary fs-4"><i class="bi bi-alarm-fill"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Jadwal BPKAD & Live Countdown Timer</h6>
+                                        <h6 class="mb-0 fw-bold">Jadwal BKAD & Live Countdown Timer</h6>
                                         <small class="text-muted">Kontrol pembukaan usulan dan hitungan mundur real-time</small>
                                     </div>
                                 </div>
                                 <ul class="small text-secondary ps-3 mb-0">
-                                    <li class="mb-1"><strong>Kontrol Periode Terpusat:</strong> BPKAD mengatur waktu buka/tutup usulan. Form terkunci otomatis jika jadwal belum dibuka atau telah berakhir.</li>
+                                    <li class="mb-1"><strong>Kontrol Periode Terpusat:</strong> BKAD mengatur waktu buka/tutup usulan. Form terkunci otomatis jika jadwal belum dibuka atau telah berakhir.</li>
                                     <li class="mb-1"><strong>Live Countdown Timer:</strong> Kartu informasi interaktif menampilkan sisa waktu detik (Hari, Jam, Menit, Detik) menuju batas penutupan jadwal resmi (23:59 WITA).</li>
                                     <li class="mb-1"><strong>Mode Kritis (&lt; 24 Jam):</strong> Penegasan visual otomatis dengan aksen merah berkedip saat masa pengusulan mendekati batas akhir.</li>
                                     <li class="mb-1"><strong>Pengumuman Halaman Login:</strong> Banner jadwal dan live countdown dapat dilihat langsung oleh seluruh SKPD di halaman login tanpa perlu masuk akun.</li>

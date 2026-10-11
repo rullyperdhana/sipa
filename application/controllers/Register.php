@@ -44,7 +44,7 @@ class Register extends MY_Controller
 
         $regEnabled = function_exists('get_setting') ? get_setting('registration_enabled', '1') : '1';
         if ($regEnabled === '0') {
-            $this->session->set_flashdata('danger', 'Pendaftaran mandiri sedang ditutup oleh Administrator BPKAD.');
+            $this->session->set_flashdata('danger', 'Pendaftaran mandiri sedang ditutup oleh Administrator BKAD.');
             redirect('register');
             return;
         }

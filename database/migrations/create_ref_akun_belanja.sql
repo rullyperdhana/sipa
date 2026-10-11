@@ -1,6 +1,6 @@
 -- ============================================================================
 -- REFERENSI AKUN BELANJA & REKENING SIPD RI
--- SIPA (Sistem Informasi Pengelolaan Aset) - BPKAD Kabupaten Tapin
+-- SIPA (Sistem Informasi Pengelolaan Aset) - BKAD Kabupaten Tapin
 -- Sumber Data: sipd_ri_r_akun.xlsx
 -- ============================================================================
 

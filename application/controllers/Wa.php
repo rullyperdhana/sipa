@@ -174,7 +174,7 @@ class Wa extends MY_Controller
                 'wa_gateway_url'      => $this->input->post('wa_gateway_url', TRUE) ?: 'https://api.fonnte.com/send',
                 'wa_gateway_token'    => trim($this->input->post('wa_gateway_token', TRUE) ?? ''),
                 'wa_auto_send'        => $this->input->post('wa_auto_send') ? '1' : '0',
-                'wa_sender_footer'    => trim($this->input->post('wa_sender_footer', TRUE) ?? 'BPKAD Kabupaten Tapin')
+                'wa_sender_footer'    => trim($this->input->post('wa_sender_footer', TRUE) ?? 'BKAD Kabupaten Tapin')
             ];
 
             $this->whatsapp->saveSettings($data);

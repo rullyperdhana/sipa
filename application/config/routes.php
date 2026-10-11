@@ -24,7 +24,7 @@ $route['rkbmd/(pengadaan|pemeliharaan|pemanfaatan|pemindahtanganan|penghapusan)/
 $route['rkbmd/(pengadaan|pemeliharaan|pemanfaatan|pemindahtanganan|penghapusan)/delete/(:num)'] = 'rkbmd/delete/$1/$2';
 $route['rkbmd/(pengadaan|pemeliharaan|pemanfaatan|pemindahtanganan|penghapusan)/upload/(:num)'] = 'rkbmd/upload/$1/$2';
 
-// ===== Verifikasi BPKAD =====
+// ===== Verifikasi BKAD =====
 $route['verifikasi']                       = 'verifikasi/index';
 $route['verifikasi/detail/(:num)']         = 'verifikasi/detail/$1';
 $route['verifikasi/proses/(:num)']         = 'verifikasi/proses/$1';
