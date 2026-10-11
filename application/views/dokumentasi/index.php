@@ -242,21 +242,63 @@
                         </div>
                     </div>
 
-                    <!-- Modul 4: Integrasi & Jadwal -->
+                    <!-- Modul 4: Integrasi Notifikasi WhatsApp -->
                     <div class="col-md-6">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-success">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-success-subtle text-success fs-4"><i class="bi bi-whatsapp"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Fitur Notifikasi WhatsApp & Penjadwalan</h6>
-                                        <small class="text-muted">Komunikasi otomatis instan dan pengamanan jadwal periode</small>
+                                        <h6 class="mb-0 fw-bold">Notifikasi WhatsApp Kedinasan</h6>
+                                        <small class="text-muted">Komunikasi otomatis instan antar Verifikator dan Operator SKPD</small>
                                     </div>
                                 </div>
                                 <ul class="small text-secondary ps-3 mb-0">
-                                    <li class="mb-1"><strong>Notifikasi WA 1-Klik:</strong> Draf notifikasi resmi ber-kop Pemerintah Kab. Tapin dapat dikirim langsung ke nomor WhatsApp operator SKPD.</li>
-                                    <li class="mb-1"><strong>Template Lengkap:</strong> Mendukung template revisi, disetujui, ditolak, dan penetapan SK.</li>
-                                    <li class="mb-1"><strong>Jadwal Pengusulan BPKAD:</strong> Form tambah usulan otomatis terkunci jika jadwal belum dibuka atau telah berakhir.</li>
+                                    <li class="mb-1"><strong>Notifikasi WA 1-Klik:</strong> Draf notifikasi resmi ber-kop Pemerintah Kab. Tapin dapat dikirim langsung ke nomor WhatsApp operator SKPD pemohon.</li>
+                                    <li class="mb-1"><strong>Template Lengkap Kedinasan:</strong> Mendukung otomatisasi format pesan revisi, usulan disetujui, ditolak (beserta catatan telaah), dan pengesahan penetapan SK.</li>
+                                    <li class="mb-1"><strong>Fleksibilitas Pengiriman:</strong> Tersedia modal interaktif untuk memeriksa kontak, mengedit pesan, direct click-to-chat, maupun integrasi WhatsApp Gateway API.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modul 5: Surat Usulan Resmi SKPD (Header-Detail) -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-danger">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-danger-subtle text-danger fs-4"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">Surat Usulan Resmi SKPD (Header-Detail)</h6>
+                                        <small class="text-muted">Prasyarat unggah scan PDF surat dinas dan manajemen rincian item</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>Prasyarat Berkas Surat (PDF):</strong> SKPD wajib membuat berkas surat usulan resmi bertanda tangan Kepala SKPD dan berstempel dinas sebelum merinci item.</li>
+                                    <li class="mb-1"><strong>Struktur Induk-Rincian:</strong> Satu surat dinas menampung banyak rincian item SSH/SBU yang terikat dalam satu kesatuan dokumen usulan.</li>
+                                    <li class="mb-1"><strong>Pratinjau PDF di Browser:</strong> Operator dan verifikator dapat menelaah dokumen surat secara instan di layar tanpa harus mengunduh file.</li>
+                                    <li class="mb-1"><strong>Verifikasi Berbasis Berkas:</strong> Verifikator BPKAD memeriksa keabsahan surat dan item usulan dengan progress bar dan sinkronisasi status otomatis.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modul 6: Penjadwalan & Countdown Timer -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-secondary">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-secondary-subtle text-secondary fs-4"><i class="bi bi-alarm-fill"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">Jadwal BPKAD & Live Countdown Timer</h6>
+                                        <small class="text-muted">Kontrol pembukaan usulan dan hitungan mundur real-time</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>Kontrol Periode Terpusat:</strong> BPKAD mengatur waktu buka/tutup usulan. Form terkunci otomatis jika jadwal belum dibuka atau telah berakhir.</li>
+                                    <li class="mb-1"><strong>Live Countdown Timer:</strong> Kartu informasi interaktif menampilkan sisa waktu detik (Hari, Jam, Menit, Detik) menuju batas penutupan jadwal resmi (23:59 WITA).</li>
+                                    <li class="mb-1"><strong>Mode Kritis (&lt; 24 Jam):</strong> Penegasan visual otomatis dengan aksen merah berkedip saat masa pengusulan mendekati batas akhir.</li>
+                                    <li class="mb-1"><strong>Pengumuman Halaman Login:</strong> Banner jadwal dan live countdown dapat dilihat langsung oleh seluruh SKPD di halaman login tanpa perlu masuk akun.</li>
                                 </ul>
                             </div>
                         </div>

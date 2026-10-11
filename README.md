@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BPKAD
 
-[![Version](https://img.shields.io/badge/version-2.8.1-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.9.3-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -151,6 +151,21 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Panduan Alur Modul Kedinasan:** Rangkuman alur 6 status usulan SSH & SBU (termasuk status *Ditolak*), 5 instrumen perencanaan RKBMD, penjadwalan BPKAD, dan notifikasi WhatsApp.
 - **Panel Diagnostik & Status Server:** Menampilkan runtime PHP, versi MySQL, batas memori, izin direktori upload (`/uploads`), dan rekap total data sistem.
 - **Tampilan Manual Teknis (README):** Menampilkan dokumentasi manual teknis arsitektur sistem secara rapi di dalam dashboard dengan dukungan cetak halaman (*print-friendly*).
+
+### 17. Pengusulan Standar Harga Berbasis Berkas Surat Resmi SKPD (Header-Detail)
+- **Prasyarat Unggah Surat Pengantar Resmi (Format PDF):** Sebelum SKPD dapat mengusulkan rincian item barang/biaya (SSH/SBU), SKPD diwajibkan terlebih dahulu membuat berkas Surat Usulan resmi dengan mengunggah pindaian (*scan*) surat pengantar bertanda tangan Kepala SKPD dan berstempel dinas dalam format PDF.
+- **Struktur Induk-Rincian (Header-Detail):** Satu Surat Usulan resmi (`standar_harga_surat`) menampung banyak rincian item usulan (`standar_harga_usulan.surat_id`). Seluruh item usulan terikat langsung pada dokumen surat resmi dinas pengusul.
+- **Pratinjau Langsung Berkas Surat Usulan PDF di Browser:** Tersedia modal viewer interaktif dan endpoint inline preview (`/ssh/surat/preview/(:num)` & `/sbu/surat/preview/(:num)`) untuk membaca berkas surat usulan secara langsung di layar tanpa memaksa pengunduhan.
+- **Halaman Detail & Manajemen Surat Usulan (`/ssh/surat/detail/(:num)` & `/sbu/surat/detail/(:num)`):** Menampilkan kartu informasi surat dinas resmi, tombol pratinjau inline dokumen PDF, ringkasan jumlah item dan akumulasi total nominal usulan, tabel rincian item di dalam surat, form tambah rincian item, serta tombol satu klik *"Kirim ke BPKAD"*.
+- **Ruang Kerja Verifikator BPKAD Berbasis Berkas Surat:** Verifikator menelaah surat dinas SKPD dan memverifikasi item di dalamnya secara komprehensif, dilengkapi bilah progres verifikasi real-time (*real-time progress bar*) serta otomatisasi sinkronisasi status induk surat (`syncStatusSurat`).
+- **Antarmuka Tab Kapsul Simetris Modern (`.sipa-segmented-tabs`):** Desain navigasi tab terpadu dengan standar kontras WCAG AA yang simetris dan jelas terbaca, diperkuat dengan *automatic CSS cache-busting* (`?v=filemtime(...)`) pada header aplikasi.
+
+### 18. Live Countdown Timer Interaktif & Pengumuman Jadwal Halaman Login
+- **Kartu Informasi Jadwal Interaktif (`.sipa-schedule-card`):** Banner jadwal pengusulan yang sedang dibuka menampilkan kartu informasi modern dengan latar hijau emerald lembut, aksen border tegas, dan animasi denyut (*pulse indicator*) pada badge "JADWAL PENGUSULAN AKTIF".
+- **Penghitung Waktu Mundur Real-Time (Countdown):** Menampilkan sisa waktu pengusulan secara langsung per detik dalam 4 kotak digital presisi: **Hari, Jam, Menit, dan Detik** menuju batas akhir tanggal penutupan jadwal resmi (pukul 23:59 WITA).
+- **Pengumuman Jadwal & Countdown Terbuka di Halaman Login (`/login`):** Memungkinkan seluruh operator SKPD dan publik melihat status jadwal resmi yang sedang dibuka beserta live countdown batas akhir langsung dari halaman depan tanpa harus login terlebih dahulu.
+- **Peringatan Batas Waktu Kritis (*Urgent Mode*):** Indikator countdown otomatis berubah menjadi aksen merah menyala dengan penegasan visual ketika sisa waktu pengusulan kurang dari 24 jam.
+- **Integrasi Menyeluruh:** Fitur live countdown diterapkan pada halaman Pengusulan SSH, Pengusulan SBU, Penyusunan RKBMD, Halaman Login Publik, serta indikator badge sisa hari pada dashboard utama.
 
 ---
 
@@ -335,13 +350,16 @@ sipa/
 
    # Migrasi v2.8.1 (Penambahan Status Ditolak pada Modul SSH & SBU)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_ditolak_status_to_ssh_sbu.sql
+
+   # Migrasi v2.9.0 (Modul Header-Detail Surat Usulan Resmi SKPD & Relasi Usulan Standar Harga)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_standar_harga_surat_and_link_usulan.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
    > [!TIP]
    > Alternatif eksekusi migrasi otomatis tanpa password MySQL root VPS:
    > ```bash
-   > php -r 'define("BASEPATH",true);define("ENVIRONMENT","production");require "application/config/database.php";$cfg=$db["default"];$pdo=new PDO("mysql:host=".($cfg["hostname"]??"localhost").";port=".($cfg["port"]??3306).";dbname=".$cfg["database"],$cfg["username"],$cfg["password"]);$pdo->exec(file_get_contents("database/migrations/add_ditolak_status_to_ssh_sbu.sql"));echo "Migrasi Berhasil!\n";'
+   > php -r 'define("BASEPATH",true);define("ENVIRONMENT","production");require "application/config/database.php";$cfg=$db["default"];$pdo=new PDO("mysql:host=".($cfg["hostname"]??"localhost").";port=".($cfg["port"]??3306).";dbname=".$cfg["database"],$cfg["username"],$cfg["password"]);$pdo->exec(file_get_contents("database/migrations/create_standar_harga_surat_and_link_usulan.sql"));echo "Migrasi Berhasil!\n";'
    > ```
 
 ---
@@ -350,6 +368,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`create_standar_harga_surat_and_link_usulan.sql`](database/migrations/create_standar_harga_surat_and_link_usulan.sql) | Membuat tabel `standar_harga_surat` untuk menampung surat dinas pengantar resmi (upload scan PDF bertanda tangan Kepala SKPD) dan relasi `surat_id` pada tabel `standar_harga_usulan`. |
 | [`add_ditolak_status_to_ssh_sbu.sql`](database/migrations/add_ditolak_status_to_ssh_sbu.sql) | Menambahkan status `Ditolak` pada enum `status_proses` tabel `standar_harga_usulan` untuk modul SSH dan SBU. |
 | [`add_global_fiscal_year_and_skpd_nomenklatur.sql`](database/migrations/add_global_fiscal_year_and_skpd_nomenklatur.sql) | Menambahkan tabel `skpd_nomenklatur` untuk mencatat riwayat nama SKPD, kode unit, dan Kepala SKPD per Tahun Anggaran agar dokumen cetak lampau tetap otentik. |
 | [`add_user_registration_settings.sql`](database/migrations/add_user_registration_settings.sql) | Menambahkan konfigurasi default pendaftaran mandiri pengguna (`registration_enabled`, `registration_require_approval`, `registration_default_role`) pada tabel `ex_settings`. |
@@ -437,6 +456,12 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.9.3 (2026-10-11):** Live Countdown Timer Interaktif pada Banner Jadwal Pengusulan Aktif (Hari, Jam, Menit, Detik), Mode Darurat/Urgent (< 24 jam), Pengumuman Jadwal & Countdown Terbuka di Halaman Login (`/login`) untuk SKPD tanpa login, integrasi pada SSH, SBU, RKBMD, dan Dashboard.
+- **v2.9.2 (2026-10-11):** Perbaikan Keterbacaan, Kontras, dan Kesimetrisan Tab Navigasi SSH & SBU (`.sipa-segmented-tabs`), Standar Kontras WCAG AA (teks tidak pernah redup/hilang saat berpindah tab), Automatic CSS Cache-Busting (`?v=filemtime(...)`) di `header.php`.
+- **v2.9.1 (2026-10-11):** Perbaikan Tampilan Layar Usulan & Verifikasi SSH/SBU, perbaikan fatal error helper `status_badge()` / `badge_status()`, layout recovery, proporsi tabel responsif, sinkronisasi filter SKPD dan statistik KPI tahun anggaran aktif.
+- **v2.9.0 (2026-10-11):** Workflow Baru Pengusulan SSH & SBU Berbasis Berkas Surat Usulan Resmi SKPD (Format PDF), Struktur Induk-Rincian (Header-Detail via tabel `standar_harga_surat` dan foreign key `surat_id`), Pratinjau Langsung PDF di Browser (*Inline PDF Preview*), Ruang Kerja Verifikator BPKAD Berbasis Berkas Surat dengan Real-Time Progress Bar dan otomatisasi sinkronisasi status surat (`syncStatusSurat`).
+- **v2.8.1 (2026-10-10):** Penambahan Status "Ditolak" pada Modul Standar Satuan Harga (SSH) & Standar Biaya Umum (SBU) sebagai terminal state, Modal Alasan Penolakan, Audit Trail Log, Banner Transparansi Penolakan untuk SKPD, Integrasi Notifikasi WhatsApp Penolakan, dan Modul Dokumentasi & Pembaruan Sistem di Aplikasi (`/dokumentasi`).
+- **v2.8.0 (2026-10-10):** Fitur Konteks Tahun Periode Anggaran Global (Dropdown Login & Quick Year Switcher di Header), Manajemen Nomenklatur & Histori SKPD Per Tahun Anggaran (`skpd_nomenklatur`), Penghapusan Berkas Spreadsheet Mentah dari Repositori, dan Pengetatan `.gitignore`.
 - **v2.7.0 (2026-10-10):** Fitur & Pengaturan Pendaftaran Mandiri Operator SKPD (`/register`), Kontrol Buka/Tutup Registrasi di Admin (`master/user`), Alur Persetujuan Verifikasi Admin (Admin Approval Workflow), Verifikasi Anti-Bot Captcha, Notifikasi Aktivasi Akun via WhatsApp, Auto-Environment Detection Production (`index.php`), Rate Limiting IP Brute-Force Protection (`Auth.php`), Anti-Bot Login (`Login.php`), HTTP Security Headers Lengkap (`MY_Controller`), dan Hardening Folder Berkas (`uploads/.htaccess`).
 - **v2.6.0 (2026-10-10):** Fitur Pemberitahuan & Notifikasi WhatsApp ke Operator SKPD (`/wa`), Integrasi 1-Klik pada Verifikasi RKBMD & Standar Harga (SSH & SBU), Draf Pesan Otomatis Kedinasan (Revisi, Disetujui, Ditolak, Ditetapkan), Modal WhatsApp Global, dan Pengaturan WA Gateway.
 - **v2.5.0 (2026-10-10):** Pengaturan Hak Akses Menu Granular Per-User (Granular RBAC) via Admin Master User (`master/user`), Checklist Izin Modul & Presets Cepat (User A: SSH/SBU/Laporan, User B: RKBMD/Laporan), Proteksi Controller Level HTTP 403, Sidebar & Quick Action Adaptif.
