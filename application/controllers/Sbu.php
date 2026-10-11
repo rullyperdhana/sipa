@@ -888,6 +888,53 @@ class Sbu extends Auth_Controller
         $this->load->view('templates/footer');
     }
 
+    /**
+     * Cetak Lembar Dokumen Katalog Resmi Master Data SBU
+     */
+    public function cetak_master()
+    {
+        $mode = $this->input->get('mode', TRUE) ?: 'all';
+        $filter = [
+            'tipe'     => $this->tipe,
+            'kategori' => $this->input->get('kategori', TRUE),
+            'tahun'    => $this->input->get('tahun', TRUE) ?: (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027),
+            'q'        => $this->input->get('q', TRUE)
+        ];
+
+        $totalFiltered = $this->ssh_model->countMasterData($filter);
+
+        if ($mode === 'current_page') {
+            $page = max(1, (int) $this->input->get('page'));
+            $perPage = min(100, max(10, (int) ($this->input->get('per_page') ?: 25)));
+            $offset = ($page - 1) * $perPage;
+            $items = $this->ssh_model->getMasterDataPaginated($filter, $perPage, $offset);
+            $printLimit = count($items);
+            $startNumber = $offset + 1;
+        } else {
+            // Batas maksimal print untuk performa browser & kejelasan dokumen
+            $limitParam = (int) $this->input->get('limit');
+            $printLimit = ($limitParam > 0) ? min(1000, $limitParam) : 500;
+            $items = $this->ssh_model->getMasterDataPaginated($filter, $printLimit, 0);
+            $startNumber = 1;
+        }
+
+        $data = [
+            'title'         => 'Katalog Resmi ' . $this->moduleTitle . ' TA ' . $filter['tahun'],
+            'tipe'          => $this->tipe,
+            'prefixUrl'     => $this->prefixUrl,
+            'moduleTitle'   => $this->moduleTitle,
+            'list'          => $items,
+            'filter'        => $filter,
+            'mode'          => $mode,
+            'totalFiltered' => $totalFiltered,
+            'printLimit'    => $printLimit,
+            'startNumber'   => $startNumber,
+            'printedAt'     => date('Y-m-d H:i:s')
+        ];
+
+        $this->load->view('ssh/cetak_master', $data);
+    }
+
     // =========================================================================
     // JADWAL PENGUSULAN STANDAR HARGA
     // =========================================================================

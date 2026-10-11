@@ -5,6 +5,22 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.9.5] - 2026-10-11
+
+### 🚀 Ditambahkan & Diperbaiki (Added & Fixed)
+- **Pembaruan Menyeluruh Fitur Cetak Katalog Master Data Standar Harga (SSH & SBU):**
+  - **Lembar Cetak Dokumen Kedinasan Resmi (`cetak_master`):** Menyediakan template cetak mandiri berstandar resmi Pemerintah Kabupaten Tapin & BPKAD lengkap dengan Kop Surat resmi berkepala ganda, judul katalog resmi, ringkasan metadata parameter/filter (Tahun Anggaran, Kategori, Kata Kunci Pencarian, Total Data, Waktu Cetak), tabel data rapi berulang (*repeating header*), dan blok tanda tangan Kepala BPKAD Kabupaten Tapin.
+  - **Menu Pilihan Cetak Fleksibel (*Print Dropdown Actions*):** Tombol *"Cetak Katalog"* pada halaman `ssh/master_data` dan `sbu/master_data` kini dilengkapi menu opsi cepat:
+    - *Cetak Halaman Ini:* Mencetak baris katalog yang sedang aktif di halaman saat ini (25-100 item).
+    - *Cetak Sesuai Filter (Maks. 250 Data):* Membuka dokumen cetak katalog hasil filter hingga 250 data.
+    - *Cetak Sesuai Filter (Maks. 500 Data):* Membuka dokumen cetak katalog hasil filter hingga 500 data.
+    - *Cetak Langsung Tampilan Web:* Pilihan cetak langsung dari peramban (*window.print()*).
+  - **Toolbar Pratinjau Interaktif Layar (`.no-print-toolbar`):** Halaman cetak dilengkapi bilah alat atas elegan untuk berpindah batas kuota data (100, 250, 500, 1.000 item), memicu cetak ulang, atau menutup tab.
+  - **Optimalisasi Media Cetak Global (`@media print`):** Menambahkan aturan CSS cetak terintegrasi yang secara otomatis menyembunyikan sidebar, bilah atas (*topbar*), filter form, badge interaktif, kartu usulan, tombol aksi per baris, dan kontrol paginasi saat pengguna menekan cetak langsung dari peramban atau pintasan keyboard (Ctrl+P).
+  - **Rute URL Cetak:** Mendaftarkan endpoint ramah cetak `/ssh/master_data/cetak`, `/ssh/cetak_master`, `/sbu/master_data/cetak`, dan `/sbu/cetak_master`.
+
+---
+
 ## [2.9.4] - 2026-10-11
 
 ### 🚀 Ditambahkan & Diperbaiki (Added & Fixed)

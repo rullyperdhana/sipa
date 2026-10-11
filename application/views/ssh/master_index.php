@@ -14,6 +14,68 @@ $startItem = ($totalRows > 0) ? (($page - 1) * $perPage + 1) : 0;
 $endItem = min($totalRows, $page * $perPage);
 ?>
 
+<style>
+@media print {
+    .sidebar, .top-header, .page-header .btn, .page-header .btn-group, .page-header .d-flex.gap-2,
+    .alert, .card:has(form), .pagination, .modal, footer, .main-footer, .card-footer,
+    #tabelMasterDataSsh th:last-child, #tabelMasterDataSsh td:last-child {
+        display: none !important;
+    }
+    .print-only-header {
+        display: block !important;
+    }
+    body {
+        background: #fff !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        font-size: 9pt !important;
+    }
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .card-header {
+        display: none !important;
+    }
+    .table-responsive {
+        overflow: visible !important;
+    }
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+    table th, table td {
+        border: 1px solid #000 !important;
+        padding: 4px 6px !important;
+        color: #000 !important;
+    }
+    table th {
+        background-color: #f0f0f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+}
+</style>
+
+<!-- Kop & Judul Khusus Cetak Langsung Web -->
+<div class="print-only-header d-none mb-3">
+    <div class="text-center">
+        <h5 class="fw-bold mb-0">PEMERINTAH KABUPATEN TAPIN</h5>
+        <h4 class="fw-bold mb-1">BADAN PENGELOLAAN KEUANGAN DAN ASET DAERAH</h4>
+        <p class="small mb-0">Kawasan Rantau Baru, Jl. Datu Nuraya, Rantau, Kalimantan Selatan</p>
+        <div style="border-bottom: 2px solid #000; margin: 8px 0 12px 0;"></div>
+        <h6 class="fw-bold text-uppercase mb-1">KATALOG RESMI <?= e($modTitle) ?> TA <?= (int)($filter['tahun'] ?? 2027) ?></h6>
+        <div class="small text-muted mb-2">
+            Kategori: <?= !empty($filter['kategori']) ? e($filter['kategori']) : 'Semua Kategori' ?> 
+            &bull; Total Data: <?= number_format($totalRows, 0, ',', '.') ?> Item 
+            &bull; Dicetak: <?= tanggal_id(date('Y-m-d')) ?>
+        </div>
+    </div>
+</div>
+
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="page-title">
@@ -37,9 +99,42 @@ $endItem = min($totalRows, $page * $perPage);
             <i class="bi bi-calendar-range me-1"></i> Jadwal Pengusulan
         </a>
         <?php endif; ?>
-        <button type="button" class="btn btn-primary" onclick="window.print()">
-            <i class="bi bi-printer me-1"></i> Cetak Katalog
-        </button>
+        <div class="btn-group">
+            <a href="<?= site_url("{$prefixUrl}/master_data/cetak?" . http_build_query(array_merge($filter, ['limit' => 250]))) ?>" 
+               target="_blank" 
+               class="btn btn-primary"
+               title="Buka Lembar Dokumen Katalog Resmi Lengkap dengan Kop Surat & Tanda Tangan BPKAD">
+                <i class="bi bi-printer me-1"></i> Cetak Katalog
+            </a>
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" title="Pilihan Cetak Katalog">
+                <span class="visually-hidden">Toggle Cetak</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width: 290px;">
+                <li><h6 class="dropdown-header text-uppercase small fw-bold text-muted"><i class="bi bi-file-earmark-pdf me-1"></i> Format Cetak Resmi (Kop BPKAD)</h6></li>
+                <li>
+                    <a class="dropdown-item py-2" href="<?= site_url("{$prefixUrl}/master_data/cetak?" . http_build_query(array_merge($filter, ['mode' => 'current_page', 'page' => $page, 'per_page' => $perPage]))) ?>" target="_blank">
+                        <i class="bi bi-file-earmark-text text-primary me-2"></i> Cetak Halaman Ini (<?= count($list) ?> Data)
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item py-2" href="<?= site_url("{$prefixUrl}/master_data/cetak?" . http_build_query(array_merge($filter, ['limit' => 250]))) ?>" target="_blank">
+                        <i class="bi bi-file-earmark-spreadsheet text-success me-2"></i> Cetak Sesuai Filter (Maks. 250 Data)
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item py-2" href="<?= site_url("{$prefixUrl}/master_data/cetak?" . http_build_query(array_merge($filter, ['limit' => 500]))) ?>" target="_blank">
+                        <i class="bi bi-files text-warning me-2"></i> Cetak Sesuai Filter (Maks. 500 Data)
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header text-uppercase small fw-bold text-muted"><i class="bi bi-display me-1"></i> Alternatif</h6></li>
+                <li>
+                    <a class="dropdown-item py-2" href="javascript:void(0)" onclick="window.print()">
+                        <i class="bi bi-browser-chrome text-secondary me-2"></i> Cetak Tampilan Web Langsung
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 

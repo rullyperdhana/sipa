@@ -462,3 +462,104 @@ a:hover { color: var(--primary-dark); }
 .sipa-countdown-wrapper.urgent .sipa-countdown-label {
     color: #ef4444 !important;
 }
+
+/* ==========================================================================
+   PRINT STYLES (Cetak Dokumen Resmi)
+   ========================================================================== */
+@media print {
+    /* Sembunyikan elemen navigasi dan kontrol interaktif */
+    .sidebar,
+    .top-header,
+    .main-footer,
+    .alert,
+    .page-header .btn,
+    .page-header .btn-group,
+    .page-header .d-flex.gap-2,
+    .btn,
+    .btn-group,
+    .pagination,
+    .card-footer,
+    .modal,
+    .toast-container,
+    #dropdownNotifBtn,
+    .notif-dropdown,
+    form.row.g-2 {
+        display: none !important;
+    }
+
+    /* Reset kontainer halaman */
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Times New Roman', Times, serif, 'Segoe UI', Arial, sans-serif !important;
+        font-size: 10pt !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .main-content,
+    .content-wrapper,
+    .container-fluid {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #000 !important;
+        padding: 6px 0 !important;
+    }
+
+    /* Format tabel cetak */
+    .table-responsive {
+        overflow: visible !important;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    table th, table td {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        padding: 4px 6px !important;
+        font-size: 8.5pt !important;
+    }
+
+    table thead {
+        display: table-header-group !important;
+    }
+
+    table tr {
+        page-break-inside: avoid !important;
+    }
+
+    table th {
+        background-color: #f0f0f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Sembunyikan kolom aksi pada tabel */
+    th.col-aksi,
+    td.col-aksi,
+    table th:last-child,
+    table td:last-child {
+        display: none !important;
+    }
+
+    @page {
+        size: A4 landscape;
+        margin: 10mm 12mm;
+    }
+}
+
