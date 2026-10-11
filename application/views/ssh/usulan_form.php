@@ -5,13 +5,24 @@ $tipe = $tipe ?? ($item->tipe ?? 'SSH');
 $isSbu = ($tipe === 'SBU');
 $prefixUrl = $prefixUrl ?? strtolower($tipe);
 $isEdit = !empty($item);
+$suratId = $suratId ?? ($suratInduk->id ?? ($item->surat_id ?? NULL));
 $modName = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
-$pageTitle = ($isEdit ? 'Edit Usulan ' : 'Tambah Usulan ') . $modName;
-$actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$prefixUrl}/tambah");
+$pageTitle = ($isEdit ? 'Edit Rincian Usulan ' : 'Tambah Rincian Usulan ') . $modName;
+$actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : ($suratId ? site_url("{$prefixUrl}/tambah/{$suratId}") : site_url("{$prefixUrl}/tambah"));
+$backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_url("{$prefixUrl}/usulan");
 ?>
 
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
     <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="<?= site_url("{$prefixUrl}/usulan") ?>">Usulan <?= $tipe ?></a></li>
+                <?php if (!empty($suratInduk)): ?>
+                <li class="breadcrumb-item"><a href="<?= site_url("{$prefixUrl}/surat/detail/{$suratInduk->id}") ?>">Surat No. <?= e($suratInduk->nomor_surat) ?></a></li>
+                <?php endif; ?>
+                <li class="breadcrumb-item active" aria-current="page"><?= $isEdit ? 'Edit Rincian Item' : 'Tambah Rincian Item' ?></li>
+            </ol>
+        </nav>
         <h1 class="page-title">
             <i class="bi <?= $isSbu ? 'bi-receipt-cutoff text-info' : 'bi-box-seam-fill text-primary' ?> me-2"></i><?= $pageTitle ?>
         </h1>
@@ -20,14 +31,14 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                 Perbaiki rincian item usulan <strong><?= e($item->kode_usulan) ?></strong>.
             <?php else: ?>
                 <?= $isSbu 
-                    ? 'Input usulan standar honorarium, jasa tenaga ahli, sewa, dan biaya operasional non-fisik untuk SKPD Anda.' 
-                    : 'Input rincian item harga satuan barang atau material fisik baru untuk SKPD Anda.' ?>
+                    ? 'Input rincian item standar honorarium, jasa tenaga ahli, sewa, dan biaya operasional ke dalam Surat Usulan Anda.' 
+                    : 'Input rincian item harga satuan barang atau material fisik baru ke dalam Surat Usulan Anda.' ?>
             <?php endif; ?>
         </p>
     </div>
     <div>
-        <a href="<?= site_url("{$prefixUrl}/usulan") ?>" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Usulan <?= $tipe ?>
+        <a href="<?= $backUrl ?>" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Kembali
         </a>
     </div>
 </div>
@@ -42,6 +53,24 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
             <small class="text-muted mt-1 d-block">Silakan perbaiki data di bawah ini, simpan, lalu klik tombol <strong>Kirim Ulang</strong> pada halaman daftar usulan.</small>
         </div>
     </div>
+</div>
+<?php endif; ?>
+
+<?php if (!empty($suratInduk)): ?>
+<div class="alert alert-primary border-primary shadow-sm mb-4 d-flex justify-content-between align-items-center py-2.5 px-3">
+    <div class="d-flex align-items-center gap-3">
+        <div class="rounded-3 p-2 bg-primary text-white d-flex align-items-center justify-content-center" style="width:42px;height:42px;">
+            <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
+        </div>
+        <div>
+            <div class="small text-muted text-uppercase fw-bold" style="font-size:10px;">Surat Usulan Resmi Terkait:</div>
+            <strong class="text-dark">No. <?= e($suratInduk->nomor_surat) ?></strong>
+            <span class="text-muted small ms-2">&bull; Tanggal: <?= tanggal_id($suratInduk->tanggal_surat) ?> &bull; <?= e($suratInduk->perihal) ?></span>
+        </div>
+    </div>
+    <a href="<?= site_url("{$prefixUrl}/surat/detail/{$suratInduk->id}") ?>" class="btn btn-sm btn-outline-primary" target="_blank">
+        <i class="bi bi-box-arrow-up-right me-1"></i> Buka Surat
+    </a>
 </div>
 <?php endif; ?>
 
@@ -62,6 +91,7 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                     <?= csrf_input() ?>
                     <!-- Hidden Tipe Otomatis Sesuai Modul -->
                     <input type="hidden" name="tipe" value="<?= $tipe ?>">
+                    <input type="hidden" name="surat_id" value="<?= (int)$suratId ?>">
                     <input type="hidden" name="master_standar_id" id="master_standar_id" value="<?= $isEdit ? (int)($item->master_standar_id ?? 0) : (!empty($masterItem) ? (int)$masterItem->id : '') ?>">
                     <input type="hidden" name="kode_kelompok" id="kode_kelompok" value="<?= $isEdit ? e($item->kode_kelompok ?? '') : (!empty($masterItem) ? e($masterItem->kode_kelompok) : '') ?>">
                     <input type="hidden" name="harga_acuan_master" id="harga_acuan_master" value="<?= $isEdit ? (float)($item->harga_acuan_master ?? 0) : (!empty($masterItem) ? (float)$masterItem->harga_satuan : '') ?>">
@@ -407,7 +437,7 @@ $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : site_url("{$p
                     <hr class="my-4">
 
                     <div class="d-flex justify-content-between align-items-center">
-                        <a href="<?= site_url("{$prefixUrl}/usulan") ?>" class="btn btn-light">Batal</a>
+                        <a href="<?= $backUrl ?>" class="btn btn-light">Batal</a>
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> px-4 fw-semibold" id="btnSimpanUsulan">
                                 <i class="bi bi-floppy-fill me-1"></i> <?= $isEdit ? 'Simpan Perubahan' : 'Simpan sebagai Draft' ?>

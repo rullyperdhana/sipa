@@ -9,6 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Ssh_model extends CI_Model
 {
     protected $table = 'standar_harga_usulan';
+    protected $table_surat = 'standar_harga_surat';
     protected $table_log = 'standar_harga_log';
     protected $table_master = 'ref_standar_harga';
     protected $table_jadwal = 'standar_harga_jadwal';
@@ -16,6 +17,410 @@ class Ssh_model extends CI_Model
     public function __construct()
     {
         parent::__construct();
+    }
+
+    // =========================================================================
+    // 0. PENGELOLAAN SURAT USULAN (standar_harga_surat)
+    // =========================================================================
+
+    /**
+     * Mengambil daftar Surat Usulan SKPD dengan aggregasi jumlah rincian item
+     */
+    public function getSuratBySkpd($skpd_id, $filter = [])
+    {
+        $this->db->select("
+            s.*,
+            skpd.nama_skpd,
+            skpd.kode_skpd,
+            usr.nama_lengkap as nama_pengusul,
+            v.nama_lengkap as nama_verifikator,
+            COUNT(u.id) as total_item,
+            COALESCE(SUM(u.harga_usulan), 0) as total_nominal,
+            COUNT(CASE WHEN u.status_proses = 'Draft' THEN 1 END) as count_draft,
+            COUNT(CASE WHEN u.status_proses = 'Diajukan' THEN 1 END) as count_diajukan,
+            COUNT(CASE WHEN u.status_proses = 'Direvisi' THEN 1 END) as count_direvisi,
+            COUNT(CASE WHEN u.status_proses = 'Ditolak' THEN 1 END) as count_ditolak,
+            COUNT(CASE WHEN u.status_proses = 'Diverifikasi' THEN 1 END) as count_diverifikasi,
+            COUNT(CASE WHEN u.status_proses = 'Ditetapkan' THEN 1 END) as count_ditetapkan
+        ", FALSE);
+        $this->db->from($this->table_surat . ' s');
+        $this->db->join($this->table . ' u', 'u.surat_id = s.id', 'left');
+        $this->db->join('skpd', 'skpd.id = s.id_skpd', 'left');
+        $this->db->join('users usr', 'usr.id = s.user_id', 'left');
+        $this->db->join('users v', 'v.id = s.verifikator_id', 'left');
+
+        if (!empty($skpd_id)) {
+            $this->db->where('s.id_skpd', (int)$skpd_id);
+        }
+
+        if (!empty($filter['tipe'])) {
+            $this->db->where('s.tipe', $filter['tipe']);
+        }
+        if (!empty($filter['tahun'])) {
+            $this->db->where('s.tahun_anggaran', (int)$filter['tahun']);
+        }
+        if (!empty($filter['status_proses'])) {
+            $this->db->where('s.status_proses', $filter['status_proses']);
+        }
+        if (!empty($filter['q'])) {
+            $q = trim($filter['q']);
+            $this->db->group_start()
+                ->like('s.nomor_surat', $q)
+                ->or_like('s.perihal', $q)
+                ->or_like('s.keterangan', $q)
+                ->group_end();
+        }
+
+        $this->db->group_by('s.id');
+        $this->db->order_by('s.id', 'DESC');
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Ambil 1 Surat Usulan berdasarkan ID
+     */
+    public function getSuratById($id)
+    {
+        $this->db->select("
+            s.*,
+            skpd.nama_skpd,
+            skpd.kode_skpd,
+            usr.nama_lengkap as nama_pengusul,
+            v.nama_lengkap as nama_verifikator,
+            COUNT(u.id) as total_item,
+            COALESCE(SUM(u.harga_usulan), 0) as total_nominal,
+            COUNT(CASE WHEN u.status_proses = 'Draft' THEN 1 END) as count_draft,
+            COUNT(CASE WHEN u.status_proses = 'Diajukan' THEN 1 END) as count_diajukan,
+            COUNT(CASE WHEN u.status_proses = 'Direvisi' THEN 1 END) as count_direvisi,
+            COUNT(CASE WHEN u.status_proses = 'Ditolak' THEN 1 END) as count_ditolak,
+            COUNT(CASE WHEN u.status_proses = 'Diverifikasi' THEN 1 END) as count_diverifikasi,
+            COUNT(CASE WHEN u.status_proses = 'Ditetapkan' THEN 1 END) as count_ditetapkan
+        ", FALSE);
+        $this->db->from($this->table_surat . ' s');
+        $this->db->join($this->table . ' u', 'u.surat_id = s.id', 'left');
+        $this->db->join('skpd', 'skpd.id = s.id_skpd', 'left');
+        $this->db->join('users usr', 'usr.id = s.user_id', 'left');
+        $this->db->join('users v', 'v.id = s.verifikator_id', 'left');
+        $this->db->where('s.id', (int)$id);
+        $this->db->group_by('s.id');
+        return $this->db->get()->row();
+    }
+
+    /**
+     * Mengambil daftar Surat Usulan untuk antrean Verifikator BPKAD
+     */
+    public function getSuratVerifikasi($filter = [])
+    {
+        $this->db->select("
+            s.*,
+            skpd.nama_skpd,
+            skpd.kode_skpd,
+            usr.nama_lengkap as nama_pengusul,
+            v.nama_lengkap as nama_verifikator,
+            COUNT(u.id) as total_item,
+            COALESCE(SUM(u.harga_usulan), 0) as total_nominal,
+            COUNT(CASE WHEN u.status_proses = 'Draft' THEN 1 END) as count_draft,
+            COUNT(CASE WHEN u.status_proses = 'Diajukan' THEN 1 END) as count_diajukan,
+            COUNT(CASE WHEN u.status_proses = 'Direvisi' THEN 1 END) as count_direvisi,
+            COUNT(CASE WHEN u.status_proses = 'Ditolak' THEN 1 END) as count_ditolak,
+            COUNT(CASE WHEN u.status_proses = 'Diverifikasi' THEN 1 END) as count_diverifikasi,
+            COUNT(CASE WHEN u.status_proses = 'Ditetapkan' THEN 1 END) as count_ditetapkan
+        ", FALSE);
+        $this->db->from($this->table_surat . ' s');
+        $this->db->join($this->table . ' u', 'u.surat_id = s.id', 'left');
+        $this->db->join('skpd', 'skpd.id = s.id_skpd', 'left');
+        $this->db->join('users usr', 'usr.id = s.user_id', 'left');
+        $this->db->join('users v', 'v.id = s.verifikator_id', 'left');
+
+        if (isset($filter['status_proses'])) {
+            if ($filter['status_proses'] !== '' && $filter['status_proses'] !== 'all') {
+                $this->db->where('s.status_proses', $filter['status_proses']);
+            }
+        } else {
+            $this->db->where('s.status_proses', 'Diajukan');
+        }
+
+        if (!empty($filter['tipe'])) {
+            $this->db->where('s.tipe', $filter['tipe']);
+        }
+        if (!empty($filter['id_skpd'])) {
+            $this->db->where('s.id_skpd', (int)$filter['id_skpd']);
+        }
+        if (!empty($filter['tahun'])) {
+            $this->db->where('s.tahun_anggaran', (int)$filter['tahun']);
+        }
+        if (!empty($filter['q'])) {
+            $q = trim($filter['q']);
+            $this->db->group_start()
+                ->like('s.nomor_surat', $q)
+                ->or_like('s.perihal', $q)
+                ->or_like('skpd.nama_skpd', $q)
+                ->group_end();
+        }
+
+        $this->db->group_by('s.id');
+        $this->db->order_by('s.id', 'DESC');
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Buat Surat Usulan Baru
+     */
+    public function insertSurat($data, $user)
+    {
+        $tipe = in_array($data['tipe'] ?? '', ['SSH', 'SBU'], TRUE) ? $data['tipe'] : 'SSH';
+        $tahun = !empty($data['tahun_anggaran']) ? (int)$data['tahun_anggaran'] : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027);
+
+        // Security / Schedule Guard: Operator SKPD dilarang membuat surat saat jadwal ditutup
+        if (!in_array($user->role, ['admin', 'pimpinan'], TRUE)) {
+            if (!$this->isJadwalBuka($tipe, $tahun)) {
+                return [
+                    'success' => FALSE,
+                    'message' => "Akses Ditolak: Jadwal pengusulan {$tipe} TA {$tahun} saat ini DITUTUP oleh Administrator BPKAD."
+                ];
+            }
+        }
+
+        $skpdId = (int)($user->role === 'admin' && !empty($data['id_skpd']) ? $data['id_skpd'] : $user->skpd_id);
+
+        $insertData = [
+            'nomor_surat'    => trim($data['nomor_surat']),
+            'tanggal_surat'  => $data['tanggal_surat'],
+            'perihal'        => trim($data['perihal']),
+            'tipe'           => $tipe,
+            'file_surat'     => $data['file_surat'],
+            'file_nama_asli' => $data['file_nama_asli'] ?? $data['file_surat'],
+            'id_skpd'        => $skpdId,
+            'user_id'        => (int)$user->id,
+            'tahun_anggaran' => $tahun,
+            'keterangan'     => !empty($data['keterangan']) ? trim($data['keterangan']) : NULL,
+            'status_proses'  => 'Draft',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'updated_at'     => date('Y-m-d H:i:s')
+        ];
+
+        $this->db->insert($this->table_surat, $insertData);
+        $insertId = (int)$this->db->insert_id();
+
+        return ['success' => TRUE, 'id' => $insertId, 'nomor_surat' => $insertData['nomor_surat']];
+    }
+
+    /**
+     * Update Surat Usulan
+     */
+    public function updateSurat($id, $data, $user)
+    {
+        $surat = $this->db->get_where($this->table_surat, ['id' => (int)$id])->row();
+        if (!$surat) {
+            return ['success' => FALSE, 'message' => 'Surat usulan tidak ditemukan.'];
+        }
+
+        if ($user->role !== 'admin' && (int)$surat->id_skpd !== (int)$user->skpd_id) {
+            return ['success' => FALSE, 'message' => 'Akses ditolak: Surat ini milik SKPD lain.'];
+        }
+
+        if (!in_array($surat->status_proses, ['Draft', 'Direvisi'], TRUE)) {
+            return ['success' => FALSE, 'message' => "Surat berstatus '{$surat->status_proses}' tidak dapat diubah."];
+        }
+
+        $updateData = [
+            'nomor_surat'   => trim($data['nomor_surat']),
+            'tanggal_surat' => $data['tanggal_surat'],
+            'perihal'       => trim($data['perihal']),
+            'keterangan'    => !empty($data['keterangan']) ? trim($data['keterangan']) : NULL,
+            'updated_at'    => date('Y-m-d H:i:s')
+        ];
+
+        if (!empty($data['file_surat'])) {
+            $updateData['file_surat']     = $data['file_surat'];
+            $updateData['file_nama_asli'] = $data['file_nama_asli'] ?? $data['file_surat'];
+        }
+
+        $this->db->where('id', (int)$id)->update($this->table_surat, $updateData);
+        return ['success' => TRUE, 'message' => 'Data Surat Usulan berhasil diperbarui.'];
+    }
+
+    /**
+     * Hapus Surat Usulan beserta rincian item di dalamnya
+     */
+    public function deleteSurat($id, $user)
+    {
+        $surat = $this->db->get_where($this->table_surat, ['id' => (int)$id])->row();
+        if (!$surat) {
+            return ['success' => FALSE, 'message' => 'Surat usulan tidak ditemukan.'];
+        }
+
+        if ($user->role !== 'admin' && (int)$surat->id_skpd !== (int)$user->skpd_id) {
+            return ['success' => FALSE, 'message' => 'Akses ditolak: Surat ini milik SKPD lain.'];
+        }
+
+        if (!in_array($surat->status_proses, ['Draft', 'Direvisi'], TRUE)) {
+            return ['success' => FALSE, 'message' => "Surat berstatus '{$surat->status_proses}' tidak dapat dihapus."];
+        }
+
+        // Hapus file surat
+        if (!empty($surat->file_surat)) {
+            @unlink(FCPATH . 'uploads/ssh_sbu/' . $surat->file_surat);
+        }
+
+        // Ambil dan hapus file lampiran dari rincian item
+        $items = $this->db->get_where($this->table, ['surat_id' => (int)$id])->result();
+        foreach ($items as $it) {
+            if (!empty($it->file_lampiran))   @unlink(FCPATH . 'uploads/ssh_sbu/' . $it->file_lampiran);
+            if (!empty($it->file_lampiran_2)) @unlink(FCPATH . 'uploads/ssh_sbu/' . $it->file_lampiran_2);
+            if (!empty($it->file_lampiran_3)) @unlink(FCPATH . 'uploads/ssh_sbu/' . $it->file_lampiran_3);
+        }
+
+        $this->db->where('id', (int)$id)->delete($this->table_surat);
+        return ['success' => TRUE, 'message' => 'Surat usulan beserta seluruh rincian item di dalamnya berhasil dihapus.'];
+    }
+
+    /**
+     * Kirim Surat Usulan ke BPKAD (Draft / Direvisi -> Diajukan)
+     */
+    public function kirimSurat($id, $user)
+    {
+        $surat = $this->db->get_where($this->table_surat, ['id' => (int)$id])->row();
+        if (!$surat) {
+            return ['success' => FALSE, 'message' => 'Surat usulan tidak ditemukan.'];
+        }
+
+        if ($user->role !== 'admin' && (int)$surat->id_skpd !== (int)$user->skpd_id) {
+            return ['success' => FALSE, 'message' => 'Akses ditolak: Surat ini milik SKPD lain.'];
+        }
+
+        if (!in_array($surat->status_proses, ['Draft', 'Direvisi'], TRUE)) {
+            return ['success' => FALSE, 'message' => "Surat berstatus '{$surat->status_proses}' tidak dapat dikirim."];
+        }
+
+        // Cek minimal ada 1 rincian item
+        $itemCount = $this->db->where('surat_id', (int)$id)->count_all_results($this->table);
+        if ($itemCount < 1) {
+            return [
+                'success' => FALSE,
+                'message' => 'Surat Usulan belum memiliki rincian item. Silakan tambahkan minimal 1 rincian item usulan sebelum mengirim berkas ke BPKAD.'
+            ];
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $statusSebelum = $surat->status_proses;
+
+        // Update surat
+        $this->db->where('id', (int)$id)->update($this->table_surat, [
+            'status_proses' => 'Diajukan',
+            'updated_at'    => $now
+        ]);
+
+        // Update semua item di dalam surat yang berstatus Draft / Direvisi
+        $this->db->where('surat_id', (int)$id)
+            ->where_in('status_proses', ['Draft', 'Direvisi'])
+            ->update($this->table, [
+                'status_proses' => 'Diajukan',
+                'updated_at'    => $now
+            ]);
+
+        // Catat log untuk tiap item
+        $items = $this->db->get_where($this->table, ['surat_id' => (int)$id])->result();
+        foreach ($items as $it) {
+            $this->logActivity($it->id, $user, $statusSebelum, 'Diajukan', "Usulan diajukan ke BPKAD melalui Surat Usulan #{$surat->nomor_surat}.");
+        }
+
+        return [
+            'success' => TRUE, 
+            'message' => "Surat Usulan <strong>{$surat->nomor_surat}</strong> beserta {$itemCount} rincian item berhasil dikirim ke BPKAD untuk diverifikasi."
+        ];
+    }
+
+    /**
+     * Ambil seluruh rincian item berdasarkan surat_id
+     */
+    public function getItemsBySuratId($surat_id)
+    {
+        $this->db->select('u.*, s.nama_skpd, usr.nama_lengkap as nama_pengusul, v.nama_lengkap as nama_verifikator, p.nama_lengkap as nama_penetap');
+        $this->db->from($this->table . ' u');
+        $this->db->join('skpd s', 's.id = u.id_skpd', 'left');
+        $this->db->join('users usr', 'usr.id = u.user_id', 'left');
+        $this->db->join('users v', 'v.id = u.verifikator_id', 'left');
+        $this->db->join('users p', 'p.id = u.penetap_id', 'left');
+        $this->db->where('u.surat_id', (int)$surat_id);
+        $this->db->order_by('u.id', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Sinkronisasi status Surat Usulan berdasarkan status rincian item di dalamnya
+     */
+    public function syncStatusSurat($surat_id)
+    {
+        $surat_id = (int)$surat_id;
+        if (!$surat_id) return;
+
+        $items = $this->db->get_where($this->table, ['surat_id' => $surat_id])->result();
+        if (empty($items)) return;
+
+        $statuses = array_column($items, 'status_proses');
+        $total = count($statuses);
+
+        $countDitolak      = count(array_keys($statuses, 'Ditolak'));
+        $countDitetapkan   = count(array_keys($statuses, 'Ditetapkan'));
+        $countDiverifikasi = count(array_keys($statuses, 'Diverifikasi'));
+        $countDirevisi     = count(array_keys($statuses, 'Direvisi'));
+        $countDiajukan     = count(array_keys($statuses, 'Diajukan'));
+        $countDraft        = count(array_keys($statuses, 'Draft'));
+
+        $newStatus = 'Diajukan';
+
+        if ($countDirevisi > 0) {
+            // Jika ada salah satu item yang minta direvisi, surat menjadi Direvisi
+            $newStatus = 'Direvisi';
+        } elseif ($countDraft === $total) {
+            $newStatus = 'Draft';
+        } elseif ($countDitolak === $total) {
+            // Semua ditolak
+            $newStatus = 'Ditolak';
+        } elseif ($countDitetapkan === $total) {
+            // Semua ditetapkan
+            $newStatus = 'Ditetapkan';
+        } elseif (($countDiverifikasi + $countDitetapkan + $countDitolak) === $total && ($countDiverifikasi + $countDitetapkan) > 0) {
+            // Semua sudah diputus dan minimal ada yang diverifikasi
+            $newStatus = ($countDitetapkan === ($total - $countDitolak)) ? 'Ditetapkan' : 'Diverifikasi';
+        } elseif ($countDiajukan > 0) {
+            $newStatus = 'Diajukan';
+        }
+
+        $this->db->where('id', $surat_id)->update($this->table_surat, [
+            'status_proses' => $newStatus,
+            'updated_at'    => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    /**
+     * Ringkasan hitungan statistik Surat Usulan
+     */
+    public function getSummaryCountsSurat($user, $tipe = NULL)
+    {
+        $role = $user->role;
+        $skpdId = (int) $user->skpd_id;
+
+        $this->db->select("
+            COUNT(CASE WHEN status_proses = 'Draft' THEN 1 END) as draft,
+            COUNT(CASE WHEN status_proses = 'Diajukan' THEN 1 END) as diajukan,
+            COUNT(CASE WHEN status_proses = 'Direvisi' THEN 1 END) as direvisi,
+            COUNT(CASE WHEN status_proses = 'Ditolak' THEN 1 END) as ditolak,
+            COUNT(CASE WHEN status_proses = 'Diverifikasi' THEN 1 END) as diverifikasi,
+            COUNT(CASE WHEN status_proses = 'Ditetapkan' THEN 1 END) as ditetapkan,
+            COUNT(*) as total
+        ");
+
+        if (in_array($role, ['operator_skpd', 'skpd'], TRUE)) {
+            $this->db->where('id_skpd', $skpdId);
+        }
+
+        if (!empty($tipe)) {
+            $this->db->where('tipe', $tipe);
+        }
+
+        return $this->db->get($this->table_surat)->row();
     }
 
     // =========================================================================
@@ -338,8 +743,18 @@ class Ssh_model extends CI_Model
         // Auto generate kode usulan: misal SSH-2026-0001
         $kodeUsulan = $this->generateKodeUsulan($tipe, $tahun);
 
+        $suratId = !empty($data['surat_id']) ? (int)$data['surat_id'] : NULL;
+        if ($suratId) {
+            $surat = $this->db->get_where($this->table_surat, ['id' => $suratId])->row();
+            if ($surat) {
+                $tipe  = $surat->tipe;
+                $tahun = (int)$surat->tahun_anggaran;
+            }
+        }
+
         $insertData = [
             'master_standar_id' => !empty($data['master_standar_id']) ? (int)$data['master_standar_id'] : NULL,
+            'surat_id'          => $suratId,
             'kode_usulan'       => $kodeUsulan,
             'tipe'              => $tipe,
             'kategori'          => trim($data['kategori']),
@@ -368,6 +783,11 @@ class Ssh_model extends CI_Model
 
         $this->db->insert($this->table, $insertData);
         $insertId = (int) $this->db->insert_id();
+
+        // Sinkronkan status surat jika terikat
+        if ($suratId) {
+            $this->syncStatusSurat($suratId);
+        }
 
         // Audit Trail
         $this->logActivity($insertId, $user, NULL, 'Draft', 'Membuat draft usulan baru: ' . $kodeUsulan);
@@ -542,6 +962,10 @@ class Ssh_model extends CI_Model
             $this->db->where('id', (int) $id)->update($this->table, $updateData);
             $this->logActivity($id, $user, $statusSebelum, 'Diverifikasi', 'Disetujui oleh verifikator. Catatan: ' . $updateData['catatan_verifikator']);
 
+            if (!empty($existing->surat_id)) {
+                $this->syncStatusSurat($existing->surat_id);
+            }
+
             return ['success' => TRUE, 'message' => 'Usulan berhasil disetujui dan berstatus Diverifikasi.'];
 
         } elseif ($action === 'revisi') {
@@ -560,6 +984,10 @@ class Ssh_model extends CI_Model
             $this->db->where('id', (int) $id)->update($this->table, $updateData);
             $this->logActivity($id, $user, $statusSebelum, 'Direvisi', 'Dikembalikan ke SKPD untuk direvisi. Catatan: ' . $catatan);
 
+            if (!empty($existing->surat_id)) {
+                $this->syncStatusSurat($existing->surat_id);
+            }
+
             return ['success' => TRUE, 'message' => 'Usulan dikembalikan ke SKPD untuk dilakukan perbaikan/revisi.'];
 
         } elseif ($action === 'tolak') {
@@ -577,6 +1005,10 @@ class Ssh_model extends CI_Model
 
             $this->db->where('id', (int) $id)->update($this->table, $updateData);
             $this->logActivity($id, $user, $statusSebelum, 'Ditolak', 'Ditolak oleh verifikator. Alasan penolakan: ' . $catatan);
+
+            if (!empty($existing->surat_id)) {
+                $this->syncStatusSurat($existing->surat_id);
+            }
 
             return ['success' => TRUE, 'message' => 'Usulan berhasil ditolak.'];
         }
@@ -634,6 +1066,10 @@ class Ssh_model extends CI_Model
         // Audit Trail
         $this->logActivity($id, $user, $statusSebelum, 'Ditetapkan', 'Standar harga resmi ditetapkan dan disinkronkan ke Master Data.');
 
+        if (!empty($existing->surat_id)) {
+            $this->syncStatusSurat($existing->surat_id);
+        }
+
         return ['success' => TRUE, 'message' => "Item '{$existing->uraian}' berhasil ditetapkan dan dikunci sebagai Master Data resmi."];
     }
 
@@ -663,7 +1099,13 @@ class Ssh_model extends CI_Model
             }
         }
 
+        $suratId = !empty($existing->surat_id) ? (int)$existing->surat_id : NULL;
+
         $this->db->where('id', (int) $id)->delete($this->table);
+
+        if ($suratId) {
+            $this->syncStatusSurat($suratId);
+        }
 
         return ['success' => TRUE, 'message' => 'Data usulan berhasil dihapus.'];
     }

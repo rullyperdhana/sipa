@@ -5,6 +5,25 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.9.0] - 2026-10-11
+
+### 🚀 Ditambahkan (Added)
+- **Workflow Baru Pengusulan SSH & SBU Berbasis Surat Usulan Resmi SKPD:**
+  - **Prasyarat Unggah Surat Usulan Resmi (Format PDF):** Sebelum SKPD dapat mengusulkan rincian barang/biaya (SSH/SBU), SKPD diwajibkan terlebih dahulu membuat berkas Surat Usulan resmi dengan mengunggah pindaian (scan) surat pengantar bertanda tangan Kepala SKPD dan berstempel dinas (format PDF).
+  - **Struktur Induk-Rincian (Header-Detail):** Satu Surat Usulan resmi menampung banyak rincian item barang/biaya SSH/SBU. Seluruh item usulan terikat langsung pada entitas Surat Usulan (`standar_harga_surat`).
+  - **Halaman Detail & Manajemen Surat Usulan (`/ssh/surat/detail/(:num)` & `/sbu/surat/detail/(:num)`):** Menampilkan kartu informasi surat dinas resmi, tombol pratinjau inline dokumen PDF tanpa unduh, statistik jumlah item dan akumulasi total nominal usulan, tabel rincian item di dalam surat, tombol tambah rincian item, serta tombol satu klik *"Kirim ke BPKAD"*.
+  - **Pratinjau Langsung Berkas Surat Usulan PDF di Browser:** Tersedia modal viewer interaktif dan endpoint inline preview (`/ssh/surat/preview/(:num)`) untuk membaca berkas surat usulan secara langsung di layar tanpa memaksa pengunduhan.
+  - **Antarmuka Tab Ganda pada Dashboard Usulan SKPD (`/ssh/usulan` & `/sbu/usulan`):**
+    - Tab 1: *Daftar Surat Usulan Resmi* (Tampilan utama berorientasi berkas surat dinas SKPD).
+    - Tab 2: *Semua Rincian Item (Flat View)* (Tampilan komprehensif seluruh item usulan lintas surat).
+  - **Ruang Kerja Verifikator BPKAD Berbasis Surat Usulan (`/ssh/verifikasi/surat/(:num)` & `/sbu/verifikasi/surat/(:num)`):**
+    - Verifikator BPKAD menelaah surat usulan resmi SKPD terlebih dahulu (melalui penampil PDF), lalu memverifikasi (Setujui / Revisi / Tolak) setiap item usulan di dalam surat tersebut.
+    - Dilengkapi bilah progres verifikasi real-time (*real-time progress bar*) dan ringkasan status putusan per surat.
+    - Otomatis melakukan sinkronisasi status induk surat (`syncStatusSurat`) saat rincian item disetujui, direvisi, atau ditolak.
+  - **Migrasi Basis Data:** Tabel baru `standar_harga_surat` dan penambahan kolom `surat_id` dengan indeks serta foreign key pada tabel `standar_harga_usulan` (`database/migrations/create_standar_harga_surat_and_link_usulan.sql`).
+
+---
+
 ## [2.8.1] - 2026-10-10
 
 ### 🚀 Ditambahkan (Added)

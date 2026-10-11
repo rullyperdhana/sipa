@@ -123,6 +123,7 @@ class Ssh_service
             'errors'   => $errors,
             'cleanData'=> [
                 'master_standar_id' => !empty($postData['master_standar_id']) ? (int)$postData['master_standar_id'] : NULL,
+                'surat_id'          => !empty($postData['surat_id']) ? (int)$postData['surat_id'] : NULL,
                 'tipe'              => in_array($postData['tipe'] ?? '', ['SSH', 'SBU']) ? $postData['tipe'] : 'SSH',
                 'kategori'          => $kategori,
                 'kode_kelompok'     => trim($postData['kode_kelompok'] ?? ''),

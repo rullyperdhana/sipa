@@ -50,7 +50,7 @@ class Dokumentasi extends Admin_Controller
         $data = [
             'title'         => 'Dokumentasi & Pembaruan Sistem',
             'activeTab'     => $tab,
-            'appVersion'    => $this->config->item('app_version') ?: '2.8.1',
+            'appVersion'    => $this->config->item('app_version') ?: '2.9.0',
             'changelogList' => $changelogList,
             'readmeHtml'    => $readmeHtml,
             'systemInfo'    => $systemInfo,
@@ -110,7 +110,7 @@ class Dokumentasi extends Admin_Controller
 
         return [
             'app_name'           => $this->config->item('app_name') ?: 'SIPA',
-            'app_version'        => $this->config->item('app_version') ?: '2.8.1',
+            'app_version'        => $this->config->item('app_version') ?: '2.9.0',
             'app_owner'          => $this->config->item('app_owner') ?: 'Pemerintah Kabupaten Tapin',
             'app_unit'           => $this->config->item('app_unit') ?: 'BPKAD',
             'environment'        => defined('ENVIRONMENT') ? ENVIRONMENT : 'production',

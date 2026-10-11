@@ -32,11 +32,20 @@ $route['verifikasi/proses/(:num)']         = 'verifikasi/proses/$1';
 // ===== Modul Standar Satuan Harga (SSH) =====
 $route['ssh']                               = 'ssh/index';
 $route['ssh/usulan']                        = 'ssh/usulan';
+$route['ssh/surat/tambah']                  = 'ssh/surat_tambah';
+$route['ssh/surat/edit/(:num)']             = 'ssh/surat_edit/$1';
+$route['ssh/surat/detail/(:num)']           = 'ssh/surat_detail/$1';
+$route['ssh/surat/kirim/(:num)']            = 'ssh/surat_kirim/$1';
+$route['ssh/surat/hapus/(:num)']            = 'ssh/surat_hapus/$1';
+$route['ssh/surat/preview/(:num)']          = 'ssh/surat_preview/$1';
+$route['ssh/surat/download/(:num)']         = 'ssh/surat_download/$1';
 $route['ssh/tambah']                        = 'ssh/tambah';
+$route['ssh/tambah/(:num)']                 = 'ssh/tambah/$1';
 $route['ssh/edit/(:num)']                   = 'ssh/edit/$1';
 $route['ssh/kirim/(:num)']                  = 'ssh/kirim/$1';
 $route['ssh/hapus/(:num)']                  = 'ssh/hapus/$1';
 $route['ssh/verifikasi']                    = 'ssh/verifikasi';
+$route['ssh/verifikasi/surat/(:num)']       = 'ssh/verifikasi_surat/$1';
 $route['ssh/proses-verifikasi/(:num)']      = 'ssh/proses_verifikasi/$1';
 $route['ssh/penetapan']                     = 'ssh/penetapan';
 $route['ssh/proses-penetapan/(:num)']       = 'ssh/proses_penetapan/$1';
@@ -51,16 +60,26 @@ $route['ssh/download/(:num)/(:num)']        = 'ssh/download_lampiran/$1/$2';
 $route['ssh/preview/(:num)']                 = 'ssh/preview_lampiran/$1';
 $route['ssh/preview/(:num)/(:num)']          = 'ssh/preview_lampiran/$1/$2';
 $route['ssh/api/lampiran/(:num)']           = 'ssh/api_lampiran/$1';
+$route['ssh/api/surat/(:num)']              = 'ssh/api_surat/$1';
 $route['ssh/api/transisi']                  = 'ssh/api_transisi_status';
 
 // ===== Modul Standar Biaya Umum (SBU) =====
 $route['sbu']                               = 'sbu/index';
 $route['sbu/usulan']                        = 'sbu/usulan';
+$route['sbu/surat/tambah']                  = 'sbu/surat_tambah';
+$route['sbu/surat/edit/(:num)']             = 'sbu/surat_edit/$1';
+$route['sbu/surat/detail/(:num)']           = 'sbu/surat_detail/$1';
+$route['sbu/surat/kirim/(:num)']            = 'sbu/surat_kirim/$1';
+$route['sbu/surat/hapus/(:num)']            = 'sbu/surat_hapus/$1';
+$route['sbu/surat/preview/(:num)']          = 'sbu/surat_preview/$1';
+$route['sbu/surat/download/(:num)']         = 'sbu/surat_download/$1';
 $route['sbu/tambah']                        = 'sbu/tambah';
+$route['sbu/tambah/(:num)']                 = 'sbu/tambah/$1';
 $route['sbu/edit/(:num)']                   = 'sbu/edit/$1';
 $route['sbu/kirim/(:num)']                  = 'sbu/kirim/$1';
 $route['sbu/hapus/(:num)']                  = 'sbu/hapus/$1';
 $route['sbu/verifikasi']                    = 'sbu/verifikasi';
+$route['sbu/verifikasi/surat/(:num)']       = 'sbu/verifikasi_surat/$1';
 $route['sbu/proses-verifikasi/(:num)']      = 'sbu/proses_verifikasi/$1';
 $route['sbu/penetapan']                     = 'sbu/penetapan';
 $route['sbu/proses-penetapan/(:num)']       = 'sbu/proses_penetapan/$1';
@@ -75,6 +94,7 @@ $route['sbu/download/(:num)/(:num)']        = 'sbu/download_lampiran/$1/$2';
 $route['sbu/preview/(:num)']                 = 'sbu/preview_lampiran/$1';
 $route['sbu/preview/(:num)/(:num)']          = 'sbu/preview_lampiran/$1/$2';
 $route['sbu/api/lampiran/(:num)']           = 'sbu/api_lampiran/$1';
+$route['sbu/api/surat/(:num)']              = 'sbu/api_surat/$1';
 $route['sbu/api/transisi']                  = 'sbu/api_transisi_status';
 
 // ===== Master Data =====

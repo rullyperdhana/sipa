@@ -203,13 +203,13 @@ $userRole = !empty($user->role) ? $user->role : '';
         <?php if ($userRole === 'admin'): ?>
         <a href="<?= site_url('dokumentasi') ?>" class="text-decoration-none text-muted" title="Buka Catatan Rilis & Dokumentasi Sistem">
             <small class="d-inline-flex align-items-center gap-1">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-0.5">v<?= $this->config->item('app_version') ?: '2.8.1' ?></span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-0.5">v<?= $this->config->item('app_version') ?: '2.9.0' ?></span>
                 <span>&copy; BPKAD <?= date('Y') ?></span>
                 <i class="bi bi-info-circle ms-0.5"></i>
             </small>
         </a>
         <?php else: ?>
-        <small>v<?= $this->config->item('app_version') ?: '2.8.1' ?> &copy; BPKAD <?= date('Y') ?></small>
+        <small>v<?= $this->config->item('app_version') ?: '2.9.0' ?> &copy; BPKAD <?= date('Y') ?></small>
         <?php endif; ?>
     </div>
 </aside>
