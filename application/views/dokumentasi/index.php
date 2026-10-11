@@ -345,6 +345,27 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Modul 9: Keamanan Sesi & Auto-Logout Pengguna Saat Idle -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-danger">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-danger-subtle text-danger fs-4"><i class="bi bi-clock-history"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">Keamanan Sesi & Auto-Logout Idle</h6>
+                                        <small class="text-muted">Proteksi akun saat perangkat ditinggalkan tanpa aktivitas</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>Pelacak Aktivitas Klien:</strong> Mendeteksi pergerakan mouse, klik, ketikan keyboard, sentuhan, dan scroll layar secara efisien.</li>
+                                    <li class="mb-1"><strong>Sinkronisasi Multi-Tab Browser:</strong> Aktivitas di satu tab otomatis mencegah logout di tab SIPA lainnya.</li>
+                                    <li class="mb-1"><strong>Countdown Warning Modal:</strong> Peringatan 60 detik sebelum sesi berakhir dengan tombol <em>"Tetap Masuk"</em> (perpanjang sesi tanpa reload) atau <em>"Logout Sekarang"</em>.</li>
+                                    <li class="mb-1"><strong>Proteksi Ganda Server & Konfigurasi Admin:</strong> Durasi idle (default 15 menit) dapat disesuaikan fleksibel oleh Admin di Master Data User.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

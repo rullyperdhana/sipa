@@ -16,8 +16,13 @@
                     <i class="bi bi-person-x-fill me-1"></i>Pendaftaran Mandiri: Ditutup
                 </span>
             <?php endif; ?>
+            <?php if (!empty($reg_settings['idle_timeout_enabled']) && $reg_settings['idle_timeout_enabled'] === '1'): ?>
+                <span class="badge bg-primary-subtle text-primary border border-primary py-2 px-3 d-none d-lg-inline-block" title="Auto-logout aktif saat idle">
+                    <i class="bi bi-clock-history me-1"></i>Auto-Logout: <?= (int)($reg_settings['idle_timeout_minutes'] ?? 15) ?> Menit
+                </span>
+            <?php endif; ?>
             <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalRegSettings">
-                <i class="bi bi-gear-fill me-1"></i>Pengaturan Pendaftaran
+                <i class="bi bi-shield-lock-fill me-1"></i>Pengaturan Sesi & Keamanan
             </button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalUser" onclick="openAddModal()">
                 <i class="bi bi-person-plus-fill me-1"></i>Tambah Pengguna
@@ -326,43 +331,124 @@
     </div>
 </div>
 
-<!-- Modal Pengaturan Pendaftaran Mandiri -->
+<!-- Modal Pengaturan Sesi & Keamanan Akun -->
 <div class="modal fade" id="modalRegSettings" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <form method="post" action="<?= site_url('master/user') ?>">
             <?= csrf_input() ?>
             <input type="hidden" name="action" value="save_reg_settings">
             <div class="modal-content">
                 <div class="modal-header bg-light">
-                    <h5 class="modal-title"><i class="bi bi-gear-wide-connected me-2 text-primary"></i>Pengaturan Pendaftaran Mandiri</h5>
+                    <h5 class="modal-title"><i class="bi bi-shield-lock-fill me-2 text-primary"></i>Pengaturan Sesi & Keamanan Pengguna</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="text-muted small mb-3">Atur kebijakan registrasi akun mandiri bagi operator SKPD melalui tautan halaman publik.</p>
+                    <ul class="nav nav-pills nav-fill mb-3" id="settingsTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-semibold" id="tab-idle-btn" data-bs-toggle="tab" data-bs-target="#tab-idle-pane" type="button" role="tab">
+                                <i class="bi bi-clock-history me-1"></i>Auto-Logout Saat Idle
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold" id="tab-reg-btn" data-bs-toggle="tab" data-bs-target="#tab-reg-pane" type="button" role="tab">
+                                <i class="bi bi-person-plus-fill me-1"></i>Pendaftaran Mandiri
+                            </button>
+                        </li>
+                    </ul>
 
-                    <div class="card p-3 mb-3 border">
-                        <div class="form-check form-switch mb-2">
-                            <input class="form-check-input" type="checkbox" role="switch" name="registration_enabled" id="set_reg_enabled" value="1" <?= (!empty($reg_settings['registration_enabled']) && $reg_settings['registration_enabled'] === '1') ? 'checked' : '' ?>>
-                            <label class="form-check-label fw-bold" for="set_reg_enabled">Buka Pendaftaran Mandiri</label>
+                    <div class="tab-content" id="settingsTabContent">
+                        <!-- Tab 1: Auto-Logout Idle -->
+                        <div class="tab-pane fade show active" id="tab-idle-pane" role="tabpanel">
+                            <div class="alert alert-info py-2 small d-flex align-items-center mb-3">
+                                <i class="bi bi-info-circle-fill fs-5 me-2 flex-shrink-0"></i>
+                                <div>
+                                    Fitur ini secara otomatis mengeluarkan sesi user yang tidak melakukan aktivitas (mouse, keyboard, scroll) demi menjaga keamanan dan kerahasiaan data daerah jika perangkat ditinggalkan.
+                                </div>
+                            </div>
+
+                            <div class="card p-3 mb-3 border">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" role="switch" name="idle_timeout_enabled" id="set_idle_enabled" value="1" <?= (!empty($reg_settings['idle_timeout_enabled']) && $reg_settings['idle_timeout_enabled'] === '1') ? 'checked' : '' ?>>
+                                    <label class="form-check-label fw-bold" for="set_idle_enabled">Aktifkan Auto-Logout Saat User Tidak Aktif (Idle)</label>
+                                </div>
+                                <small class="text-muted">Bila diaktifkan, pengguna yang tidak bergerak/berinteraksi selama batas waktu yang ditentukan akan otomatis dilogout.</small>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Batas Waktu Idle (Menit)</label>
+                                    <div class="input-group">
+                                        <select name="idle_timeout_minutes" class="form-select" id="select_idle_minutes">
+                                            <?php 
+                                            $currMins = (int)($reg_settings['idle_timeout_minutes'] ?? 15);
+                                            $optMins = [5, 10, 15, 20, 30, 45, 60, 120];
+                                            foreach ($optMins as $m): 
+                                            ?>
+                                                <option value="<?= $m ?>" <?= ($currMins === $m) ? 'selected' : '' ?>>
+                                                    <?= $m ?> Menit <?= ($m === 15) ? '(Rekomendasi)' : '' ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <span class="input-group-text"><i class="bi bi-stopwatch"></i></span>
+                                    </div>
+                                    <div class="form-text">Durasi maksimal tanpa interaksi sebelum akun otomatis logout.</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Peringatan Hitung Mundur (Detik)</label>
+                                    <div class="input-group">
+                                        <select name="idle_warning_seconds" class="form-select" id="select_idle_warning">
+                                            <?php 
+                                            $currSec = (int)($reg_settings['idle_warning_seconds'] ?? 60);
+                                            $optSec = [
+                                                0 => 'Tanpa Dialog (Langsung Logout)',
+                                                30 => '30 Detik Sebelum Logout',
+                                                60 => '60 Detik (1 Menit - Rekomendasi)',
+                                                120 => '120 Detik (2 Menit Sebelum Logout)'
+                                            ];
+                                            foreach ($optSec as $secVal => $secLabel): 
+                                            ?>
+                                                <option value="<?= $secVal ?>" <?= ($currSec === $secVal) ? 'selected' : '' ?>>
+                                                    <?= $secLabel ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <span class="input-group-text"><i class="bi bi-bell"></i></span>
+                                    </div>
+                                    <div class="form-text">Dialog peringatan muncul agar pengguna dapat memperpanjang sesi sebelum logout.</div>
+                                </div>
+                            </div>
                         </div>
-                        <small class="text-muted">Jika dinonaktifkan, tautan dan formulir registrasi mandiri akan ditutup untuk publik.</small>
-                    </div>
 
-                    <div class="card p-3 mb-3 border">
-                        <div class="form-check form-switch mb-2">
-                            <input class="form-check-input" type="checkbox" role="switch" name="registration_require_approval" id="set_reg_approval" value="1" <?= (!empty($reg_settings['registration_require_approval']) && $reg_settings['registration_require_approval'] === '1') ? 'checked' : '' ?>>
-                            <label class="form-check-label fw-bold" for="set_reg_approval">Wajib Verifikasi & Persetujuan Admin</label>
+                        <!-- Tab 2: Pendaftaran Mandiri -->
+                        <div class="tab-pane fade" id="tab-reg-pane" role="tabpanel">
+                            <p class="text-muted small mb-3">Atur kebijakan registrasi akun mandiri bagi operator SKPD melalui tautan halaman login publik.</p>
+
+                            <div class="card p-3 mb-3 border">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" role="switch" name="registration_enabled" id="set_reg_enabled" value="1" <?= (!empty($reg_settings['registration_enabled']) && $reg_settings['registration_enabled'] === '1') ? 'checked' : '' ?>>
+                                    <label class="form-check-label fw-bold" for="set_reg_enabled">Buka Pendaftaran Mandiri</label>
+                                </div>
+                                <small class="text-muted">Jika dinonaktifkan, tautan dan formulir registrasi mandiri akan ditutup untuk publik.</small>
+                            </div>
+
+                            <div class="card p-3 mb-3 border">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" role="switch" name="registration_require_approval" id="set_reg_approval" value="1" <?= (!empty($reg_settings['registration_require_approval']) && $reg_settings['registration_require_approval'] === '1') ? 'checked' : '' ?>>
+                                    <label class="form-check-label fw-bold" for="set_reg_approval">Wajib Verifikasi & Persetujuan Admin</label>
+                                </div>
+                                <small class="text-muted">Akun baru yang mendaftar mandiri akan berstatus <em>Nonaktif / Menunggu Verifikasi</em> sampai disetujui oleh Administrator BKAD (Sangat Disarankan untuk Keamanan).</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Role Bawaan Pendaftar Baru</label>
+                                <select name="registration_default_role" class="form-select">
+                                    <option value="operator_skpd" <?= ($reg_settings['registration_default_role'] === 'operator_skpd') ? 'selected' : '' ?>>Operator SKPD (operator_skpd - Rekomendasi)</option>
+                                    <option value="skpd" <?= ($reg_settings['registration_default_role'] === 'skpd') ? 'selected' : '' ?>>SKPD / Unit Kerja (skpd)</option>
+                                </select>
+                                <div class="form-text">Role yang otomatis disematkan pada pengguna saat berhasil mendaftar mandiri.</div>
+                            </div>
                         </div>
-                        <small class="text-muted">Akun baru yang mendaftar mandiri akan berstatus <em>Nonaktif / Menunggu Verifikasi</em> sampai disetujui oleh Administrator BKAD (Sangat Disarankan untuk Keamanan).</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Role Bawaan Pendaftar Baru</label>
-                        <select name="registration_default_role" class="form-select">
-                            <option value="operator_skpd" <?= ($reg_settings['registration_default_role'] === 'operator_skpd') ? 'selected' : '' ?>>Operator SKPD (operator_skpd - Rekomendasi)</option>
-                            <option value="skpd" <?= ($reg_settings['registration_default_role'] === 'skpd') ? 'selected' : '' ?>>SKPD / Unit Kerja (skpd)</option>
-                        </select>
-                        <div class="form-text">Role yang otomatis disematkan pada pengguna saat berhasil mendaftar mandiri.</div>
                     </div>
                 </div>
                 <div class="modal-footer bg-light">

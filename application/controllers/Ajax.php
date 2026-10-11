@@ -132,4 +132,19 @@ class Ajax extends Auth_Controller
     {
         return $this->baca_notif('all');
     }
+
+    /**
+     * Endpoint heartbeat untuk memperpanjang sesi user (mereset batas waktu idle)
+     */
+    public function ping_session()
+    {
+        $this->session->set_userdata('last_activity', time());
+        return $this->output->set_output(json_encode([
+            'success'   => TRUE,
+            'message'   => 'Sesi berhasil diperpanjang.',
+            'timestamp' => time(),
+            'csrfName'  => $this->security->get_csrf_token_name(),
+            'csrfHash'  => $this->security->get_csrf_hash()
+        ]));
+    }
 }

@@ -363,13 +363,16 @@ sipa/
 
    # Migrasi v2.9.0 (Modul Header-Detail Surat Usulan Resmi SKPD & Relasi Usulan Standar Harga)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_standar_harga_surat_and_link_usulan.sql
+
+   # Migrasi v2.9.6 (Konfigurasi Auto-Logout Pengguna Saat Idle pada ex_settings)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_idle_timeout_settings.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
    > [!TIP]
    > Alternatif eksekusi migrasi otomatis tanpa password MySQL root VPS:
    > ```bash
-   > php -r 'define("BASEPATH",true);define("ENVIRONMENT","production");require "application/config/database.php";$cfg=$db["default"];$pdo=new PDO("mysql:host=".($cfg["hostname"]??"localhost").";port=".($cfg["port"]??3306).";dbname=".$cfg["database"],$cfg["username"],$cfg["password"]);$pdo->exec(file_get_contents("database/migrations/create_standar_harga_surat_and_link_usulan.sql"));echo "Migrasi Berhasil!\n";'
+   > php -r 'define("BASEPATH",true);define("ENVIRONMENT","production");require "application/config/database.php";$cfg=$db["default"];$pdo=new PDO("mysql:host=".($cfg["hostname"]??"localhost").";port=".($cfg["port"]??3306).";dbname=".$cfg["database"],$cfg["username"],$cfg["password"]);$pdo->exec(file_get_contents("database/migrations/add_idle_timeout_settings.sql"));echo "Migrasi Berhasil!\n";'
    > ```
 
 ---
@@ -378,6 +381,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`add_idle_timeout_settings.sql`](database/migrations/add_idle_timeout_settings.sql) | Menambahkan konfigurasi bawaan auto-logout pengguna saat tidak aktif (`idle_timeout_enabled`, `idle_timeout_minutes`, `idle_warning_seconds`) pada tabel `ex_settings`. |
 | [`create_standar_harga_surat_and_link_usulan.sql`](database/migrations/create_standar_harga_surat_and_link_usulan.sql) | Membuat tabel `standar_harga_surat` untuk menampung surat dinas pengantar resmi (upload scan PDF bertanda tangan Kepala SKPD) dan relasi `surat_id` pada tabel `standar_harga_usulan`. |
 | [`add_ditolak_status_to_ssh_sbu.sql`](database/migrations/add_ditolak_status_to_ssh_sbu.sql) | Menambahkan status `Ditolak` pada enum `status_proses` tabel `standar_harga_usulan` untuk modul SSH dan SBU. |
 | [`add_global_fiscal_year_and_skpd_nomenklatur.sql`](database/migrations/add_global_fiscal_year_and_skpd_nomenklatur.sql) | Menambahkan tabel `skpd_nomenklatur` untuk mencatat riwayat nama SKPD, kode unit, dan Kepala SKPD per Tahun Anggaran agar dokumen cetak lampau tetap otentik. |
@@ -446,6 +450,12 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
   POST /ajax/notif/read/{id}
   ```
 
+- **Detak Jantung Sesi Aktif (*Session Heartbeat Ping*):**
+  ```http
+  POST /ajax/ping_session
+  ```
+  *Response:* `{"success": true, "message": "Sesi berhasil diperpanjang.", "csrfName": "...", "csrfHash": "..."}`
+
 - **Persiapan Draf & Kontak Notifikasi WhatsApp:**
   ```http
   POST /wa/ajax_prepare
@@ -466,6 +476,7 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.9.6 (2026-10-12):** Fitur Auto-Logout Otomatis Pengguna saat Idle (Inactivity Auto-Logout System) - Pelacak aktivitas mouse, keyboard, touch, dan scroll dengan *throttling* performa, Sinkronisasi Multi-Tab Peramban via `localStorage` dan Storage Event, Dialog Peringatan Hitung Mundur Interaktif (SweetAlert2 Countdown Modal) dengan opsi *"Tetap Masuk"* (AJAX Heartbeat Ping) atau *"Logout Sekarang"*, Proteksi Ganda Sisi Server (`Auth.php`), Penanganan Otomatis Background Polling (`X-Background-Poll: 1`) & Jeda Polling saat idle > 2 menit, Global AJAX 401 Error Handler, Pengaturan Administrator Fleksibel di Master Data User, dan Migrasi Konfigurasi Database `add_idle_timeout_settings.sql`.
 - **v2.9.5 (2026-10-11):** Pembaruan Menyeluruh Fitur Cetak Katalog Master Data Standar Harga (SSH & SBU) - Lembar Dokumen Resmi Kedinasan (`cetak_master`) lengkap dengan Kop Surat Pemkab Tapin & BKAD, Judul Resmi, Ringkasan Parameter Filter, Tabel Landscape Berulang (*repeating thead*), dan Blok Tanda Tangan Kepala BKAD. Menu Dropdown Cetak Fleksibel (*Cetak Halaman Ini*, *Cetak 250 Data*, *Cetak 500 Data*, *Cetak Tampilan Web*), Toolbar Layar Interaktif (`.no-print-toolbar`), dan Global CSS Media Print (`@media print`) Anti-Sidebar/Navbar.
 - **v2.9.4 (2026-10-11):** Perbaikan Menyeluruh & Optimalisasi Fitur Notifikasi Aplikasi (In-App Notification System) - Autoload global `notifikasi_model`, helper notifikasi (`create`, `sendToRoles`, `sendToSkpd`), format waktu relatif (*"Baru saja"*, *"5 mnt lalu"*, *"2 jam lalu"*, *"Kemarin"*), normalisasi URL notifikasi anti-domain lama, tombol 1-klik "Tandai Semua Dibaca" (*Mark All as Read*), sinkronisasi CSRF token otomatis, integrasi alur SSH & SBU, registrasi & aktivasi akun, serta penanganan respon AJAX 401/403 JSON saat sesi berakhir.
 - **v2.9.3 (2026-10-11):** Live Countdown Timer Interaktif pada Banner Jadwal Pengusulan Aktif (Hari, Jam, Menit, Detik), Mode Darurat/Urgent (< 24 jam), Pengumuman Jadwal & Countdown Terbuka di Halaman Login (`/login`) untuk SKPD tanpa login, integrasi pada SSH, SBU, RKBMD, dan Dashboard.

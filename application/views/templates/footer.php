@@ -20,13 +20,27 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<?php
+$idleEnabled = function_exists('get_setting') ? (get_setting('idle_timeout_enabled', '1') === '1') : TRUE;
+$idleMinutes = function_exists('get_setting') ? (int) get_setting('idle_timeout_minutes', 15) : 15;
+if ($idleMinutes < 1) $idleMinutes = 15;
+$idleWarningSec = function_exists('get_setting') ? (int) get_setting('idle_warning_seconds', 60) : 60;
+if ($idleWarningSec < 0) $idleWarningSec = 60;
+?>
 <!-- App Configuration (Loaded before scripts) -->
 <script>
 window.appConfig = {
     baseUrl: '<?= site_url() ?>',
     csrfName: '<?= $this->security->get_csrf_token_name() ?>',
     csrfHash: '<?= $this->security->get_csrf_hash() ?>',
-    userRole: '<?= ($this->auth && $this->auth->user()) ? $this->auth->user()->role : "" ?>'
+    userRole: '<?= ($this->auth && $this->auth->user()) ? $this->auth->user()->role : "" ?>',
+    idleTimeout: {
+        enabled: <?= $idleEnabled ? 'true' : 'false' ?>,
+        timeoutMinutes: <?= $idleMinutes ?>,
+        warningSeconds: <?= $idleWarningSec ?>,
+        logoutUrl: '<?= site_url("logout?reason=idle") ?>',
+        pingUrl: '<?= site_url("ajax/ping_session") ?>'
+    }
 };
 </script>
 

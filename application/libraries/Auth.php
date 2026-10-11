@@ -114,6 +114,7 @@ class Auth
             'menu_permissions' => $perms,
             'is_logged_in'     => TRUE,
             'login_time'       => time(),
+            'last_activity'    => time(),
         ];
         $this->CI->session->set_userdata($sessionData);
 
@@ -264,16 +265,20 @@ class Auth
         }
     }
 
-    public function logout()
+    public function logout($reason = 'manual')
     {
         $userId = $this->CI->session->userdata('user_id');
         if ($userId) {
             try {
+                $keterangan = ($reason === 'idle')
+                    ? 'Logout otomatis karena tidak ada aktivitas (idle timeout)'
+                    : 'Logout normal';
                 $this->CI->db->insert('log_aktivitas', [
                     'user_id'    => $userId,
                     'username'   => $this->CI->session->userdata('username'),
                     'aksi'       => 'logout',
                     'modul'      => 'auth',
+                    'keterangan' => $keterangan,
                     'ip_address' => $this->CI->input->ip_address(),
                     'created_at' => date('Y-m-d H:i:s')
                 ]);
@@ -283,9 +288,57 @@ class Auth
         $this->CI->session->sess_destroy();
     }
 
+    /**
+     * Memeriksa apakah request berasal dari polling berkala (background worker)
+     * agar tidak merefresh batas waktu idle user secara otomatis.
+     */
+    public function isBackgroundPoll()
+    {
+        if ($this->CI->input->get_request_header('X-Background-Poll') !== NULL) {
+            return TRUE;
+        }
+        if ($this->CI->input->get('bg_poll') === '1') {
+            return TRUE;
+        }
+        $uri = trim($this->CI->uri->uri_string(), '/');
+        if ($this->CI->input->method() === 'get' && ($uri === 'ajax/notif/list' || $uri === 'ajax/notifikasi')) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
     public function check()
     {
         if ((bool) $this->CI->session->userdata('is_logged_in')) {
+            // Pemeriksaan idle timeout jika fitur diaktifkan
+            $idleEnabled = function_exists('get_setting') ? (get_setting('idle_timeout_enabled', '1') === '1') : TRUE;
+            if ($idleEnabled) {
+                $idleMinutes = function_exists('get_setting') ? (int) get_setting('idle_timeout_minutes', 15) : 15;
+                if ($idleMinutes < 1) $idleMinutes = 15;
+                $maxIdleSeconds = $idleMinutes * 60;
+
+                $lastActivity = (int) $this->CI->session->userdata('last_activity');
+                $now = time();
+
+                // Inisialisasi last_activity jika belum ada
+                if ($lastActivity <= 0) {
+                    $lastActivity = (int) $this->CI->session->userdata('login_time') ?: $now;
+                    $this->CI->session->set_userdata('last_activity', $lastActivity);
+                }
+
+                // Cek apakah waktu idle telah melebihi batas
+                if (($now - $lastActivity) > $maxIdleSeconds) {
+                    $this->logout('idle');
+                    $this->CI->session->set_flashdata('warning', "Sesi Anda telah berakhir otomatis karena tidak ada aktivitas selama {$idleMinutes} menit demi keamanan akun.");
+                    return FALSE;
+                }
+
+                // Perbarui waktu aktivitas jika bukan polling background otomatis
+                if (!$this->isBackgroundPoll()) {
+                    $this->CI->session->set_userdata('last_activity', $now);
+                }
+            }
+
             return TRUE;
         }
 
@@ -307,6 +360,7 @@ class Auth
                     'menu_permissions' => $perms,
                     'is_logged_in'     => TRUE,
                     'login_time'       => time(),
+                    'last_activity'    => time(),
                 ]);
                 // Rotate remember-me token
                 $newToken = bin2hex(random_bytes(32));
@@ -415,14 +469,17 @@ class Auth
                 $this->CI->output->set_status_header(401)
                     ->set_content_type('application/json')
                     ->set_output(json_encode([
-                        'success'   => false,
-                        'message'   => 'Sesi Anda telah berakhir. Silakan login kembali.',
-                        'logged_in' => false
+                        'success'      => false,
+                        'message'      => 'Sesi Anda telah berakhir. Silakan login kembali.',
+                        'logged_in'    => false,
+                        'idle_timeout' => true
                     ]))
                     ->_display();
                 exit;
             }
-            $this->CI->session->set_flashdata('warning', 'Silakan login terlebih dahulu.');
+            if (!$this->CI->session->flashdata('warning')) {
+                $this->CI->session->set_flashdata('warning', 'Silakan login terlebih dahulu.');
+            }
             redirect('login');
         }
         if ($roles !== NULL && !$this->hasRole($roles)) {

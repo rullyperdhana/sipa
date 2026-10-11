@@ -331,6 +331,9 @@ class Master extends Admin_Controller
                 'registration_enabled'          => function_exists('get_setting') ? get_setting('registration_enabled', '1') : '1',
                 'registration_require_approval' => function_exists('get_setting') ? get_setting('registration_require_approval', '1') : '1',
                 'registration_default_role'     => function_exists('get_setting') ? get_setting('registration_default_role', 'operator_skpd') : 'operator_skpd',
+                'idle_timeout_enabled'          => function_exists('get_setting') ? get_setting('idle_timeout_enabled', '1') : '1',
+                'idle_timeout_minutes'          => function_exists('get_setting') ? (int) get_setting('idle_timeout_minutes', '15') : 15,
+                'idle_warning_seconds'          => function_exists('get_setting') ? (int) get_setting('idle_warning_seconds', '60') : 60,
             ]
         ];
         $this->load->view('templates/header', $data);
@@ -412,12 +415,22 @@ class Master extends Admin_Controller
             $requireApproval = $this->input->post('registration_require_approval') ? '1' : '0';
             $defaultRole = $this->input->post('registration_default_role', TRUE) ?: 'operator_skpd';
 
+            $idleEnabled = $this->input->post('idle_timeout_enabled') ? '1' : '0';
+            $idleMinutes = (int) $this->input->post('idle_timeout_minutes');
+            if ($idleMinutes < 1) $idleMinutes = 15;
+            $idleWarningSec = (int) $this->input->post('idle_warning_seconds');
+            if ($idleWarningSec < 0) $idleWarningSec = 60;
+
             set_setting('registration_enabled', $regEnabled);
             set_setting('registration_require_approval', $requireApproval);
             set_setting('registration_default_role', $defaultRole);
 
-            $this->logger->record('update', 'setting', "Update Pengaturan Registrasi Mandiri: Status={$regEnabled}, Approval={$requireApproval}, Role={$defaultRole}");
-            $this->session->set_flashdata('success', 'Pengaturan pendaftaran mandiri user berhasil diperbarui.');
+            set_setting('idle_timeout_enabled', $idleEnabled);
+            set_setting('idle_timeout_minutes', (string)$idleMinutes);
+            set_setting('idle_warning_seconds', (string)$idleWarningSec);
+
+            $this->logger->record('update', 'setting', "Update Pengaturan Sesi & Registrasi: Status Reg={$regEnabled}, Idle={$idleEnabled} ({$idleMinutes}m, warning {$idleWarningSec}s)");
+            $this->session->set_flashdata('success', 'Pengaturan sesi pengguna & pendaftaran mandiri berhasil diperbarui.');
         } elseif ($action === 'approve') {
             $id = (int) $this->input->post('id');
             $this->user_model->update($id, ['is_active' => 1]);

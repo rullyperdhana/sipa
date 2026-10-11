@@ -17,7 +17,17 @@ class Login extends MY_Controller
 
     public function masuk()
     {
-        if ($this->auth->check()) redirect('dashboard');
+        $reason = $this->input->get('reason');
+        if ($reason === 'idle') {
+            if ($this->auth->check()) {
+                $this->auth->logout('idle');
+            }
+            if (!$this->session->flashdata('warning')) {
+                $this->session->set_flashdata('warning', 'Sesi Anda telah berakhir otomatis karena tidak ada aktivitas dalam waktu lama demi keamanan akun. Silakan login kembali.');
+            }
+        } else {
+            if ($this->auth->check()) redirect('dashboard');
+        }
 
         $fails = (int) $this->session->userdata('login_fails');
         $showCaptcha = ($fails >= 3);
@@ -129,9 +139,16 @@ class Login extends MY_Controller
 
     public function logout()
     {
-        $this->auth->logout();
-        $this->session->set_flashdata('success', 'Anda telah berhasil logout.');
-        redirect('login');
+        $reason = $this->input->get('reason');
+        if ($reason === 'idle') {
+            $this->auth->logout('idle');
+            $this->session->set_flashdata('warning', 'Sesi Anda telah berakhir otomatis karena tidak ada aktivitas dalam waktu lama demi keamanan akun. Silakan login kembali.');
+            redirect('login?reason=idle');
+        } else {
+            $this->auth->logout('manual');
+            $this->session->set_flashdata('success', 'Anda telah berhasil logout.');
+            redirect('login');
+        }
     }
 
     protected function _get_skpd_list() {

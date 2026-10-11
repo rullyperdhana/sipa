@@ -5,6 +5,25 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.9.6] - 2026-10-12
+
+### 🚀 Ditambahkan (Added)
+- **Fitur Auto-Logout Otomatis Pengguna saat Idle (Inactivity Auto-Logout System):**
+  - **Pelacak Aktivitas Pengguna Klien (`app.js`):** Mendeteksi pergerakan kursor mouse (`mousemove`), klik (`mousedown`), ketikan keyboard (`keydown`), scroll layar (`scroll`), sentuhan (`touchstart`), dan roda mouse (`wheel`) dengan *throttling* efisien agar tidak membebani performa peramban.
+  - **Sinkronisasi Multi-Tab Peramban (`localStorage` & `storage event`):** Aktivitas di satu tab otomatis memperbarui status aktif di seluruh tab terbuka lainnya, mencegah logout mendadak saat pengguna sedang aktif mengetik di tab lain. Jika user logout di salah satu tab, seluruh tab terbuka lainnya otomatis tersinkronisasi untuk keluar.
+  - **Dialog Peringatan Hitung Mundur Interaktif (SweetAlert2 Countdown Modal):** Muncul secara elegan (default 60 detik sebelum batas waktu berakhir) dengan detik hitung mundur berjalan:
+    - *Tombol "Tetap Masuk":* Memperpanjang sesi secara mulus melalui endpoint detak (*heartbeat ping*) tanpa perlu memuat ulang halaman (*reload*).
+    - *Tombol "Logout Sekarang":* Langsung mengakhiri sesi dan keluar ke halaman login.
+    - *Auto-Dismiss:* Jika hitungan detik mencapai 0, peramban otomatis mengalihkan pengguna ke halaman login dengan pesan peringatan keamanan.
+  - **Proteksi Ganda Sisi Server (*Server-Side Inactivity Enforcement*):** Pustaka `Auth.php` memeriksa timestamp aktivitas terakhir (`last_activity`) pada setiap request yang diautentikasi. Jika laptop/komputer dalam keadaan sleep atau peramban ditutup melebihi batas waktu idle, server langsung membatalkan sesi, menghapus cookie remember-me, mencatat log audit ke `log_aktivitas` (*"Logout otomatis karena tidak ada aktivitas (idle timeout)"*), dan mengarahkan ke halaman login.
+  - **Penanganan Background Polling:** Request berkala notifikasi otomatis (`ajax/notif/list`) diberikan header `X-Background-Poll: 1` agar tidak memperbarui timestamp aktivitas user secara semu, serta polling otomatis dijeda jika pengguna sudah tidak bergerak lebih dari 2 menit.
+  - **Penanganan Global AJAX Error 401:** Menambahkan handler `$(document).ajaxError` di `app.js` untuk mendeteksi sesi kedaluwarsa pada request AJAX latar belakang dan mengarahkan pengguna secara mulus ke `/login?reason=idle`.
+  - **Konfigurasi Fleksibel oleh Administrator:** Pada menu **Master Data > Manajemen Pengguna**, modal **"Pengaturan Sesi & Keamanan"** kini menyediakan tab khusus untuk mengaktifkan/menonaktifkan auto-logout, mengatur batas durasi idle (5 s.d 120 menit, rekomendasi 15 menit), serta memilih durasi hitung mundur peringatan (30s, 60s, 120s, atau langsung logout).
+  - **Endpoint Heartbeat Ping:** Mendaftarkan endpoint terproteksi `POST /ajax/ping_session` untuk memperbarui timestamp sesi aktif dan memperbarui CSRF token.
+  - **Migrasi Database (`add_idle_timeout_settings.sql`):** Menyimpan pengaturan `idle_timeout_enabled`, `idle_timeout_minutes`, dan `idle_warning_seconds` pada tabel `ex_settings`.
+
+---
+
 ## [2.9.5] - 2026-10-11
 
 ### 🚀 Ditambahkan & Diperbaiki (Added & Fixed)
