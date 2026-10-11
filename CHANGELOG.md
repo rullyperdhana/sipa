@@ -5,6 +5,18 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 
 ---
 
+## [2.9.1] - 2026-10-11
+
+### 🐛 Diperbaiki (Fixed)
+- **Perbaikan Tampilan Layar Usulan & Verifikasi SSH/SBU:**
+  - Mengatasi fatal error `Call to undefined function status_badge()` yang menyebabkan output halaman terpotong dan kehilangan seluruh CSS, sidebar, dan tata letak (*layout broken / kacau*).
+  - Menyediakan alias fungsi helper `status_badge()` dan mengganti semua pemanggilan menjadi fungsi standar `badge_status()`.
+  - Merestrukturisasi navigasi tab menjadi *Modern Pill Navigation* yang lebih elegan, kontras tinggi, dan responsif.
+  - Memperbaiki proporsi lebar kolom tabel (`table-responsive`) sehingga kolom total nominal dan aksi verifikator/kelola rincian tidak terpotong atau menimbulkan scrollbar horizontal berlebih pada resolusi desktop standar.
+  - Menyelaraskan filter SKPD untuk akun administrator dan menyempurnakan sinkronisasi hitungan statistik (*KPI cards*) berdasarkan tahun anggaran aktif.
+
+---
+
 ## [2.9.0] - 2026-10-11
 
 ### 🚀 Ditambahkan (Added)

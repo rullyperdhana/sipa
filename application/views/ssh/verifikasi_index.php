@@ -134,22 +134,27 @@ $stats = $summarySurat ?? $summary;
 </div>
 
 <!-- Navigasi Tab Tampilan: Antrean Berbasis Surat Usulan vs Rincian Item (Flat) -->
-<ul class="nav nav-tabs border-bottom mb-3" id="verifTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active fw-semibold" id="tab-surat-btn" data-bs-toggle="tab" data-bs-target="#tab-surat-content" type="button" role="tab" aria-controls="tab-surat-content" aria-selected="true">
-            <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>
-            Antrean Surat Usulan Resmi
-            <span class="badge bg-primary ms-1"><?= count($suratList ?? []) ?></span>
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link fw-semibold" id="tab-item-btn" data-bs-toggle="tab" data-bs-target="#tab-item-content" type="button" role="tab" aria-controls="tab-item-content" aria-selected="false">
-            <i class="bi bi-list-columns-reverse text-secondary me-2"></i>
-            Semua Rincian Item (Flat View)
-            <span class="badge bg-secondary ms-1"><?= count($list ?? []) ?></span>
-        </button>
-    </li>
-</ul>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <ul class="nav nav-pills gap-1 bg-white p-1 rounded-3 shadow-sm border" id="verifTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active px-3 py-1.5 fw-semibold" id="tab-surat-btn" data-bs-toggle="tab" data-bs-target="#tab-surat-content" type="button" role="tab" aria-controls="tab-surat-content" aria-selected="true">
+                <i class="bi bi-file-earmark-pdf-fill text-danger me-1.5"></i>
+                Antrean Surat Usulan Resmi
+                <span class="badge bg-primary ms-1.5"><?= count($suratList ?? []) ?></span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link px-3 py-1.5 fw-semibold text-secondary" id="tab-item-btn" data-bs-toggle="tab" data-bs-target="#tab-item-content" type="button" role="tab" aria-controls="tab-item-content" aria-selected="false">
+                <i class="bi bi-list-columns-reverse me-1.5"></i>
+                Semua Rincian Item (Flat View)
+                <span class="badge bg-secondary ms-1.5"><?= count($list ?? []) ?></span>
+            </button>
+        </li>
+    </ul>
+    <div class="text-muted small">
+        <i class="bi bi-shield-check me-1 text-primary"></i> Telaah & verifikasi berbasis <strong>Berkas Surat Resmi</strong> dari SKPD
+    </div>
+</div>
 
 <div class="tab-content" id="verifTabsContent">
     <!-- TAB 1: ANTREAN BERBASIS SURAT USULAN RESMI (ALUR UTAMA) -->
@@ -167,15 +172,15 @@ $stats = $summarySurat ?? $summary;
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-muted small text-uppercase">
                             <tr>
-                                <th width="40" class="text-center">#</th>
-                                <th>Nomor & Tanggal Surat</th>
-                                <th>SKPD Pengusul</th>
-                                <th>Perihal Usulan</th>
-                                <th class="text-center">Berkas Surat Resmi</th>
-                                <th class="text-center">Jumlah Item</th>
-                                <th class="text-end">Total Nominal</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center" width="220">Aksi Verifikator</th>
+                                <th width="45" class="text-center">#</th>
+                                <th style="min-width: 200px;">Nomor & Tanggal Surat</th>
+                                <th style="min-width: 200px;">SKPD Pengusul</th>
+                                <th style="min-width: 220px;">Perihal Usulan</th>
+                                <th class="text-center" style="width: 120px;">Berkas Surat</th>
+                                <th class="text-center" style="width: 110px;">Jumlah Item</th>
+                                <th class="text-end text-nowrap" style="width: 140px;">Total Nominal</th>
+                                <th class="text-center text-nowrap" style="width: 110px;">Status</th>
+                                <th class="text-center text-nowrap" style="width: 180px;">Aksi Verifikator</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -228,7 +233,7 @@ $stats = $summarySurat ?? $summary;
                                     <?= rupiah($sRow->total_nominal) ?>
                                 </td>
                                 <td class="text-center">
-                                    <?= status_badge($sRow->status_proses) ?>
+                                    <?= badge_status($sRow->status_proses) ?>
                                 </td>
                                 <td class="text-center">
                                     <!-- Tombol Verifikasi Surat Usulan -->
@@ -260,15 +265,15 @@ $stats = $summarySurat ?? $summary;
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-muted small text-uppercase">
                             <tr>
-                                <th width="40" class="text-center">#</th>
-                                <th>Kode Usulan</th>
-                                <th>SKPD Pengusul</th>
-                                <th><?= $isSbu ? 'Uraian Biaya / Ketentuan' : 'Uraian Barang & Spesifikasi' ?></th>
-                                <th class="text-center">Satuan</th>
-                                <th class="text-end">Harga Usulan</th>
-                                <th class="text-center">Lampiran</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center" width="270">Aksi Verifikasi</th>
+                                <th width="45" class="text-center">#</th>
+                                <th style="min-width: 170px;">Kode Usulan</th>
+                                <th style="min-width: 180px;">SKPD Pengusul</th>
+                                <th style="min-width: 260px;"><?= $isSbu ? 'Uraian Biaya / Ketentuan' : 'Uraian Barang & Spesifikasi' ?></th>
+                                <th class="text-center" style="width: 90px;">Satuan</th>
+                                <th class="text-end text-nowrap" style="width: 140px;">Harga Usulan</th>
+                                <th class="text-center text-nowrap" style="width: 110px;">Bukti Survey</th>
+                                <th class="text-center text-nowrap" style="width: 110px;">Status</th>
+                                <th class="text-center text-nowrap" style="width: 220px;">Aksi Verifikasi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -349,7 +354,7 @@ $stats = $summarySurat ?? $summary;
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <?= status_badge($row->status_proses) ?>
+                                    <?= badge_status($row->status_proses) ?>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-1">

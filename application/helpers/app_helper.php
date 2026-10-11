@@ -172,6 +172,12 @@ if (!function_exists('badge_status')) {
     }
 }
 
+if (!function_exists('status_badge')) {
+    function status_badge($status) {
+        return badge_status($status);
+    }
+}
+
 /**
  * Mengubah format tanggal Y-m-d menjadi format Indonesia.
  * Contoh: 2026-05-01 -> 01 Mei 2026

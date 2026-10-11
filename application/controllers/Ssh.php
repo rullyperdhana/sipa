@@ -68,7 +68,7 @@ class Ssh extends Auth_Controller
 
         // Ambil daftar Surat Usulan (Workflow Induk) & Rincian Item Usulan
         $suratList = $this->ssh_model->getSuratBySkpd($skpdId, $filter);
-        $summarySurat = $this->ssh_model->getSummaryCountsSurat($this->currentUser, $this->tipe);
+        $summarySurat = $this->ssh_model->getSummaryCountsSurat($this->currentUser, $this->tipe, $thAktif);
 
         $data = [
             'title'        => 'Usulan ' . $this->moduleTitle,
@@ -736,7 +736,7 @@ class Ssh extends Auth_Controller
             'prefixUrl'    => $this->prefixUrl,
             'moduleTitle'  => $this->moduleTitle,
             'suratList'    => $this->ssh_model->getSuratVerifikasi($filter),
-            'summarySurat' => $this->ssh_model->getSummaryCountsSurat($this->currentUser, $this->tipe),
+            'summarySurat' => $this->ssh_model->getSummaryCountsSurat($this->currentUser, $this->tipe, $thAktif),
             'list'         => $this->ssh_model->getUsulanVerifikasi($filter),
             'summary'      => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
             'filter'       => $filter,

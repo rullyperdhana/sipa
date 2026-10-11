@@ -25,7 +25,7 @@ $isLocked = !in_array($surat->status_proses, ['Draft', 'Direvisi'], TRUE);
                 <i class="bi <?= $isSbu ? 'bi-file-earmark-ruled text-info' : 'bi-file-earmark-text-fill text-primary' ?> me-2"></i>
                 Surat Usulan: <span class="font-monospace text-dark"><?= e($surat->nomor_surat) ?></span>
             </h1>
-            <?= status_badge($surat->status_proses) ?>
+            <?= badge_status($surat->status_proses) ?>
         </div>
         <p class="page-subtitle text-muted mb-0 mt-1">
             SKPD: <strong><?= e($surat->nama_skpd) ?></strong> &bull; Tanggal Surat: <strong><?= tanggal_id($surat->tanggal_surat) ?></strong> &bull; TA <?= (int)$surat->tahun_anggaran ?>
@@ -302,7 +302,7 @@ $isLocked = !in_array($surat->status_proses, ['Draft', 'Direvisi'], TRUE);
                             </div>
                         </td>
                         <td class="text-center">
-                            <?= status_badge($row->status_proses) ?>
+                            <?= badge_status($row->status_proses) ?>
                         </td>
                         <td class="text-center">
                             <div class="btn-group btn-group-sm">

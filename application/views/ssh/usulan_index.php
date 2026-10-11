@@ -6,22 +6,24 @@ $isSbu = ($tipe === 'SBU');
 $prefixUrl = $prefixUrl ?? strtolower($tipe);
 $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
 $stats = $summarySurat ?? $summary;
+$role = $this->currentUser->role ?? '';
 ?>
 
+<!-- Header Halaman -->
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h1 class="page-title">
+        <h1 class="page-title mb-1">
             <i class="bi <?= $isSbu ? 'bi-receipt-cutoff text-info' : 'bi-box-seam-fill text-primary' ?> me-2"></i>
             Usulan <?= $modTitle ?>
         </h1>
         <p class="page-subtitle text-muted mb-0">
             <?= $isSbu 
-                ? 'Kelola dan ajukan usulan standar biaya honorarium, jasa tenaga kerja, sewa, dan tarif operasional SKPD Anda.' 
-                : 'Kelola dan ajukan usulan harga satuan barang, peralatan, dan material fisik SKPD Anda.' ?>
+                ? 'Kelola berkas surat usulan resmi dan rincian standar biaya honorarium, jasa, sewa, serta tarif operasional SKPD.' 
+                : 'Kelola berkas surat usulan resmi dan rincian harga satuan barang, peralatan, dan material fisik SKPD.' ?>
         </p>
     </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <?php if ($isJadwalBuka || in_array($this->currentUser->role, ['admin', 'pimpinan'], TRUE)): ?>
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+        <?php if ($isJadwalBuka || in_array($role, ['admin', 'pimpinan'], TRUE)): ?>
         <a href="<?= site_url("{$prefixUrl}/surat/tambah") ?>" class="btn <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> shadow-sm">
             <i class="bi bi-file-earmark-plus-fill me-1"></i> Buat Usulan Baru (Upload Surat)
         </a>
@@ -30,7 +32,7 @@ $stats = $summarySurat ?? $summary;
             <i class="bi bi-lock-fill me-1"></i> Menunggu Jadwal Dibuka
         </button>
         <?php endif; ?>
-        <?php if (in_array($this->currentUser->role, ['admin', 'verifikator'], TRUE)): ?>
+        <?php if (in_array($role, ['admin', 'verifikator'], TRUE)): ?>
         <a href="<?= site_url("{$prefixUrl}/jadwal") ?>" class="btn btn-outline-primary" title="Kelola Jadwal Pengusulan">
             <i class="bi bi-calendar-range me-1"></i> Atur Jadwal
         </a>
@@ -40,7 +42,7 @@ $stats = $summarySurat ?? $summary;
 
 <!-- Banner Status Jadwal Pengusulan -->
 <?php if ($isJadwalBuka && !empty($jadwalAktif)): ?>
-<div class="alert alert-success border-success shadow-sm d-flex justify-content-between align-items-center mb-4 py-2.5 px-3">
+<div class="alert alert-success border-success shadow-sm d-flex justify-content-between align-items-center mb-4 py-2 px-3">
     <div class="d-flex align-items-center gap-2">
         <i class="bi bi-broadcast fs-5 text-success"></i>
         <div>
@@ -51,7 +53,7 @@ $stats = $summarySurat ?? $summary;
     <span class="badge bg-success py-1.5 px-2.5"><i class="bi bi-unlock-fill me-1"></i>PENGUSULAN DIBUKA</span>
 </div>
 <?php else: ?>
-<div class="alert alert-warning border-warning shadow-sm d-flex justify-content-between align-items-center mb-4 py-2.5 px-3">
+<div class="alert alert-warning border-warning shadow-sm d-flex justify-content-between align-items-center mb-4 py-2 px-3">
     <div class="d-flex align-items-center gap-2">
         <i class="bi bi-clock-history fs-5 text-warning"></i>
         <div>
@@ -64,38 +66,38 @@ $stats = $summarySurat ?? $summary;
 <?php endif; ?>
 
 <!-- Statistik Ringkasan Surat Usulan -->
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-4 col-xl">
+<div class="row g-2 mb-4">
+    <div class="col-6 col-md-3 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 <?= $isSbu ? 'border-info' : 'border-primary' ?>">
             <div class="card-body p-2">
-                <small class="text-muted fw-semibold d-block text-uppercase">Total Surat</small>
+                <small class="text-muted fw-semibold d-block text-uppercase" style="font-size:11px;">Total Surat</small>
                 <h3 class="mb-0 mt-1 fw-bold <?= $isSbu ? 'text-info' : 'text-primary' ?>"><?= (int)($stats->total ?? 0) ?></h3>
                 <small class="text-muted" style="font-size:11px;">Berkas usulan</small>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4 col-xl">
+    <div class="col-6 col-md-3 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-secondary">
             <div class="card-body p-2">
-                <small class="text-muted fw-semibold d-block text-uppercase">Draft</small>
+                <small class="text-muted fw-semibold d-block text-uppercase" style="font-size:11px;">Draft</small>
                 <h3 class="mb-0 mt-1 fw-bold text-secondary"><?= (int)($stats->draft ?? 0) ?></h3>
                 <small class="text-muted" style="font-size:11px;">Belum dikirim</small>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4 col-xl">
+    <div class="col-6 col-md-3 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-info">
             <div class="card-body p-2">
-                <small class="text-muted fw-semibold d-block text-uppercase">Diajukan</small>
+                <small class="text-muted fw-semibold d-block text-uppercase" style="font-size:11px;">Diajukan</small>
                 <h3 class="mb-0 mt-1 fw-bold text-info"><?= (int)($stats->diajukan ?? 0) ?></h3>
                 <small class="text-muted" style="font-size:11px;">Menunggu telaah</small>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4 col-xl">
+    <div class="col-6 col-md-3 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-warning">
             <div class="card-body p-2">
-                <small class="text-muted fw-semibold d-block text-uppercase">Direvisi</small>
+                <small class="text-muted fw-semibold d-block text-uppercase" style="font-size:11px;">Direvisi</small>
                 <h3 class="mb-0 mt-1 fw-bold text-warning"><?= (int)($stats->direvisi ?? 0) ?></h3>
                 <small class="text-muted" style="font-size:11px;">Perlu perbaikan</small>
             </div>
@@ -104,7 +106,7 @@ $stats = $summarySurat ?? $summary;
     <div class="col-6 col-md-4 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-danger">
             <div class="card-body p-2">
-                <small class="text-muted fw-semibold d-block text-uppercase">Ditolak</small>
+                <small class="text-muted fw-semibold d-block text-uppercase" style="font-size:11px;">Ditolak</small>
                 <h3 class="mb-0 mt-1 fw-bold text-danger"><?= (int)($stats->ditolak ?? 0) ?></h3>
                 <small class="text-muted" style="font-size:11px;">Tidak disetujui</small>
             </div>
@@ -113,16 +115,16 @@ $stats = $summarySurat ?? $summary;
     <div class="col-6 col-md-4 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-primary">
             <div class="card-body p-2">
-                <small class="text-muted fw-semibold d-block text-uppercase">Diverifikasi</small>
+                <small class="text-muted fw-semibold d-block text-uppercase" style="font-size:11px;">Diverifikasi</small>
                 <h3 class="mb-0 mt-1 fw-bold text-primary"><?= (int)($stats->diverifikasi ?? 0) ?></h3>
                 <small class="text-muted" style="font-size:11px;">Disetujui BPKAD</small>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4 col-xl">
+    <div class="col-12 col-md-4 col-xl">
         <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-success">
             <div class="card-body p-2">
-                <small class="text-muted fw-semibold d-block text-uppercase">Ditetapkan</small>
+                <small class="text-muted fw-semibold d-block text-uppercase" style="font-size:11px;">Ditetapkan</small>
                 <h3 class="mb-0 mt-1 fw-bold text-success"><?= (int)($stats->ditetapkan ?? 0) ?></h3>
                 <small class="text-muted" style="font-size:11px;">Standar resmi</small>
             </div>
@@ -132,9 +134,23 @@ $stats = $summarySurat ?? $summary;
 
 <!-- Card Filter & Search -->
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
+    <div class="card-body p-3">
         <form method="get" action="<?= site_url("{$prefixUrl}/usulan") ?>" class="row g-2 align-items-end">
+            <?php if ($role === 'admin' && !empty($skpdList)): ?>
             <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted mb-1">SKPD / Unit Kerja</label>
+                <select class="form-select form-select-sm" name="skpd_id">
+                    <option value="">Semua SKPD</option>
+                    <?php foreach ($skpdList as $skpd): ?>
+                    <option value="<?= $skpd->id ?>" <?= ((int)($this->input->get('skpd_id')) === (int)$skpd->id) ? 'selected' : '' ?>>
+                        <?= e($skpd->nama_skpd) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php endif; ?>
+
+            <div class="<?= ($role === 'admin') ? 'col-md-2' : 'col-md-3' ?>">
                 <label class="form-label small fw-semibold text-muted mb-1">Status Usulan</label>
                 <select class="form-select form-select-sm" name="status">
                     <option value="">Semua Status</option>
@@ -143,7 +159,8 @@ $stats = $summarySurat ?? $summary;
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-4">
+
+            <div class="<?= ($role === 'admin') ? 'col-md-3' : 'col-md-4' ?>">
                 <label class="form-label small fw-semibold text-muted mb-1">Kategori <?= $tipe ?></label>
                 <select class="form-select form-select-sm" name="kategori">
                     <option value="">Semua Kategori</option>
@@ -152,10 +169,12 @@ $stats = $summarySurat ?? $summary;
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-3">
+
+            <div class="<?= ($role === 'admin') ? 'col-md-2' : 'col-md-3' ?>">
                 <label class="form-label small fw-semibold text-muted mb-1">Cari Kata Kunci</label>
                 <input type="text" name="q" class="form-control form-control-sm" value="<?= e($filter['q'] ?? '') ?>" placeholder="Nomor surat, perihal, uraian...">
             </div>
+
             <div class="col-md-2 d-flex gap-1">
                 <button type="submit" class="btn btn-sm <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> flex-fill">
                     <i class="bi bi-funnel me-1"></i> Filter
@@ -168,23 +187,28 @@ $stats = $summarySurat ?? $summary;
     </div>
 </div>
 
-<!-- Navigasi Tab Tampilan: Berbasis Surat Usulan (Utama) vs Semua Rincian Item (Flat) -->
-<ul class="nav nav-tabs border-bottom mb-3" id="usulanTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active fw-semibold" id="tab-surat-btn" data-bs-toggle="tab" data-bs-target="#tab-surat-content" type="button" role="tab" aria-controls="tab-surat-content" aria-selected="true">
-            <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>
-            Daftar Surat Usulan Resmi
-            <span class="badge bg-primary ms-1"><?= count($suratList ?? []) ?></span>
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link fw-semibold" id="tab-item-btn" data-bs-toggle="tab" data-bs-target="#tab-item-content" type="button" role="tab" aria-controls="tab-item-content" aria-selected="false">
-            <i class="bi bi-list-columns-reverse text-secondary me-2"></i>
-            Semua Rincian Item (Flat View)
-            <span class="badge bg-secondary ms-1"><?= count($list ?? []) ?></span>
-        </button>
-    </li>
-</ul>
+<!-- Navigasi Tab Tampilan: Modern Pills Style -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <ul class="nav nav-pills gap-1 bg-white p-1 rounded-3 shadow-sm border" id="usulanTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active px-3 py-1.5 fw-semibold" id="tab-surat-btn" data-bs-toggle="tab" data-bs-target="#tab-surat-content" type="button" role="tab" aria-controls="tab-surat-content" aria-selected="true">
+                <i class="bi bi-file-earmark-pdf-fill text-danger me-1.5"></i>
+                Daftar Surat Usulan Resmi
+                <span class="badge bg-primary ms-1.5"><?= count($suratList ?? []) ?></span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link px-3 py-1.5 fw-semibold text-secondary" id="tab-item-btn" data-bs-toggle="tab" data-bs-target="#tab-item-content" type="button" role="tab" aria-controls="tab-item-content" aria-selected="false">
+                <i class="bi bi-list-columns-reverse me-1.5"></i>
+                Semua Rincian Item (Flat View)
+                <span class="badge bg-secondary ms-1.5"><?= count($list ?? []) ?></span>
+            </button>
+        </li>
+    </ul>
+    <div class="text-muted small">
+        <i class="bi bi-info-circle me-1 text-primary"></i> Workflow: <strong>Upload Surat Resmi SKPD</strong> &rarr; <strong>Input Rincian Item</strong>
+    </div>
+</div>
 
 <div class="tab-content" id="usulanTabsContent">
     <!-- TAB 1: DAFTAR SURAT USULAN (WORKFLOW RESMI INDUK) -->
@@ -193,7 +217,7 @@ $stats = $summarySurat ?? $summary;
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <h6 class="card-title mb-0 fw-bold">
                     <i class="bi bi-envelope-paper me-2 <?= $isSbu ? 'text-info' : 'text-primary' ?>"></i>
-                    Daftar Surat Usulan <?= $modTitle ?>
+                    Daftar Berkas Surat Usulan <?= $modTitle ?>
                 </h6>
                 <span class="badge bg-light text-dark border"><?= count($suratList ?? []) ?> Surat Ditemukan</span>
             </div>
@@ -202,14 +226,14 @@ $stats = $summarySurat ?? $summary;
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-muted small text-uppercase">
                             <tr>
-                                <th width="40" class="text-center">#</th>
-                                <th>Nomor & Tanggal Surat</th>
+                                <th width="35" class="text-center">#</th>
+                                <th style="min-width: 160px;">Nomor & Tanggal Surat</th>
                                 <th>Perihal & Keterangan</th>
-                                <th class="text-center">Berkas Surat Resmi</th>
-                                <th class="text-center">Rincian Item</th>
-                                <th class="text-end">Total Nominal</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center" width="220">Aksi</th>
+                                <th class="text-center" style="width: 100px;">Berkas Surat</th>
+                                <th class="text-center" style="width: 95px;">Rincian Item</th>
+                                <th class="text-end text-nowrap" style="width: 125px;">Total Nominal</th>
+                                <th class="text-center text-nowrap" style="width: 95px;">Status</th>
+                                <th class="text-center text-nowrap" style="width: 130px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -218,7 +242,7 @@ $stats = $summarySurat ?? $summary;
                                 <td colspan="8" class="text-center py-5 text-muted">
                                     <i class="bi bi-file-earmark-x fs-1 d-block mb-2 text-secondary"></i>
                                     <span class="fw-semibold">Belum ada Surat Usulan <?= $tipe ?> yang dibuat.</span><br>
-                                    <small class="text-muted">Klik tombol <strong>Buat Usulan Baru (Upload Surat)</strong> di atas untuk memulai pengusulan.</small>
+                                    <small class="text-muted">Klik tombol <strong>Buat Usulan Baru (Upload Surat)</strong> di atas untuk memulai pengusulan resmi SKPD.</small>
                                 </td>
                             </tr>
                             <?php else: foreach ($suratList as $idx => $sRow): ?>
@@ -234,49 +258,51 @@ $stats = $summarySurat ?? $summary;
                                 <td>
                                     <div class="fw-semibold text-dark"><?= e($sRow->perihal) ?></div>
                                     <?php if (!empty($sRow->keterangan)): ?>
-                                    <div class="small text-muted text-truncate" style="max-width: 300px;" title="<?= e($sRow->keterangan) ?>">
+                                    <div class="small text-muted text-truncate" style="max-width: 260px;" title="<?= e($sRow->keterangan) ?>">
                                         <?= e($sRow->keterangan) ?>
                                     </div>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
                                     <?php if (!empty($sRow->file_surat)): ?>
-                                    <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 btn-preview-surat-pdf" 
+                                    <button type="button" class="btn btn-sm btn-outline-danger py-0.5 px-2 btn-preview-surat-pdf text-nowrap" 
                                             data-url="<?= site_url("{$prefixUrl}/surat/preview/{$sRow->id}") ?>"
                                             data-download="<?= site_url("{$prefixUrl}/surat/download/{$sRow->id}") ?>"
                                             data-nomor="<?= e($sRow->nomor_surat) ?>"
                                             data-nama="<?= e($sRow->file_nama_asli ?: $sRow->file_surat) ?>"
-                                            title="Pratinjau Surat Resmi PDF di Layar: <?= e($sRow->file_nama_asli ?: $sRow->file_surat) ?>">
-                                        <i class="bi bi-eye me-1"></i> Lihat PDF
+                                            title="Pratinjau Surat Resmi PDF: <?= e($sRow->file_nama_asli ?: $sRow->file_surat) ?>">
+                                        <i class="bi bi-eye me-1"></i> PDF
                                     </button>
                                     <?php else: ?>
                                     <span class="text-muted small">-</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace fs-6 px-2.5 py-1">
-                                        <i class="bi bi-list-check me-1"></i><?= (int)$sRow->total_item ?> Item
-                                    </span>
+                                    <a href="<?= site_url("{$prefixUrl}/surat/detail/{$sRow->id}") ?>" class="text-decoration-none" title="Klik untuk kelola rincian item">
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2 py-1">
+                                            <i class="bi bi-list-check me-1"></i><?= (int)$sRow->total_item ?> Item
+                                        </span>
+                                    </a>
                                 </td>
-                                <td class="text-end fw-bold text-dark font-monospace">
+                                <td class="text-end fw-bold text-dark font-monospace text-nowrap">
                                     <?= rupiah($sRow->total_nominal) ?>
                                 </td>
-                                <td class="text-center">
-                                    <?= status_badge($sRow->status_proses) ?>
+                                <td class="text-center text-nowrap">
+                                    <?= badge_status($sRow->status_proses) ?>
                                 </td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-1">
+                                <td class="text-center text-nowrap">
+                                    <div class="d-inline-flex gap-1 justify-content-center">
                                         <!-- Tombol Utama: Buka Detail & Rincian Item -->
-                                        <a href="<?= site_url("{$prefixUrl}/surat/detail/{$sRow->id}") ?>" class="btn btn-sm btn-primary" title="Buka dan kelola rincian item dalam surat ini">
-                                            <i class="bi bi-folder2-open me-1"></i> Kelola Item
+                                        <a href="<?= site_url("{$prefixUrl}/surat/detail/{$sRow->id}") ?>" class="btn btn-sm btn-primary py-0.5 px-2 shadow-sm" title="Buka dan kelola rincian item dalam surat ini">
+                                            <i class="bi bi-folder2-open me-1"></i> Rincian
                                         </a>
 
                                         <?php if (in_array($sRow->status_proses, ['Draft', 'Direvisi'], TRUE)): ?>
-                                        <a href="<?= site_url("{$prefixUrl}/surat/edit/{$sRow->id}") ?>" class="btn btn-sm btn-outline-secondary" title="Edit informasi surat">
+                                        <a href="<?= site_url("{$prefixUrl}/surat/edit/{$sRow->id}") ?>" class="btn btn-sm btn-outline-secondary py-0.5 px-1.5" title="Edit informasi surat">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
                                         <?php if ($sRow->status_proses === 'Draft'): ?>
-                                        <a href="<?= site_url("{$prefixUrl}/surat/hapus/{$sRow->id}") ?>" class="btn btn-sm btn-outline-danger btn-confirm-hapus-surat" 
+                                        <a href="<?= site_url("{$prefixUrl}/surat/hapus/{$sRow->id}") ?>" class="btn btn-sm btn-outline-danger py-0.5 px-1.5 btn-confirm-hapus-surat" 
                                            data-nomor="<?= e($sRow->nomor_surat) ?>" title="Hapus draft surat">
                                             <i class="bi bi-trash"></i>
                                         </a>
@@ -308,15 +334,15 @@ $stats = $summarySurat ?? $summary;
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-muted small text-uppercase">
                             <tr>
-                                <th width="40" class="text-center">#</th>
-                                <th>Kode Usulan</th>
-                                <th>Kategori</th>
-                                <th><?= $isSbu ? 'Uraian Biaya / Ketentuan' : 'Uraian Barang & Spesifikasi' ?></th>
-                                <th class="text-center">Satuan</th>
-                                <th class="text-end">Harga Usulan</th>
-                                <th class="text-center">Lampiran</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center" width="180">Aksi</th>
+                                <th width="35" class="text-center">#</th>
+                                <th style="min-width: 160px;">Kode & Surat Usulan</th>
+                                <th style="width: 130px;">Kategori</th>
+                                <th style="min-width: 220px;"><?= $isSbu ? 'Uraian Biaya / Ketentuan' : 'Uraian Barang & Spesifikasi' ?></th>
+                                <th class="text-center" style="width: 80px;">Satuan</th>
+                                <th class="text-end text-nowrap" style="width: 125px;">Harga Usulan</th>
+                                <th class="text-center text-nowrap" style="width: 95px;">Bukti Survey</th>
+                                <th class="text-center text-nowrap" style="width: 95px;">Status</th>
+                                <th class="text-center text-nowrap" style="width: 100px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -334,6 +360,13 @@ $stats = $summarySurat ?? $summary;
                                 <td>
                                     <strong class="text-dark font-monospace"><?= e($row->kode_usulan) ?></strong>
                                     <div class="small text-muted"><?= tanggal_id($row->created_at) ?></div>
+                                    <?php if (!empty($row->surat_id)): ?>
+                                    <div class="mt-0.5">
+                                        <a href="<?= site_url("{$prefixUrl}/surat/detail/{$row->surat_id}") ?>" class="badge bg-light text-primary border text-decoration-none" title="Buka berkas surat pengusul">
+                                            <i class="bi bi-file-earmark-text me-1"></i><?= e($row->nomor_surat ?? "Surat #{$row->surat_id}") ?>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <span class="badge bg-light text-secondary border"><?= e($row->kategori) ?></span>
@@ -371,13 +404,13 @@ $stats = $summarySurat ?? $summary;
                                 <td class="text-center">
                                     <span class="badge bg-light text-dark border"><?= e($row->satuan) ?></span>
                                 </td>
-                                <td class="text-end fw-bold text-dark">
+                                <td class="text-end fw-bold text-dark text-nowrap font-monospace">
                                     <?= rupiah($row->harga_usulan) ?>
                                     <?php if ($row->status_proses === 'Ditetapkan' && $row->harga_ditetapkan): ?>
-                                    <div class="small text-success fw-normal">Tetap: <?= rupiah($row->harga_ditetapkan) ?></div>
+                                    <div class="small text-success fw-normal font-sans-serif">Tetap: <?= rupiah($row->harga_ditetapkan) ?></div>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center text-nowrap">
                                     <div class="d-inline-flex gap-1 justify-content-center">
                                         <?php if (!empty($row->file_lampiran)): ?>
                                         <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1.5 btn-preview-lampiran" 
@@ -415,25 +448,28 @@ $stats = $summarySurat ?? $summary;
                                             <i class="bi bi-eye"></i> S3
                                         </button>
                                         <?php endif; ?>
+                                        <?php if (empty($row->file_lampiran) && empty($row->file_lampiran_2) && empty($row->file_lampiran_3)): ?>
+                                        <span class="text-muted small">-</span>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
-                                <td class="text-center">
-                                    <?= status_badge($row->status_proses) ?>
+                                <td class="text-center text-nowrap">
+                                    <?= badge_status($row->status_proses) ?>
                                 </td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-1">
+                                <td class="text-center text-nowrap">
+                                    <div class="d-inline-flex gap-1 justify-content-center">
                                         <?php if (in_array($row->status_proses, ['Draft', 'Direvisi'], TRUE)): ?>
-                                        <a href="<?= site_url("{$prefixUrl}/edit/{$row->id}") ?>" class="btn btn-sm btn-outline-primary" title="Edit usulan">
+                                        <a href="<?= site_url("{$prefixUrl}/edit/{$row->id}") ?>" class="btn btn-sm btn-outline-primary py-1 px-2" title="Edit usulan item">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
                                         <?php if ($row->status_proses === 'Draft'): ?>
-                                        <a href="<?= site_url("{$prefixUrl}/hapus/{$row->id}") ?>" class="btn btn-sm btn-outline-danger btn-hapus-usulan" 
+                                        <a href="<?= site_url("{$prefixUrl}/hapus/{$row->id}") ?>" class="btn btn-sm btn-outline-danger py-1 px-2 btn-hapus-usulan" 
                                            data-confirm="Hapus usulan <?= e($row->kode_usulan) ?>?" title="Hapus draft">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                         <?php endif; ?>
                                         <?php else: ?>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Lihat detail">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2 btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Lihat detail">
                                             <i class="bi bi-eye"></i> Detail
                                         </button>
                                         <?php endif; ?>

@@ -397,10 +397,11 @@ class Ssh_model extends CI_Model
     /**
      * Ringkasan hitungan statistik Surat Usulan
      */
-    public function getSummaryCountsSurat($user, $tipe = NULL)
+    public function getSummaryCountsSurat($user, $tipe = NULL, $tahun = NULL)
     {
         $role = $user->role;
         $skpdId = (int) $user->skpd_id;
+        $thAktif = $tahun ? (int)$tahun : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027);
 
         $this->db->select("
             COUNT(CASE WHEN status_proses = 'Draft' THEN 1 END) as draft,
@@ -419,6 +420,7 @@ class Ssh_model extends CI_Model
         if (!empty($tipe)) {
             $this->db->where('tipe', $tipe);
         }
+        $this->db->where('tahun_anggaran', $thAktif);
 
         return $this->db->get($this->table_surat)->row();
     }

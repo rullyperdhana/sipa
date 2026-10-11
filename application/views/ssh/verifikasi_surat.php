@@ -38,7 +38,7 @@ $progressPercent = ($totalItems > 0) ? round(($sudahDiproses / $totalItems) * 10
                 <i class="bi <?= $isSbu ? 'bi-check2-circle text-info' : 'bi-patch-check-fill text-primary' ?> me-2"></i>
                 Verifikasi Surat Usulan: <span class="font-monospace text-dark"><?= e($surat->nomor_surat) ?></span>
             </h1>
-            <?= status_badge($surat->status_proses) ?>
+            <?= badge_status($surat->status_proses) ?>
         </div>
         <p class="page-subtitle text-muted mb-0 mt-1">
             SKPD: <strong><?= e($surat->nama_skpd) ?></strong> &bull; Tanggal Surat: <strong><?= tanggal_id($surat->tanggal_surat) ?></strong> &bull; TA <?= (int)$surat->tahun_anggaran ?>
@@ -263,7 +263,7 @@ $progressPercent = ($totalItems > 0) ? round(($sudahDiproses / $totalItems) * 10
                             </div>
                         </td>
                         <td class="text-center">
-                            <?= status_badge($row->status_proses) ?>
+                            <?= badge_status($row->status_proses) ?>
                         </td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-1">
