@@ -734,12 +734,21 @@ class Ssh extends Auth_Controller
         $rawStatus = $this->input->get('status', TRUE);
         $statusProses = ($rawStatus !== NULL) ? $rawStatus : 'Diajukan';
 
+        $rawTahun = $this->input->get('tahun', TRUE);
+        if ($rawTahun !== NULL && $rawTahun !== '') {
+            $tahunFilter = ($rawTahun === 'all') ? NULL : (int)$rawTahun;
+            $thAktif = ($rawTahun === 'all') ? (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027) : (int)$rawTahun;
+        } else {
+            $thAktif = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027;
+            $tahunFilter = $thAktif;
+        }
+
         $filter = [
             'tipe'          => $this->tipe,
             'status_proses' => $statusProses,
             'id_skpd'       => $this->input->get('skpd_id', TRUE),
             'kategori'      => $this->input->get('kategori', TRUE),
-            'tahun'         => $this->input->get('tahun', TRUE),
+            'tahun'         => $tahunFilter,
             'q'             => $this->input->get('q', TRUE)
         ];
 
@@ -754,7 +763,8 @@ class Ssh extends Auth_Controller
             'summary'      => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
             'filter'       => $filter,
             'kategori'     => $this->ssh_model->getKategoriList($this->tipe),
-            'skpdList'     => $this->master_model->getAllSkpd()
+            'skpdList'     => $this->master_model->getAllSkpd(),
+            'thAktif'      => $thAktif
         ];
 
         $this->load->view('templates/header', $data);
