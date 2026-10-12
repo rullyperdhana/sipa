@@ -366,11 +366,14 @@ body::before {
 }
 
 /* Modern Form Controls */
+.form-floating {
+    position: relative;
+}
 .form-floating > .form-control,
 .form-floating > .form-select {
     border-radius: 12px;
-    padding: 16px 16px 16px 42px;
     height: 58px;
+    min-height: 58px;
     border: 1.5px solid #e2e8f0;
     font-size: 14px;
     font-weight: 500;
@@ -378,17 +381,65 @@ body::before {
     transition: all 0.2s ease;
     background-color: #f8fafc;
 }
+
+/* Base input paddings with room for left icon (44px) */
+.form-floating > .form-control {
+    padding: 1rem 1rem 1rem 44px;
+}
+.form-floating > .form-control:focus,
+.form-floating > .form-control:not(:placeholder-shown) {
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+    padding-left: 44px;
+    padding-right: 1rem;
+}
+.form-floating > #password {
+    padding-right: 46px;
+}
+
+/* Dedicated styling for Select Dropdown (Tahun Anggaran) to ensure perfect vertical symmetry & zero label collision */
+.form-floating > .form-select {
+    padding-top: 1.625rem !important;
+    padding-bottom: 0.625rem !important;
+    padding-left: 44px !important;
+    padding-right: 36px !important;
+    line-height: 1.35;
+    background-position: right 14px center;
+}
+
 .form-floating > .form-control:focus,
 .form-floating > .form-select:focus {
     border-color: var(--primary);
     background-color: #ffffff;
     box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
 }
+
+/* Unified Floating Labels aligned with 44px icon offset */
 .form-floating > label {
-    padding-left: 42px;
+    position: absolute;
+    top: 0;
+    left: 44px;
+    width: auto;
+    max-width: calc(100% - 54px);
+    height: 100%;
+    padding: 18px 0;
     color: #64748b;
     font-size: 13.5px;
+    font-weight: 500;
+    pointer-events: none;
+    border: none;
+    transform-origin: 0 0;
+    transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
 }
+
+/* Shrunk label state: strictly horizontally aligned with left: 44px and clean top breathing room */
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+    opacity: 0.75;
+    transform: scale(0.80) translateY(-0.6rem);
+}
+
 .input-icon-lead {
     position: absolute;
     left: 14px;
@@ -399,6 +450,11 @@ body::before {
     z-index: 5;
     pointer-events: none;
     transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
 }
 .form-floating:focus-within .input-icon-lead {
     color: var(--primary);
