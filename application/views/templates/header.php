@@ -202,6 +202,9 @@ $userRole = !empty($user->role) ? $user->role : '';
         <a href="<?= site_url('telegram/settings') ?>" class="nav-link <?= $this->uri->segment(1) === 'telegram' ? 'active' : '' ?>">
             <i class="bi bi-telegram text-info"></i> <span>Notifikasi Telegram</span>
         </a>
+        <a href="<?= site_url('master/pembersihan') ?>" class="nav-link <?= ($this->uri->segment(1) === 'master' && $this->uri->segment(2) === 'pembersihan') ? 'active' : '' ?>">
+            <i class="bi bi-trash3-fill text-danger"></i> <span>Pembersihan Data</span>
+        </a>
         <a href="<?= site_url('dokumentasi') ?>" class="nav-link <?= $this->uri->segment(1) === 'dokumentasi' ? 'active' : '' ?>">
             <i class="bi bi-journal-code"></i> <span>Dokumentasi & Update</span>
         </a>
@@ -235,6 +238,17 @@ $userRole = !empty($user->role) ? $user->role : '';
         </div>
 
         <div class="topbar-actions">
+            <!-- Jam Server Real-time (WITA) -->
+            <div class="d-flex align-items-center gap-1.5 px-2.5 py-1 rounded-pill bg-light border text-muted small font-monospace me-1" 
+                 id="serverClockWidget" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="bottom" 
+                 title="Waktu Server (WITA): <?= date('d M Y') ?>">
+                <i class="bi bi-clock-history text-primary"></i>
+                <span id="serverClockText" class="fw-bold text-dark"><?= date('H:i:s') ?></span>
+                <span class="badge bg-secondary-subtle text-secondary border px-1 d-none d-md-inline" style="font-size: 10px;">WITA</span>
+            </div>
+
             <!-- Pemilih Tahun Periode Anggaran Global -->
             <?php 
             $currYear = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027;

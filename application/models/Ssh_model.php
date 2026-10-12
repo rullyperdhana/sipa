@@ -1741,4 +1741,239 @@ class Ssh_model extends CI_Model
         $this->db->order_by('uraian', 'ASC');
         return $this->db->get()->result();
     }
+
+    // =========================================================================
+    // 6. FITUR KEAMANAN & PEMBERSIHAN DATA (DATA PURGE & DYNAMIC PASSWORD)
+    // =========================================================================
+
+    /**
+     * Memverifikasi Password Keamanan Dinamis Berbasis Waktu Server [Jam][Bulan][Tanggal]
+     * Format: 2-digit Jam (00-23) + 2-digit Bulan (01-12) + 2-digit Tanggal (01-31).
+     * Contoh: Jam 06.xx tgl 13 Oktober => '061013'.
+     * Menyertakan toleransi batas pergantian jam (grace window +/- 1 jam).
+     *
+     * @param string $inputPassword
+     * @return bool
+     */
+    public function verifyDynamicSecurityPassword($inputPassword)
+    {
+        $clean = preg_replace('/[^0-9]/', '', (string)$inputPassword);
+        if (empty($clean)) {
+            return false;
+        }
+
+        // Komponen waktu server aktif
+        $h2 = date('H'); // 2 digit jam (00-23)
+        $h1 = date('G'); // 1 digit jam (0-23)
+        $m2 = date('m'); // 2 digit bulan (01-12)
+        $d2 = date('d'); // 2 digit tanggal (01-31)
+
+        $validTokens = [
+            "{$h2}{$m2}{$d2}", // Format standar 6 digit (misal: 061013)
+            "{$h1}{$m2}{$d2}", // Format 5 digit tanpa leading zero (misal: 61013)
+        ];
+
+        // Toleransi transisi jam (-1 jam dan +1 jam)
+        $tsPrev = strtotime('-1 hour');
+        $validTokens[] = date('Hmd', $tsPrev);
+        $validTokens[] = date('Gmd', $tsPrev);
+
+        $tsNext = strtotime('+1 hour');
+        $validTokens[] = date('Hmd', $tsNext);
+        $validTokens[] = date('Gmd', $tsNext);
+
+        return in_array($clean, $validTokens, true);
+    }
+
+    /**
+     * Menghitung statistik berkas & data yang terdampak sebelum dieksekusi
+     *
+     * @param int $tahun
+     * @param string $tipe 'ALL', 'SSH', atau 'SBU'
+     * @return array
+     */
+    public function getPembersihanStats($tahun, $tipe = 'ALL')
+    {
+        $tahun = (int) $tahun;
+        $tipe = strtoupper($tipe);
+
+        // 1. Hitung Surat Usulan SKPD
+        $this->db->from($this->table_surat);
+        $this->db->where('tahun_anggaran', $tahun);
+        if ($tipe !== 'ALL') {
+            $this->db->where('tipe', $tipe);
+        }
+        $countSurat = $this->db->count_all_results();
+
+        // 2. Hitung Rincian Usulan Item
+        $this->db->from($this->table);
+        $this->db->where('tahun_anggaran', $tahun);
+        if ($tipe !== 'ALL') {
+            $this->db->where('tipe', $tipe);
+        }
+        $countUsulan = $this->db->count_all_results();
+
+        // 3. Hitung Berkas Lampiran Fisik (Surat + Bukti Survei)
+        $filesCount = 0;
+
+        $this->db->select('file_surat');
+        $this->db->from($this->table_surat);
+        $this->db->where('tahun_anggaran', $tahun);
+        if ($tipe !== 'ALL') {
+            $this->db->where('tipe', $tipe);
+        }
+        $suratFiles = $this->db->get()->result();
+        foreach ($suratFiles as $sf) {
+            if (!empty($sf->file_surat) && file_exists(FCPATH . 'uploads/ssh_sbu/' . $sf->file_surat)) {
+                $filesCount++;
+            }
+        }
+
+        $this->db->select('file_lampiran, file_lampiran_2, file_lampiran_3');
+        $this->db->from($this->table);
+        $this->db->where('tahun_anggaran', $tahun);
+        if ($tipe !== 'ALL') {
+            $this->db->where('tipe', $tipe);
+        }
+        $usulanFiles = $this->db->get()->result();
+        foreach ($usulanFiles as $uf) {
+            if (!empty($uf->file_lampiran) && file_exists(FCPATH . 'uploads/ssh_sbu/' . $uf->file_lampiran)) $filesCount++;
+            if (!empty($uf->file_lampiran_2) && file_exists(FCPATH . 'uploads/ssh_sbu/' . $uf->file_lampiran_2)) $filesCount++;
+            if (!empty($uf->file_lampiran_3) && file_exists(FCPATH . 'uploads/ssh_sbu/' . $uf->file_lampiran_3)) $filesCount++;
+        }
+
+        // 4. Hitung Master Standar Harga (ref_standar_harga)
+        $this->db->from($this->table_master);
+        $this->db->where('tahun_anggaran', $tahun);
+        if ($tipe !== 'ALL') {
+            $this->db->where('tipe', $tipe);
+        }
+        $countMaster = $this->db->count_all_results();
+
+        return [
+            'tahun'  => $tahun,
+            'tipe'   => $tipe,
+            'surat'  => $countSurat,
+            'usulan' => $countUsulan,
+            'files'  => $filesCount,
+            'master' => $countMaster
+        ];
+    }
+
+    /**
+     * Eksekusi pembersihan data secara permanen dengan transaksi basis data
+     *
+     * @param int $tahun
+     * @param string $tipe 'ALL', 'SSH', atau 'SBU'
+     * @param bool $hapusMaster Apakah ikut menghapus katalog master ref_standar_harga tahun berkenaan
+     * @param object $user User admin yang mengeksekusi
+     * @return array
+     */
+    public function executePembersihan($tahun, $tipe = 'ALL', $hapusMaster = FALSE, $user = NULL)
+    {
+        $tahun = (int) $tahun;
+        $tipe  = strtoupper($tipe);
+
+        $this->db->trans_start();
+
+        // 1. Kumpulkan file lampiran dari usulan
+        $this->db->select('id, file_lampiran, file_lampiran_2, file_lampiran_3');
+        $this->db->from($this->table);
+        $this->db->where('tahun_anggaran', $tahun);
+        if ($tipe !== 'ALL') {
+            $this->db->where('tipe', $tipe);
+        }
+        $usulanRows = $this->db->get()->result();
+
+        $usulanIds = [];
+        $filesToDelete = [];
+        foreach ($usulanRows as $u) {
+            $usulanIds[] = (int) $u->id;
+            if (!empty($u->file_lampiran))   $filesToDelete[] = $u->file_lampiran;
+            if (!empty($u->file_lampiran_2)) $filesToDelete[] = $u->file_lampiran_2;
+            if (!empty($u->file_lampiran_3)) $filesToDelete[] = $u->file_lampiran_3;
+        }
+
+        // 2. Kumpulkan file surat
+        $this->db->select('id, file_surat');
+        $this->db->from($this->table_surat);
+        $this->db->where('tahun_anggaran', $tahun);
+        if ($tipe !== 'ALL') {
+            $this->db->where('tipe', $tipe);
+        }
+        $suratRows = $this->db->get()->result();
+
+        foreach ($suratRows as $s) {
+            if (!empty($s->file_surat)) {
+                $filesToDelete[] = $s->file_surat;
+            }
+        }
+
+        // 3. Hapus berkas fisik di uploads/ssh_sbu/
+        $deletedFilesCount = 0;
+        foreach (array_unique($filesToDelete) as $fName) {
+            $fPath = FCPATH . 'uploads/ssh_sbu/' . $fName;
+            if (file_exists($fPath) && is_file($fPath)) {
+                if (@unlink($fPath)) {
+                    $deletedFilesCount++;
+                }
+            }
+        }
+
+        // 4. Hapus log audit aktivitas
+        $deletedLogsCount = 0;
+        if (!empty($usulanIds)) {
+            $chunks = array_chunk($usulanIds, 500);
+            foreach ($chunks as $chunk) {
+                $this->db->where_in('usulan_id', $chunk)->delete($this->table_log);
+                $deletedLogsCount += $this->db->affected_rows();
+            }
+        }
+
+        // 5. Hapus rincian usulan
+        $this->db->where('tahun_anggaran', $tahun);
+        if ($tipe !== 'ALL') {
+            $this->db->where('tipe', $tipe);
+        }
+        $this->db->delete($this->table);
+        $deletedUsulanCount = $this->db->affected_rows();
+
+        // 6. Hapus surat pengantar usulan
+        $this->db->where('tahun_anggaran', $tahun);
+        if ($tipe !== 'ALL') {
+            $this->db->where('tipe', $tipe);
+        }
+        $this->db->delete($this->table_surat);
+        $deletedSuratCount = $this->db->affected_rows();
+
+        // 7. Hapus katalog master jika dicentang
+        $deletedMasterCount = 0;
+        if ($hapusMaster) {
+            $this->db->where('tahun_anggaran', $tahun);
+            if ($tipe !== 'ALL') {
+                $this->db->where('tipe', $tipe);
+            }
+            $this->db->delete($this->table_master);
+            $deletedMasterCount = $this->db->affected_rows();
+        }
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            return [
+                'success' => FALSE,
+                'message' => 'Terjadi kesalahan basis data saat membersihkan berkas.'
+            ];
+        }
+
+        return [
+            'success'        => TRUE,
+            'deleted_usulan' => $deletedUsulanCount,
+            'deleted_surat'  => $deletedSuratCount,
+            'deleted_files'  => $deletedFilesCount,
+            'deleted_logs'   => $deletedLogsCount,
+            'deleted_master' => $deletedMasterCount
+        ];
+    }
 }
+

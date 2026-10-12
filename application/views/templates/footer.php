@@ -34,6 +34,7 @@ window.appConfig = {
     csrfName: '<?= $this->security->get_csrf_token_name() ?>',
     csrfHash: '<?= $this->security->get_csrf_hash() ?>',
     userRole: '<?= ($this->auth && $this->auth->user()) ? $this->auth->user()->role : "" ?>',
+    serverTime: <?= round(microtime(true) * 1000) ?>,
     idleTimeout: {
         enabled: <?= $idleEnabled ? 'true' : 'false' ?>,
         timeoutMinutes: <?= $idleMinutes ?>,

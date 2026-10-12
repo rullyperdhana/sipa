@@ -99,6 +99,13 @@ $endItem = min($totalRows, $page * $perPage);
             <i class="bi bi-calendar-range me-1"></i> Jadwal Pengusulan
         </a>
         <?php endif; ?>
+        <?php if ($this->currentUser->role === 'admin'): ?>
+        <a href="<?= site_url('master/pembersihan?tahun=' . ($filter['tahun'] ?? 2028) . '&tipe=' . $tipe) ?>" 
+           class="btn btn-outline-danger shadow-sm" 
+           title="Alat pembersihan data uji coba per tahun anggaran dengan password dinamis">
+            <i class="bi bi-trash3-fill me-1"></i> Bersihkan Data Uji Coba
+        </a>
+        <?php endif; ?>
         <a href="<?= site_url("{$prefixUrl}/export_sipd?source=master&tahun=" . ($filter['tahun'] ?? 2027)) ?>" 
            class="btn btn-success" 
            title="Unduh Katalog Master Data dalam format template Excel upload SIPD (form_upload_SIPD.xlsx)">

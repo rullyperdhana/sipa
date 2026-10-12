@@ -508,6 +508,40 @@ $(function () {
 
     window.SipaIdleManager = SipaIdleManager;
 
+    // ===== Live Server Clock Widget (WITA / Asia/Makassar) =====
+    (function initServerClock() {
+        const clockEl = document.getElementById('serverClockText');
+        if (!clockEl) return;
+
+        let serverBaseMs = (window.appConfig && window.appConfig.serverTime)
+            ? Number(window.appConfig.serverTime)
+            : Date.now();
+        const clientStartMs = Date.now();
+
+        function renderClock() {
+            const currentServerMs = serverBaseMs + (Date.now() - clientStartMs);
+            const d = new Date(currentServerMs);
+            try {
+                const timeStr = d.toLocaleTimeString('id-ID', {
+                    timeZone: 'Asia/Makassar',
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                }).replace(/\./g, ':');
+                clockEl.textContent = timeStr;
+            } catch (e) {
+                const pad = (n) => String(n).padStart(2, '0');
+                const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+                const witaDate = new Date(utc + (3600000 * 8));
+                clockEl.textContent = pad(witaDate.getHours()) + ':' + pad(witaDate.getMinutes()) + ':' + pad(witaDate.getSeconds());
+            }
+        }
+
+        renderClock();
+        setInterval(renderClock, 1000);
+    })();
+
     // ===== Confirm delete via data-confirm =====
     $(document).on('submit', 'form[data-confirm]', function (e) {
         if (!confirm($(this).data('confirm'))) {

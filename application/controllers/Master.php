@@ -6,7 +6,7 @@ class Master extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(['master_model', 'user_model', 'akun_model', 'kode_barang_sipd_model', 'satuan_model']);
+        $this->load->model(['master_model', 'user_model', 'akun_model', 'kode_barang_sipd_model', 'satuan_model', 'ssh_model']);
     }
 
     // ==================== SKPD ====================
@@ -737,6 +737,110 @@ class Master extends Admin_Controller
                 $this->session->set_flashdata('success', 'Data Satuan berhasil dihapus.');
             }
         }
+    }
+
+    // ==================== PEMBERSIHAN DATA & RESET UJI COBA ====================
+
+    /**
+     * Halaman dan proses pembersihan data usulan & ketetapan (massal per tahun atau per kategori)
+     * Dilindungi otentikasi role Admin dan password dinamis waktu server [Jam][Bulan][Tanggal].
+     */
+    public function pembersihan()
+    {
+        $currGlobalYear = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2028;
+        $tahun = (int) ($this->input->get_post('tahun') ?: $currGlobalYear);
+        $tipe  = strtoupper($this->input->get_post('tipe') ?: 'ALL');
+        if (!in_array($tipe, ['ALL', 'SSH', 'SBU'], TRUE)) {
+            $tipe = 'ALL';
+        }
+
+        if ($this->input->method() === 'post') {
+            $tahunPost     = (int) $this->input->post('tahun');
+            $tipePost      = strtoupper($this->input->post('tipe') ?: 'ALL');
+            if (!in_array($tipePost, ['ALL', 'SSH', 'SBU'], TRUE)) {
+                $tipePost = 'ALL';
+            }
+            $hapusMaster   = (bool) $this->input->post('hapus_master');
+            $passwordInput = trim($this->input->post('security_password', TRUE) ?? '');
+            $konfirmasi    = trim($this->input->post('konfirmasi_teks', TRUE) ?? '');
+
+            // 1. Validasi Password Dinamis [Jam][Bulan][Tanggal]
+            if (!$this->ssh_model->verifyDynamicSecurityPassword($passwordInput)) {
+                $this->session->set_flashdata('danger', 'Password keamanan salah! Harap masukkan kombinasi [2-Digit Jam][2-Digit Bulan][2-Digit Tanggal] sesuai jam server saat ini (lihat jam server pada top bar).');
+                redirect("master/pembersihan?tahun={$tahunPost}&tipe={$tipePost}");
+                return;
+            }
+
+            // 2. Validasi Teks Konfirmasi
+            $expectedKonfirmasi = "HAPUS-{$tahunPost}";
+            if (strtoupper($konfirmasi) !== $expectedKonfirmasi) {
+                $this->session->set_flashdata('danger', "Teks konfirmasi salah! Anda harus mengetik persis '{$expectedKonfirmasi}' untuk mencegah ketidaksengajaan.");
+                redirect("master/pembersihan?tahun={$tahunPost}&tipe={$tipePost}");
+                return;
+            }
+
+            // 3. Eksekusi Pembersihan Bersih (Cascade Unlink & DB Purge)
+            $res = $this->ssh_model->executePembersihan($tahunPost, $tipePost, $hapusMaster, $this->currentUser);
+
+            if ($res['success']) {
+                $labelTipe = ($tipePost === 'ALL') ? 'Semua Kategori (SSH & SBU)' : "Kategori {$tipePost}";
+                $msg = "Pembersihan Data Berhasil! Data Tahun Anggaran {$tahunPost} untuk {$labelTipe} telah dihapus permanen. "
+                     . "Rincian terhapus: {$res['deleted_usulan']} rincian usulan, {$res['deleted_surat']} berkas surat pengantar, "
+                     . "{$res['deleted_files']} berkas lampiran fisik (surat & bukti survey), {$res['deleted_logs']} riwayat log"
+                     . ($hapusMaster ? ", dan {$res['deleted_master']} item katalog master." : ".");
+                
+                $this->logger->record('delete', 'pembersihan_data', "Pembersihan Data TA {$tahunPost} ({$tipePost}) oleh {$this->currentUser->username}");
+                $this->session->set_flashdata('success', $msg);
+            } else {
+                $this->session->set_flashdata('danger', 'Gagal melakukan pembersihan data: ' . ($res['message'] ?? 'Terjadi kesalahan sistem.'));
+            }
+
+            redirect("master/pembersihan?tahun={$tahunPost}&tipe={$tipePost}");
+            return;
+        }
+
+        // Statistik awal
+        $stats = $this->ssh_model->getPembersihanStats($tahun, $tipe);
+        $allYears = function_exists('get_daftar_tahun_anggaran') ? get_daftar_tahun_anggaran() : [2028, 2027, 2026, 2025];
+        if (!in_array(2028, $allYears)) {
+            array_unshift($allYears, 2028);
+        }
+
+        $data = [
+            'title'      => 'Pembersihan & Reset Data Uji Coba',
+            'tahun'      => $tahun,
+            'tipe'       => $tipe,
+            'stats'      => $stats,
+            'allYears'   => $allYears,
+            'serverHour' => date('H'),
+            'serverMonth'=> date('m'),
+            'serverDay'  => date('d')
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('master/pembersihan', $data);
+        $this->load->view('templates/footer');
+    }
+
+    /**
+     * Endpoint AJAX untuk menghitung ulang jumlah data terdampak saat dropdown Tahun/Tipe berubah
+     */
+    public function ajax_pembersihan_stats()
+    {
+        $tahun = (int) ($this->input->get('tahun') ?: 2028);
+        $tipe  = strtoupper($this->input->get('tipe') ?: 'ALL');
+        if (!in_array($tipe, ['ALL', 'SSH', 'SBU'], TRUE)) {
+            $tipe = 'ALL';
+        }
+
+        $stats = $this->ssh_model->getPembersihanStats($tahun, $tipe);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'success' => true,
+                'stats'   => $stats
+            ]));
     }
 }
 

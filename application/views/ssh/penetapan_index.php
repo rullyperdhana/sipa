@@ -34,33 +34,42 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
     $urlExportDitetapkan = site_url("{$prefixUrl}/export_sipd?" . http_build_query(array_merge($exportQueryBase, ['status' => 'Ditetapkan'])));
     $urlExportDiverifikasi = site_url("{$prefixUrl}/export_sipd?" . http_build_query(array_merge($exportQueryBase, ['status' => 'Diverifikasi'])));
     ?>
-    <div class="dropdown">
-        <button class="btn btn-success shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Unduh berkas Excel usulan berformat resmi SIPD RI (form_upload_SIPD.xlsx)">
-            <i class="bi bi-file-earmark-excel-fill me-1"></i> Ekspor Format Upload SIPD (.xlsx)
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-            <li>
-                <a class="dropdown-item fw-semibold" href="<?= $urlExportCurrent ?>">
-                    <i class="bi bi-funnel-fill text-primary me-2"></i> Ekspor Sesuai Tampilan Tabel (<?= $activeStatus ?: 'Semua Status' ?>)
-                </a>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-                <a class="dropdown-item" href="<?= $urlExportAll ?>">
-                    <i class="bi bi-check2-all text-success me-2"></i> Ekspor Semua Usulan Siap SIPD (Ditetapkan &amp; Diverifikasi)
-                </a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="<?= $urlExportDitetapkan ?>">
-                    <i class="bi bi-shield-check text-success me-2"></i> Ekspor Hanya yang Telah Ditetapkan (SK Bupati)
-                </a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="<?= $urlExportDiverifikasi ?>">
-                    <i class="bi bi-hourglass-split text-warning me-2"></i> Ekspor Menunggu Penetapan (Diverifikasi BKAD)
-                </a>
-            </li>
-        </ul>
+    <div class="d-flex align-items-center gap-2">
+        <?php if (($this->currentUser->role ?? '') === 'admin'): ?>
+        <a href="<?= site_url('master/pembersihan?tahun=' . ($filter['tahun'] ?? 2028) . '&tipe=' . $tipe) ?>" 
+           class="btn btn-outline-danger shadow-sm" 
+           title="Alat pembersihan data uji coba per tahun anggaran dengan password dinamis">
+            <i class="bi bi-trash3-fill me-1"></i> Bersihkan Data Uji Coba
+        </a>
+        <?php endif; ?>
+        <div class="dropdown">
+            <button class="btn btn-success shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Unduh berkas Excel usulan berformat resmi SIPD RI (form_upload_SIPD.xlsx)">
+                <i class="bi bi-file-earmark-excel-fill me-1"></i> Ekspor Format Upload SIPD (.xlsx)
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                    <a class="dropdown-item fw-semibold" href="<?= $urlExportCurrent ?>">
+                        <i class="bi bi-funnel-fill text-primary me-2"></i> Ekspor Sesuai Tampilan Tabel (<?= $activeStatus ?: 'Semua Status' ?>)
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="<?= $urlExportAll ?>">
+                        <i class="bi bi-check2-all text-success me-2"></i> Ekspor Semua Usulan Siap SIPD (Ditetapkan &amp; Diverifikasi)
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="<?= $urlExportDitetapkan ?>">
+                        <i class="bi bi-shield-check text-success me-2"></i> Ekspor Hanya yang Telah Ditetapkan (SK Bupati)
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="<?= $urlExportDiverifikasi ?>">
+                        <i class="bi bi-hourglass-split text-warning me-2"></i> Ekspor Menunggu Penetapan (Diverifikasi BKAD)
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 
