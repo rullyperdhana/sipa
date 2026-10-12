@@ -4,6 +4,13 @@
  * Pemerintah Kabupaten Tapin
  * CodeIgniter 3 Entry Point
  */
+// Normalisasi protokol HTTPS jika berada di balik Reverse Proxy (Cloudflare / Nginx / Load Balancer)
+if ((isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+    || (isset($_SERVER['HTTP_CF_VISITOR']) && strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false)
+    || (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')) {
+    $_SERVER['HTTPS'] = 'on';
+}
+
 $is_local_host = (isset($_SERVER['HTTP_HOST']) && (strpos($_SERVER['HTTP_HOST'], 'localhost') !== FALSE || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== FALSE));
 $auto_env = $is_local_host ? 'development' : 'production';
 define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : $auto_env);

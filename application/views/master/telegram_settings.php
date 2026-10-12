@@ -196,6 +196,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Helper Sinkronisasi Token CSRF ke Meta dan Input Form
+    function syncCsrfToken(newHash) {
+        if (!newHash) return;
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (csrfMeta) csrfMeta.setAttribute('content', newHash);
+        const tokenName = (window.appConfig && window.appConfig.csrfName) ? window.appConfig.csrfName : 'rkbmd_csrf_token';
+        const formInput = document.querySelector('#formTelegramSettings input[name="' + tokenName + '"]');
+        if (formInput) formInput.value = newHash;
+        if (window.appConfig) window.appConfig.csrfHash = newHash;
+    }
+
+    // Pastikan token CSRF pada form selalu sinkron saat tombol Simpan Pengaturan ditekan
+    const formSettings = document.getElementById('formTelegramSettings');
+    if (formSettings) {
+        formSettings.addEventListener('submit', function() {
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            const tokenName = (window.appConfig && window.appConfig.csrfName) ? window.appConfig.csrfName : 'rkbmd_csrf_token';
+            let formInput = formSettings.querySelector('input[name="' + tokenName + '"]');
+            const currentHash = csrfMeta ? csrfMeta.getAttribute('content') : (window.appConfig ? window.appConfig.csrfHash : '');
+            if (currentHash) {
+                if (formInput) {
+                    formInput.value = currentHash;
+                } else {
+                    formInput = document.createElement('input');
+                    formInput.type = 'hidden';
+                    formInput.name = tokenName;
+                    formInput.value = currentHash;
+                    formSettings.appendChild(formInput);
+                }
+            }
+        });
+    }
+
     // Tombol Uji Coba Kirim Notifikasi via AJAX
     const btnTest = document.getElementById('btnTestTelegram');
     if (btnTest) {
@@ -257,8 +290,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     btnTest.disabled = false;
                     btnTest.innerHTML = originalHtml;
 
-                    if (res.csrfHash && csrfMeta) {
-                        csrfMeta.setAttribute('content', res.csrfHash);
+                    if (res.csrfHash) {
+                        syncCsrfToken(res.csrfHash);
                     }
 
                     if (res.success) {
@@ -376,8 +409,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     btnDetectChat.disabled = false;
                     btnDetectChat.innerHTML = originalHtml;
 
-                    if (res.csrfHash && csrfMeta) {
-                        csrfMeta.setAttribute('content', res.csrfHash);
+                    if (res.csrfHash) {
+                        syncCsrfToken(res.csrfHash);
                     }
 
                     if (!res.success) {

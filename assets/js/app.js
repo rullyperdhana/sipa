@@ -117,6 +117,8 @@ $(function () {
             window.appConfig.csrfHash = data.csrfHash;
             if (data.csrfName) window.appConfig.csrfName = data.csrfName;
             $('meta[name="csrf-token"]').attr('content', data.csrfHash);
+            const tokenName = data.csrfName || window.appConfig.csrfName || 'rkbmd_csrf_token';
+            $('input[name="' + tokenName + '"]').val(data.csrfHash);
         }
     }
 

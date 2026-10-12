@@ -14,6 +14,10 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - Menambahkan multi-stage trigger: inisialisasi instan saat parse script, event `DOMContentLoaded`, `window.onload`, dan `window.onhashchange`.
   - Menyematkan elemen jangkar fisik `<span id="panduan">`, `<span id="changelog">`, `<span id="sistem">`, dan `<span id="readme">` di setiap tab pane.
   - Normalisasi query parameter server-side `?tab=panduan` dan `?tab=tab-panduan` pada controller `Dokumentasi.php`.
+- **Penyelesaian Galat CSRF "The action you have requested is not allowed" ([`index.php`](index.php), [`application/config/config.php`](application/config/config.php), [`application/views/master/telegram_settings.php`](application/views/master/telegram_settings.php), [`assets/js/app.js`](assets/js/app.js)):**
+  - **Deteksi HTTPS Reverse Proxy & Cloudflare:** Menginisialisasi `$_SERVER['HTTPS'] = 'on'` di `index.php` jika terdeteksi header proxy Cloudflare/Nginx (`HTTP_X_FORWARDED_PROTO`, `HTTP_CF_VISITOR`, `HTTP_X_FORWARDED_SSL`), memastikan cookie keamanan CSRF tidak tertolak di server VPS.
+  - **Stabilisasi Token CSRF pada Aksi AJAX (`csrf_regenerate = FALSE`):** Menyetel konfigurasi regenerasi CSRF menjadi `FALSE` pada `config.php`, mencegah token pada formulir menjadi hangus/kedaluwarsa setelah pengguna mengklik tombol *Deteksi Chat ID Otomatis* atau *Kirim Pesan Uji Coba*.
+  - **Sinkronisasi Input Tersembunyi Form Sebelum Submit:** Menambahkan listener submit dan helper sinkronisasi pada `telegram_settings.php` serta `app.js` untuk memastikan nilai token CSRF selalu diperbarui sebelum data form dikirim ke server.
 
 ## [2.10.0] - 2026-10-12
 
