@@ -320,6 +320,9 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                                 : 'Tuliskan nama barang fisik secara jelas dan terstandarisasi.' ?>
                         </div>
                         <div class="invalid-feedback">Uraian wajib diisi minimal 3 karakter.</div>
+                        
+                        <!-- Container Peringatan Kemiripan Master Data Tahun Sebelumnya -->
+                        <div id="containerSimilarityAlert" class="d-none mt-2"></div>
                     </div>
 
                     <!-- Spesifikasi -->
@@ -971,6 +974,344 @@ document.addEventListener('DOMContentLoaded', function() {
             placeholder: '-- Cari & Pilih Satuan Standar --',
             allowClear: false,
             width: '100%'
+        });
+    }
+
+    // =========================================================================
+    // SMART SIMILARITY CHECK (Deteksi Item Serupa di Master Tahun Sebelumnya)
+    // =========================================================================
+    let similarityDebounceTimer = null;
+    let lastSimilarityMatches = [];
+    let allowSubmitNewItem = false;
+    const inputUraian = document.getElementById('uraian');
+    const containerSimAlert = document.getElementById('containerSimilarityAlert');
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/&/g, '&amp;')
+                   .replace(/</g, '&lt;')
+                   .replace(/>/g, '&gt;')
+                   .replace(/"/g, '&quot;')
+                   .replace(/'/g, '&#039;');
+    }
+
+    function checkSimilarity(uraian) {
+        if (!containerSimAlert) return;
+        // Hanya cek jika mode yang aktif adalah modeManual (Input Item Baru)
+        if (modeMaster && modeMaster.checked) {
+            containerSimAlert.classList.add('d-none');
+            containerSimAlert.innerHTML = '';
+            lastSimilarityMatches = [];
+            return;
+        }
+
+        const query = (uraian || '').trim();
+        if (query.length < 3) {
+            containerSimAlert.classList.add('d-none');
+            containerSimAlert.innerHTML = '';
+            lastSimilarityMatches = [];
+            return;
+        }
+
+        $.ajax({
+            url: '<?= site_url("ajax/standar_harga/similarity") ?>',
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                tipe: '<?= $tipe ?>',
+                uraian: query
+            },
+            success: function(res) {
+                if (res && res.found && res.matches && res.matches.length > 0) {
+                    lastSimilarityMatches = res.matches;
+                    renderSimilarityAlert(res.matches);
+                } else {
+                    lastSimilarityMatches = [];
+                    containerSimAlert.classList.add('d-none');
+                    containerSimAlert.innerHTML = '';
+                }
+            },
+            error: function() {
+                lastSimilarityMatches = [];
+            }
+        });
+    }
+
+    function renderSimilarityAlert(matches) {
+        if (!containerSimAlert) return;
+
+        let listHtml = '';
+        matches.forEach(function(m, idx) {
+            listHtml += `
+                <div class="list-group-item p-3 d-flex flex-wrap align-items-center justify-content-between gap-2 bg-white">
+                    <div class="me-2" style="max-width: calc(100% - 240px);">
+                        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                            <span class="badge bg-primary font-monospace" style="font-size: 11px;">${escapeHtml(m.kode_standar || 'MASTER')}</span>
+                            <span class="fw-bold text-dark" style="font-size: 14px;">${escapeHtml(m.uraian)}</span>
+                            <span class="badge bg-light text-secondary border" style="font-size: 11px;">TA ${m.tahun_anggaran}</span>
+                        </div>
+                        <div class="small text-muted" style="font-size: 12px;">
+                            ${m.spesifikasi ? '<span class="text-secondary">' + escapeHtml(m.spesifikasi) + '</span> &bull; ' : ''}
+                            Satuan: <strong>${escapeHtml(m.satuan)}</strong> &bull; 
+                            Harga Acuan: <strong class="text-primary font-monospace">Rp ${m.harga_satuan_fmt}</strong>
+                            ${m.nama_rekening ? ' &bull; <span class="d-none d-md-inline text-truncate">' + escapeHtml(m.nama_rekening) + '</span>' : ''}
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-primary py-1.5 px-3 btn-apply-similarity shadow-sm" data-idx="${idx}">
+                            <i class="bi bi-arrow-repeat me-1"></i> Alihkan ke Penyesuaian Harga
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        const alertHtml = `
+            <div class="card border-warning shadow-sm mt-2 mb-2" style="background-color: #fffbeb;">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-start gap-2.5">
+                        <div class="p-2 bg-warning text-dark rounded-circle flex-shrink-0 mt-0.5">
+                            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1">
+                                <h6 class="fw-bold text-dark mb-0" style="font-size: 14.5px;">
+                                    <i class="bi bi-info-circle-fill text-warning me-1"></i>
+                                    Perhatian: Item Serupa Terdeteksi di Master Standar Harga!
+                                </h6>
+                                <span class="badge bg-warning text-dark border border-warning-subtle px-2 py-1">
+                                    ${matches.length} Item Ditemukan
+                                </span>
+                            </div>
+                            <p class="text-dark small mb-2" style="font-size: 12.5px; line-height: 1.5;">
+                                Item dengan nama serupa telah terdaftar di Katalog Master tahun sebelumnya. Anda <strong>tidak perlu mengajukan sebagai Item Baru</strong>, silakan klik tombol di bawah untuk mengajukan <strong>Penyesuaian/Perubahan Harga</strong>.
+                            </p>
+                            <div class="list-group list-group-flush border rounded-3 mb-2 shadow-sm overflow-hidden">
+                                ${listHtml}
+                            </div>
+                            <div class="small text-muted d-flex align-items-center justify-content-between" style="font-size: 11.5px;">
+                                <span><i class="bi bi-shield-check me-1"></i>Menghubungkan ke master menjaga riwayat historis harga di BKAD.</span>
+                                <span class="text-secondary opacity-75">Abaikan jika barang/jasa ini benar-benar memiliki spesifikasi baru.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        containerSimAlert.innerHTML = alertHtml;
+        containerSimAlert.classList.remove('d-none');
+
+        $(containerSimAlert).find('.btn-apply-similarity').off('click').on('click', function(e) {
+            e.preventDefault();
+            const idx = $(this).data('idx');
+            const item = matches[idx];
+            if (item) {
+                applySimilarityItem(item);
+            }
+        });
+    }
+
+    function applySimilarityItem(data) {
+        if (!data) return;
+
+        // 1. Alihkan mode radio ke modeMaster
+        if (modeMaster) {
+            modeMaster.checked = true;
+            if (secSearch) secSearch.classList.remove('d-none');
+            if (cardNoticeBaru) cardNoticeBaru.classList.add('d-none');
+        }
+
+        // 2. Pasang nilai ke Hidden Inputs
+        document.getElementById('master_standar_id').value = data.id;
+        document.getElementById('harga_acuan_master').value = data.harga_satuan || 0;
+
+        // 3. Masukkan ke Select2 Katalog Master
+        if ($('#selectMasterStandar').length) {
+            const rekText = data.kode_rekening ? ' [Rek: ' + data.kode_rekening + ']' : '';
+            const optText = (data.kode_kelompok ? data.kode_kelompok + ' - ' : '') + data.uraian + (data.spesifikasi ? ' (' + data.spesifikasi + ')' : '') + ' - Rp ' + (data.harga_satuan_fmt || '0') + '/' + data.satuan + rekText;
+            const opt = new Option(optText, data.id, true, true);
+            $('#selectMasterStandar').empty().append(opt).trigger({
+                type: 'select2:select',
+                params: { data: data }
+            });
+        }
+
+        // 4. Masukkan ke input teks form
+        document.getElementById('uraian').value = data.uraian || '';
+        document.getElementById('spesifikasi').value = data.spesifikasi || '';
+
+        // 5. Set Kode Barang SIPD jika ada
+        if (data.kode_kelompok && $('#kode_kelompok').length) {
+            const optText = data.kode_kelompok + (data.nama_kelompok ? ' - ' + data.nama_kelompok : '');
+            const opt = new Option(optText, data.kode_kelompok, true, true);
+            $('#kode_kelompok').empty().append(opt).trigger('change');
+        }
+
+        // 6. Set Satuan
+        if (data.satuan && $('#satuan').length) {
+            const $selectSatuan = $('#satuan');
+            let foundSatuan = null;
+            $selectSatuan.find('option').each(function() {
+                if ($(this).val().toLowerCase() === data.satuan.toLowerCase()) {
+                    foundSatuan = $(this).val();
+                    return false;
+                }
+            });
+            if (foundSatuan) {
+                $selectSatuan.val(foundSatuan).trigger('change');
+            } else {
+                const newSatOpt = new Option(data.satuan, data.satuan, true, true);
+                $selectSatuan.append(newSatOpt).trigger('change');
+            }
+        }
+
+        // 7. Set Kategori jika ada
+        const selectKat = document.getElementById('kategori');
+        if (selectKat && data.kategori) {
+            selectKat.value = data.kategori;
+            if (selectKat.value !== data.kategori) {
+                const opt = new Option(data.kategori, data.kategori, true, true);
+                selectKat.add(opt);
+                selectKat.value = data.kategori;
+            }
+        }
+
+        // 8. Set Rekening Belanja SIPD
+        if (data.kode_rekening) {
+            setRekeningBelanja(data.kode_rekening, data.nama_rekening || '');
+            if ($('#selectAkunBelanja').length) {
+                const optText = data.kode_rekening + (data.nama_rekening ? ' - ' + data.nama_rekening : '');
+                const newOpt = new Option(optText, data.kode_rekening, true, true);
+                $('#selectAkunBelanja').empty().append(newOpt).trigger('change');
+            }
+        }
+
+        // 9. Set TKDN & Keterangan
+        if (typeof data.nilai_tkdn !== 'undefined' && document.getElementById('nilai_tkdn')) {
+            document.getElementById('nilai_tkdn').value = data.nilai_tkdn || 0;
+        }
+        if (data.keterangan && document.getElementById('keterangan_usulan')) {
+            document.getElementById('keterangan_usulan').value = data.keterangan;
+        }
+
+        // 10. Tampilkan Card Info Acuan Master
+        if (cardAcuan) {
+            cardAcuan.classList.remove('d-none');
+            document.getElementById('lblKodeKelompok').textContent = data.kode_kelompok || '-';
+            document.getElementById('lblHargaAcuan').textContent = 'Rp ' + (data.harga_satuan_fmt || '0');
+            document.getElementById('lblRekeningAcuan').innerHTML = data.kode_rekening 
+                ? '<i class="bi bi-journal-text me-1"></i>Rekening SIPD: <strong>' + data.kode_rekening + '</strong> &bull; ' + (data.nama_rekening || '') 
+                : '';
+        }
+
+        // 11. Sembunyikan alert similarity & reset state
+        if (containerSimAlert) {
+            containerSimAlert.classList.add('d-none');
+            containerSimAlert.innerHTML = '';
+        }
+        lastSimilarityMatches = [];
+        allowSubmitNewItem = false;
+
+        // 12. Fokus ke harga usulan agar operator langsung mengisi harga baru
+        setTimeout(function() {
+            const inputHarga = document.getElementById('harga_usulan');
+            if (inputHarga) {
+                inputHarga.focus();
+                inputHarga.select();
+            }
+        }, 300);
+
+        // 13. Tampilkan Notifikasi Sukses SweetAlert2
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Mode Dialihkan ke Penyesuaian Harga',
+                html: `Item <strong>${escapeHtml(data.uraian)}</strong> (${escapeHtml(data.satuan)}) berhasil dihubungkan ke Master Data.<br><small class="text-muted">Silakan tentukan nominal <strong>Harga Usulan Baru</strong> dan lengkapi bukti survey.</small>`,
+                timer: 4000,
+                timerProgressBar: true,
+                confirmButtonColor: '#0284c7'
+            });
+        }
+    }
+
+    // Pasang listener input typing pada #uraian
+    if (inputUraian) {
+        inputUraian.addEventListener('input', function() {
+            allowSubmitNewItem = false;
+            clearTimeout(similarityDebounceTimer);
+            similarityDebounceTimer = setTimeout(function() {
+                checkSimilarity(inputUraian.value);
+            }, 450);
+        });
+    }
+
+    // Bersihkan alert jika user sengaja memilih radio modeMaster
+    if (modeMaster) {
+        modeMaster.addEventListener('change', function() {
+            if (this.checked && containerSimAlert) {
+                containerSimAlert.classList.add('d-none');
+                containerSimAlert.innerHTML = '';
+                lastSimilarityMatches = [];
+            }
+        });
+    }
+
+    // Cek ulang jika user beralih kembali ke modeManual dan uraian sudah terisi
+    if (modeManual) {
+        modeManual.addEventListener('change', function() {
+            if (this.checked && inputUraian && inputUraian.value.trim().length >= 3) {
+                checkSimilarity(inputUraian.value);
+            }
+        });
+    }
+
+    // =========================================================================
+    // GUARDRAIL FORM SUBMISSION (SweetAlert2 Konfirmasi jika item serupa diabaikan)
+    // =========================================================================
+    const formUsulan = document.getElementById('formSshUsulan');
+    if (formUsulan) {
+        formUsulan.addEventListener('submit', function(e) {
+            if (allowSubmitNewItem) {
+                return true;
+            }
+
+            const isManualActive = modeManual && modeManual.checked;
+            if (isManualActive && lastSimilarityMatches && lastSimilarityMatches.length > 0) {
+                e.preventDefault();
+                const topMatch = lastSimilarityMatches[0];
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Perhatian: Item Serupa Terdeteksi!',
+                        html: `Item <strong>"${escapeHtml(topMatch.uraian)}"</strong> terindikasi sudah terdaftar di Master Data sebelumnya dengan harga acuan <strong>Rp ${topMatch.harga_satuan_fmt} / ${escapeHtml(topMatch.satuan)}</strong>.<br><br>Sesuai ketentuan, Anda disarankan mengajukan <strong>Penyesuaian Harga</strong> agar riwayat harga di BKAD tetap terhubung.<br><br><small class="text-muted">Apakah Anda ingin mengalihkan ke Penyesuaian Harga atau tetap menyimpan sebagai Item Baru?</small>`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#0284c7',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: '<i class="bi bi-arrow-repeat me-1"></i> Alihkan ke Penyesuaian Harga',
+                        cancelButtonText: 'Tetap Simpan sebagai Item Baru',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            applySimilarityItem(topMatch);
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            allowSubmitNewItem = true;
+                            setTimeout(function() {
+                                formUsulan.submit();
+                            }, 50);
+                        }
+                    });
+                } else {
+                    if (confirm(`Item "${topMatch.uraian}" terindikasi sudah ada di Master Data. Alihkan ke Penyesuaian Harga?`)) {
+                        applySimilarityItem(topMatch);
+                    } else {
+                        allowSubmitNewItem = true;
+                        formUsulan.submit();
+                    }
+                }
+                return false;
+            }
         });
     }
 });

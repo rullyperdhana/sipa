@@ -81,6 +81,45 @@ class Ajax extends Auth_Controller
         return $this->output->set_output(json_encode(['item' => $item]));
     }
 
+    public function check_standar_similarity()
+    {
+        $this->load->model('ssh_model');
+        $tipe   = $this->input->get('tipe', TRUE) ?: 'SSH';
+        $uraian = $this->input->get('uraian', TRUE) ?: '';
+
+        if (mb_strlen(trim($uraian)) < 3) {
+            return $this->output->set_content_type('application/json')
+                ->set_output(json_encode(['found' => false, 'matches' => []]));
+        }
+
+        $results = $this->ssh_model->findSimilarMasterByUraian($tipe, $uraian, 3);
+
+        $matches = array_map(function($m) {
+            return [
+                'id'               => (int) $m->id,
+                'kode_standar'     => $m->kode_standar,
+                'kode_kelompok'    => $m->kode_kelompok,
+                'uraian'           => $m->uraian,
+                'spesifikasi'      => $m->spesifikasi,
+                'satuan'           => $m->satuan,
+                'harga_satuan'     => (float) $m->harga_satuan,
+                'harga_satuan_fmt' => number_format($m->harga_satuan, 0, ',', '.'),
+                'kategori'         => $m->kategori,
+                'kode_rekening'    => $m->kode_rekening,
+                'nama_rekening'    => $m->nama_rekening,
+                'nilai_tkdn'       => (float) ($m->nilai_tkdn ?? 0),
+                'keterangan'       => $m->keterangan ?? '',
+                'tahun_anggaran'   => (int) $m->tahun_anggaran
+            ];
+        }, $results);
+
+        return $this->output->set_content_type('application/json')
+            ->set_output(json_encode([
+                'found'   => !empty($matches),
+                'matches' => $matches
+            ]));
+    }
+
     public function search_kode_barang_sipd()
     {
         $this->load->model('kode_barang_sipd_model');

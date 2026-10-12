@@ -678,6 +678,67 @@ class Ssh_model extends CI_Model
             ->get()->result();
     }
 
+    /**
+     * Cari kemiripan item pada Katalog Master Standar Harga (ref_standar_harga)
+     * berdasarkan Uraian Barang untuk mendeteksi usulan duplikat non-master.
+     */
+    public function findSimilarMasterByUraian($tipe, $uraian, $limit = 3)
+    {
+        $uraian = trim($uraian);
+        if (mb_strlen($uraian) < 3) {
+            return [];
+        }
+
+        // Prioritas 1: Exact Match (Case-insensitive)
+        $exact = $this->db->from($this->table_master)
+            ->where('tipe', $tipe)
+            ->where('is_active', 1)
+            ->where('LOWER(TRIM(uraian))', strtolower($uraian))
+            ->order_by('tahun_anggaran', 'DESC')
+            ->limit((int)$limit)
+            ->get()->result();
+
+        if (!empty($exact)) {
+            return $exact;
+        }
+
+        // Prioritas 2: LIKE Substring Match
+        $like = $this->db->from($this->table_master)
+            ->where('tipe', $tipe)
+            ->where('is_active', 1)
+            ->like('uraian', $uraian)
+            ->order_by('CHAR_LENGTH(uraian)', 'ASC')
+            ->order_by('tahun_anggaran', 'DESC')
+            ->limit((int)$limit)
+            ->get()->result();
+
+        if (!empty($like)) {
+            return $like;
+        }
+
+        // Prioritas 3: Multi-word Match jika uraian terdiri dari beberapa kata
+        $words = preg_split('/\s+/', $uraian);
+        $cleanWords = array_values(array_filter($words, function($w) {
+            return mb_strlen($w) >= 3 && !in_array(strtolower($w), ['dan', 'atau', 'non', 'dll', 'untuk', 'pada', 'dari']);
+        }));
+
+        if (count($cleanWords) >= 2) {
+            $this->db->from($this->table_master)
+                ->where('tipe', $tipe)
+                ->where('is_active', 1)
+                ->group_start();
+            foreach ($cleanWords as $w) {
+                $this->db->like('uraian', $w);
+            }
+            $this->db->group_end();
+            return $this->db->order_by('tahun_anggaran', 'DESC')
+                ->limit((int)$limit)
+                ->get()->result();
+        }
+
+        return [];
+    }
+
     public function getDistinctKategoriMaster($tipe, $tahun = NULL)
     {
         $this->db->distinct()->select('kategori');

@@ -139,6 +139,7 @@ $route['ajax/kode_barang_sipd/search']    = 'ajax/search_kode_barang_sipd';
 $route['ajax/satuan/search']              = 'ajax/search_satuan';
 $route['ajax/standar_harga/search']       = 'ajax/search_standar_harga';
 $route['ajax/standar_harga/detail/(:num)']= 'ajax/detail_standar_harga/$1';
+$route['ajax/standar_harga/similarity']   = 'ajax/check_standar_similarity';
 $route['ajax/notif/list']                 = 'ajax/notifikasi';
 $route['ajax/notif/read_all']             = 'ajax/baca_semua_notif';
 $route['ajax/notif/read/(:any)']          = 'ajax/baca_notif/$1';
