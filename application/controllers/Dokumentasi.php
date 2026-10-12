@@ -17,7 +17,11 @@ class Dokumentasi extends Admin_Controller
      */
     public function index()
     {
-        $tab = $this->input->get('tab', TRUE) ?: 'changelog';
+        $rawTab = $this->input->get('tab', TRUE) ?: 'changelog';
+        $tab = str_replace('tab-', '', strtolower(trim($rawTab)));
+        if (!in_array($tab, ['changelog', 'panduan', 'sistem', 'readme'], TRUE)) {
+            $tab = 'changelog';
+        }
 
         // 1. Parse CHANGELOG.md untuk riwayat rilis
         $changelogPath = FCPATH . 'CHANGELOG.md';

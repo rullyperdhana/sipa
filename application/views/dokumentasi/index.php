@@ -104,6 +104,7 @@
             <!-- TAB 1: RIWAYAT PEMBARUAN (CHANGELOG)                          -->
             <!-- ============================================================= -->
             <div class="tab-pane fade <?= ($activeTab === 'changelog') ? 'show active' : '' ?>" id="tab-changelog" role="tabpanel">
+                <span id="changelog"></span>
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                     <div>
                         <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Catatan Rilis & Log Pembaruan Aplikasi</h5>
@@ -150,6 +151,7 @@
             <!-- TAB 2: PANDUAN FITUR & ALUR MODUL                             -->
             <!-- ============================================================= -->
             <div class="tab-pane fade <?= ($activeTab === 'panduan') ? 'show active' : '' ?>" id="tab-panduan" role="tabpanel">
+                <span id="panduan"></span>
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                     <div>
                         <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-diagram-3-fill text-info me-2"></i>Panduan Alur Kerja & Modul Kedinasan</h5>
@@ -526,6 +528,7 @@
             <!-- TAB 3: DIAGNOSTIK & SERVER INFO                               -->
             <!-- ============================================================= -->
             <div class="tab-pane fade <?= ($activeTab === 'sistem') ? 'show active' : '' ?>" id="tab-sistem" role="tabpanel">
+                <span id="sistem"></span>
                 <div class="mb-4">
                     <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-hdd-network-fill text-success me-2"></i>Informasi Lingkungan Sistem & Konfigurasi Server</h5>
                     <p class="text-muted small mb-0">Rincian status runtime PHP, database MySQL, batas alokasi memori, dan izin berkas.</p>
@@ -631,6 +634,7 @@
             <!-- TAB 4: MANUAL TEKNIS (README)                                 -->
             <!-- ============================================================= -->
             <div class="tab-pane fade <?= ($activeTab === 'readme') ? 'show active' : '' ?>" id="tab-readme" role="tabpanel">
+                <span id="readme"></span>
                 <div class="mb-4 d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-file-earmark-text text-secondary me-2"></i>Manual Teknis & Arsitektur Sistem (README.md)</h5>
@@ -651,90 +655,135 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Sinkronisasi Hash URL dengan Navigasi Tab
-    const currentHash = window.location.hash;
-    if (currentHash) {
-        let targetId = currentHash;
-        if (!targetId.startsWith('#tab-')) {
-            targetId = '#tab-' + targetId.replace('#', '');
+(function() {
+    function switchTab(tabIdentifier) {
+        if (!tabIdentifier) return false;
+        var clean = tabIdentifier.toLowerCase().replace('#', '').replace('tab-', '').trim();
+        var valid = ['changelog', 'panduan', 'sistem', 'readme'];
+        if (valid.indexOf(clean) === -1) return false;
+
+        var targetSelector = '#tab-' + clean;
+        var targetBtn = document.querySelector('button[data-bs-target="' + targetSelector + '"]') 
+                     || document.getElementById('tab-' + clean + '-btn');
+        var targetPane = document.getElementById('tab-' + clean);
+
+        if (!targetBtn || !targetPane) return false;
+
+        // 1. Matikan seluruh tab dan pane yang sedang aktif
+        var allBtns = document.querySelectorAll('#docTabs button[data-bs-toggle="tab"]');
+        for (var i = 0; i < allBtns.length; i++) {
+            allBtns[i].classList.remove('active', 'fw-bold');
+            allBtns[i].setAttribute('aria-selected', 'false');
         }
-        const targetBtn = document.querySelector(`button[data-bs-target="${targetId}"]`);
-        if (targetBtn && typeof bootstrap !== 'undefined') {
-            const tabInstance = bootstrap.Tab.getOrCreateInstance(targetBtn);
-            tabInstance.show();
+        var allPanes = document.querySelectorAll('#docTabsContent .tab-pane');
+        for (var j = 0; j < allPanes.length; j++) {
+            allPanes[j].classList.remove('show', 'active');
+        }
+
+        // 2. Aktifkan tab dan pane yang dituju secara langsung pada DOM
+        targetBtn.classList.add('active', 'fw-bold');
+        targetBtn.setAttribute('aria-selected', 'true');
+        targetPane.classList.add('show', 'active');
+
+        // 3. Panggil Bootstrap API jika telah dimuat
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+            try {
+                bootstrap.Tab.getOrCreateInstance(targetBtn).show();
+            } catch (err) {}
+        }
+
+        return true;
+    }
+
+    function syncHash() {
+        var hash = window.location.hash;
+        if (hash) {
+            switchTab(hash);
         }
     }
 
-    // Perbarui URL hash saat tab berpindah tanpa reload halaman
-    const tabButtons = document.querySelectorAll('#docTabs button[data-bs-toggle="tab"]');
-    tabButtons.forEach(function(btn) {
-        btn.addEventListener('shown.bs.tab', function(e) {
-            const targetSelector = e.target.getAttribute('data-bs-target');
-            if (targetSelector) {
-                const cleanHash = targetSelector.replace('#tab-', '#');
-                if (history.replaceState) {
-                    history.replaceState(null, null, cleanHash);
-                } else {
-                    window.location.hash = cleanHash;
+    // 1. Eksekusi instan saat script di-parse
+    syncHash();
+
+    // 2. Eksekusi saat DOM siap
+    document.addEventListener('DOMContentLoaded', function() {
+        syncHash();
+
+        // Bind klik pada tombol tab
+        var tabBtns = document.querySelectorAll('#docTabs button[data-bs-toggle="tab"]');
+        tabBtns.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                var target = this.getAttribute('data-bs-target');
+                if (target) {
+                    switchTab(target);
+                    var cleanHash = target.replace('#tab-', '#');
+                    if (history.replaceState) {
+                        history.replaceState(null, null, cleanHash);
+                    } else {
+                        window.location.hash = cleanHash;
+                    }
                 }
-            }
+            });
         });
+
+        // 3. Fitur Live Search Changelog
+        var searchChangelog = document.getElementById('searchChangelog');
+        if (searchChangelog) {
+            searchChangelog.addEventListener('input', function() {
+                var query = this.value.toLowerCase().trim();
+                var cards = document.querySelectorAll('.changelog-card');
+                cards.forEach(function(card) {
+                    var keywords = card.getAttribute('data-keywords') || '';
+                    var title = card.innerText.toLowerCase();
+                    if (keywords.includes(query) || title.includes(query)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // 4. Fitur Live Search Panduan Modul & Alur
+        var searchPanduan = document.getElementById('searchPanduan');
+        if (searchPanduan) {
+            searchPanduan.addEventListener('input', function() {
+                var query = this.value.toLowerCase().trim();
+                var cols = document.querySelectorAll('#panduanGrid .panduan-col');
+                var matchCount = 0;
+                cols.forEach(function(col) {
+                    var keywords = col.getAttribute('data-keywords') || '';
+                    var text = col.innerText.toLowerCase();
+                    if (keywords.includes(query) || text.includes(query)) {
+                        col.style.display = '';
+                        matchCount++;
+                    } else {
+                        col.style.display = 'none';
+                    }
+                });
+
+                var noResultMsg = document.getElementById('panduanNoResult');
+                if (matchCount === 0) {
+                    if (!noResultMsg) {
+                        noResultMsg = document.createElement('div');
+                        noResultMsg.id = 'panduanNoResult';
+                        noResultMsg.className = 'col-12 text-center py-5 text-muted';
+                        noResultMsg.innerHTML = '<i class="bi bi-search fs-1 d-block mb-2 text-secondary"></i><h6 class="fw-bold">Tidak ada modul yang cocok</h6><p class="small mb-0">Coba gunakan kata kunci lain seperti "ssh", "sbu", "telegram", "sipd", "rekening", atau "satuan".</p>';
+                        var grid = document.getElementById('panduanGrid');
+                        if (grid) grid.appendChild(noResultMsg);
+                    }
+                    noResultMsg.style.display = '';
+                } else if (noResultMsg) {
+                    noResultMsg.style.display = 'none';
+                }
+            });
+        }
     });
 
-    // 2. Fitur Live Search Changelog
-    const searchChangelog = document.getElementById('searchChangelog');
-    if (searchChangelog) {
-        searchChangelog.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.changelog-card');
-            
-            cards.forEach(function(card) {
-                const keywords = card.getAttribute('data-keywords') || '';
-                const title = card.innerText.toLowerCase();
-                if (keywords.includes(query) || title.includes(query)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    }
+    // 5. Eksekusi pada window load (ketika seluruh CDN Bootstrap JS tuntas dimuat)
+    window.addEventListener('load', syncHash);
 
-    // 3. Fitur Live Search Panduan Modul & Alur
-    const searchPanduan = document.getElementById('searchPanduan');
-    if (searchPanduan) {
-        searchPanduan.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            const cols = document.querySelectorAll('#panduanGrid .panduan-col');
-            let matchCount = 0;
-
-            cols.forEach(function(col) {
-                const keywords = col.getAttribute('data-keywords') || '';
-                const text = col.innerText.toLowerCase();
-                if (keywords.includes(query) || text.includes(query)) {
-                    col.style.display = '';
-                    matchCount++;
-                } else {
-                    col.style.display = 'none';
-                }
-            });
-
-            // Feedback jika tidak ada hasil
-            let noResultMsg = document.getElementById('panduanNoResult');
-            if (matchCount === 0) {
-                if (!noResultMsg) {
-                    noResultMsg = document.createElement('div');
-                    noResultMsg.id = 'panduanNoResult';
-                    noResultMsg.className = 'col-12 text-center py-5 text-muted';
-                    noResultMsg.innerHTML = '<i class="bi bi-search fs-1 d-block mb-2 text-secondary"></i><h6 class="fw-bold">Tidak ada modul yang cocok</h6><p class="small mb-0">Coba gunakan kata kunci lain seperti "ssh", "sbu", "telegram", "sipd", "rekening", atau "satuan".</p>';
-                    document.getElementById('panduanGrid').appendChild(noResultMsg);
-                }
-                noResultMsg.style.display = '';
-            } else if (noResultMsg) {
-                noResultMsg.style.display = 'none';
-            }
-        });
-    }
-});
+    // 6. Eksekusi pada hashchange jika user berpindah tautan hash
+    window.addEventListener('hashchange', syncHash);
+})();
 </script>
