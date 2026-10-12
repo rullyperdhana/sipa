@@ -1591,10 +1591,13 @@ class Ssh_model extends CI_Model
      */
     public function getFinalUsulanForSipdExport($tipe = 'SSH', $tahun = NULL, $filter = [])
     {
-        $this->db->select('u.*, skpd.nama_skpd, skpd.kode_skpd, kb.uraian as nama_kelompok_sipd');
+        $this->db->select('u.*, skpd.nama_skpd, skpd.kode_skpd');
+        if ($this->db->table_exists('ref_kode_barang_sipd')) {
+            $this->db->select('kb.uraian as nama_kelompok_sipd');
+            $this->db->join('ref_kode_barang_sipd kb', 'kb.kode_barang = u.kode_kelompok', 'left');
+        }
         $this->db->from($this->table . ' u');
         $this->db->join('skpd', 'skpd.id = u.id_skpd', 'left');
-        $this->db->join('ref_kode_barang_sipd kb', 'kb.kode_barang = u.kode_kelompok', 'left');
 
         if (!empty($tipe)) {
             $this->db->where('u.tipe', $tipe);

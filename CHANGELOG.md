@@ -48,7 +48,12 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
     - **Halaman Antrean Verifikasi ([`verifikasi_index.php`](application/views/ssh/verifikasi_index.php)):** Menambahkan tombol aksi WhatsApp pada setiap baris tabel serta menyelaraskan tombol draf WA pada modal revisi dan tolak.
     - **Halaman Penetapan Usulan ([`penetapan_index.php`](application/views/ssh/penetapan_index.php)):** Menambahkan tombol WhatsApp pada kolom aksi setiap item usulan yang siap/telah ditetapkan resmi.
     - **Halaman Detail Usulan Surat ([`surat_detail.php`](application/views/ssh/surat_detail.php) & [`detail.php`](application/views/ssh/detail.php)):** Menambahkan tombol hubungi SKPD via WA pada header dan baris item usulan bagi verifikator/admin.
-    - **Modul Javascript ([`assets/js/ssh_module.js`](assets/js/ssh_module.js)):** Menyatukan listener modal revisi (`#btnWaFromModalRevisi` dan `#btnWaFromModal`), tolak (`#btnWaFromModalTolak`), telaah (`#btnWaFromModalTelaah`), dan baris tabel (`.btn-kirim-wa-ssh`) ke `window.SipaWa.open()`.
+- **Perbaikan Fatal Error 500 pada Ekspor Format SIPD (`export_sipd`):**
+  - **Penyebab:** Pada server VPS tempat berkas template belum terunggah (karena rule `*.xlsx` pada `.gitignore`), sistem jatuh ke blok *fallback* yang memanggil method `setCellValueByColumnAndRow()`. Method ini telah dihapus pada library PhpSpreadsheet versi 2.x ke atas, sehingga memicu `Fatal error: Call to undefined method ...::setCellValueByColumnAndRow()` yang menghasilkan HTTP 500.
+  - **Perbaikan Method Cell:** Mengganti seluruh sintaks lama dengan pemetaan koordinat sel standar (`A1:N1` via `$colLetters[$cIdx] . '1'`) yang 100% kompatibel di seluruh versi PhpSpreadsheet.
+  - **Penelusuran Template Resmi:** Menambahkan pengecualian `!form_upload_SIPD.xlsx` pada `.gitignore` dan menyertakan berkas template `form_upload_SIPD.xlsx` ke dalam git repository agar otomatis tersedia di server VPS.
+  - **Ketahanan Ekstensi & Error Handling:** Menambahkan pengecekan ketersediaan ekstensi PHP `ZipArchive`, pembungkusan *try-catch* pada pembuatan file Excel, serta pembersihan *output buffer* (`ob_end_clean()`) untuk mencegah rusaknya stream biner berkas Excel.
+  - **Ketahanan Kueri Database:** Menambahkan proteksi `table_exists('ref_kode_barang_sipd')` pada `Ssh_model.php` agar proses ekspor tetap berjalan aman meskipun tabel referensi kode barang SIPD belum dimigrasikan pada basis data server.
 
 ---
 

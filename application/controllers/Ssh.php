@@ -953,6 +953,10 @@ class Ssh extends Auth_Controller
      */
     public function export_sipd()
     {
+        if (!class_exists('ZipArchive')) {
+            show_error("Fitur ekspor Excel memerlukan ekstensi PHP 'zip' (ZipArchive) aktif pada server. Silakan hubungi administrator atau pasang paket 'php-zip' pada VPS Anda.", 500, 'Ekstensi PHP Zip Belum Aktif');
+        }
+
         $thAktif = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027;
         $tahun = (int)($this->input->get('tahun', TRUE) ?: $thAktif);
         $source = $this->input->get('source', TRUE) ?: 'penetapan';
@@ -978,39 +982,54 @@ class Ssh extends Auth_Controller
 
         // Generate Berkas Excel Mengacu ke form_upload_SIPD.xlsx
         $templatePath = FCPATH . 'form_upload_SIPD.xlsx';
+        $spreadsheet = null;
         if (file_exists($templatePath)) {
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($templatePath);
-            $sheet = $spreadsheet->getActiveSheet();
-        } else {
+            try {
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($templatePath);
+                $sheet = $spreadsheet->getActiveSheet();
+            } catch (\Throwable $e) {
+                log_message('error', 'Gagal memuat template form_upload_SIPD.xlsx: ' . $e->getMessage());
+                $spreadsheet = null;
+            }
+        }
+
+        if (!$spreadsheet) {
             $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
             $sheet->setTitle('Sheet 1');
             $headers = ['Kode', 'Uraian', 'Spek', 'Satuan', 'Harga 1', 'Harga 2', 'Harga 3', 'Rekening 1', 'Rekening 2', 'Rekening 3', 'Sumber', 'Keterangan', 'Kelompok', 'Nilai TKDN'];
+            $colLetters = range('A', 'N');
             foreach ($headers as $cIdx => $h) {
-                $sheet->setCellValueByColumnAndRow($cIdx + 1, 1, $h);
+                $sheet->setCellValue($colLetters[$cIdx] . '1', $h);
             }
             $sheet->getStyle('A1:N1')->getFont()->setBold(true);
+            $sheet->getStyle('A1:N1')->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FFE2EFDA');
         }
 
         $rowNum = 2;
         foreach ($items as $item) {
-            $harga1 = (float)(!empty($item->harga_ditetapkan) ? $item->harga_ditetapkan : ($item->harga_satuan ?? $item->harga_usulan));
+            $harga1 = (float)(!empty($item->harga_ditetapkan) ? $item->harga_ditetapkan : (!empty($item->harga_satuan) ? $item->harga_satuan : (!empty($item->harga_usulan) ? $item->harga_usulan : 0)));
             $harga2 = (float)(!empty($item->harga_2) ? $item->harga_2 : $harga1);
             $harga3 = (float)(!empty($item->harga_3) ? $item->harga_3 : $harga1);
             $tkdn   = (float)(!empty($item->nilai_tkdn) ? $item->nilai_tkdn : 0);
             $kode   = (string)(!empty($item->kode_kelompok) ? $item->kode_kelompok : '');
             $ket    = !empty($item->keterangan_usulan) ? $item->keterangan_usulan : (!empty($item->keterangan) ? $item->keterangan : '');
+            $uraian = !empty($item->uraian) ? $item->uraian : '';
+            $spek   = !empty($item->spesifikasi) ? $item->spesifikasi : '-';
+            $satuan = !empty($item->satuan) ? $item->satuan : '';
 
             $sheet->setCellValueExplicit('A' . $rowNum, $kode, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $sheet->setCellValue('B' . $rowNum, $item->uraian);
-            $sheet->setCellValue('C' . $rowNum, $item->spesifikasi ?: '-');
-            $sheet->setCellValue('D' . $rowNum, $item->satuan);
+            $sheet->setCellValue('B' . $rowNum, $uraian);
+            $sheet->setCellValue('C' . $rowNum, $spek);
+            $sheet->setCellValue('D' . $rowNum, $satuan);
             $sheet->setCellValue('E' . $rowNum, $harga1);
             $sheet->setCellValue('F' . $rowNum, $harga2);
             $sheet->setCellValue('G' . $rowNum, $harga3);
-            $sheet->setCellValueExplicit('H' . $rowNum, (string)($item->kode_rekening ?? ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $sheet->setCellValueExplicit('I' . $rowNum, (string)($item->kode_rekening_2 ?? ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $sheet->setCellValueExplicit('J' . $rowNum, (string)($item->kode_rekening_3 ?? ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('H' . $rowNum, (string)(!empty($item->kode_rekening) ? $item->kode_rekening : ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('I' . $rowNum, (string)(!empty($item->kode_rekening_2) ? $item->kode_rekening_2 : ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('J' . $rowNum, (string)(!empty($item->kode_rekening_3) ? $item->kode_rekening_3 : ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
             $sheet->setCellValue('K' . $rowNum, $this->tipe);
             $sheet->setCellValue('L' . $rowNum, $ket);
             $sheet->setCellValue('M' . $rowNum, $this->tipe);
@@ -1024,14 +1043,24 @@ class Ssh extends Auth_Controller
         }
 
         $filename = "form_upload_SIPD_{$this->tipe}_{$tahun}_" . date('Ymd_His') . ".xlsx";
+
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
         header('Pragma: public');
 
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
+        try {
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save('php://output');
+            exit;
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal generate spreadsheet SIPD: ' . $e->getMessage());
+            show_error('Gagal membuat berkas Excel: ' . $e->getMessage(), 500, 'Kesalahan Ekspor SIPD');
+        }
     }
 
     // =========================================================================

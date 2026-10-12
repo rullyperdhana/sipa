@@ -27,6 +27,7 @@ application/config/database.local.php
 *.sql
 !database/migrations/*.sql
 *.xlsx
+!form_upload_SIPD.xlsx
 *.xls
 *.csv
 !vendor/**
