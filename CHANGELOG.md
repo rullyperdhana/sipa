@@ -6,12 +6,13 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 ## [2.10.0] - 2026-10-12
 
 ### 🚀 Ditambahkan (Added)
-- **Modul & Layanan Notifikasi Otomatis Bot Telegram (`Telegram.php`):**
-  - **Layanan Notifikasi Terintegrasi (`application/libraries/Telegram.php`):**
+- **Modul & Layanan Notifikasi Otomatis Bot Telegram (`Telegram_service.php`):**
+  - **Layanan Notifikasi Terintegrasi (`application/libraries/Telegram_service.php`):**
     - Mengirim notifikasi otomatis seketika (*real-time*) ke Admin BKAD atau Grup Tim Verifikator Telegram setiap kali operator SKPD mengirimkan berkas usulan SSH maupun SBU ke BKAD.
     - Format pesan ramah dan terstruktur (HTML) mencakup: Nama SKPD Pengusul, Nomor Surat Usulan, Tanggal, Operator, Jumlah Rincian Item, Total Nilai Usulan, Perihal, Catatan SKPD, serta *direct link* untuk verifikator langsung membuka dan menelaah berkas usulan di SIPA.
     - Mendukung pengiriman ke beberapa Chat ID sekaligus (pribadi maupun ID Grup seperti `-100...`) yang dipisahkan dengan koma.
     - Dilengkapi *fallback* koneksi cURL dengan timeout aman (5-8 detik) dan penanganan kesalahan *non-blocking*, memastikan proses pengiriman usulan oleh SKPD tidak akan pernah terhambat sekalipun terjadi gangguan jaringan ke server Telegram.
+    - Penamaan class `Telegram_service` mencegah tabrakan nama (*class collision*) dengan Controller `Telegram`, mengatasi kendala `Unable to locate the specified class: Session.php`.
   - **Halaman Pengaturan Bot Telegram (`application/controllers/Telegram.php` & `application/views/master/telegram_settings.php`):**
     - Halaman konfigurasi khusus Administrator di menu **Integrasi & Sistem > Notifikasi Telegram** (`/telegram/settings`).
     - Pengaturan Switch Aktif/Nonaktif notifikasi, Token Bot API Telegram, dan Chat ID / ID Grup penerima.

@@ -343,8 +343,8 @@ class Ssh_model extends CI_Model
 
         // Notifikasi Otomatis ke Telegram Bot Admin BKAD
         try {
-            $this->load->library('telegram');
-            $this->telegram->sendSuratNotification($surat, $itemCount, $user, $surat->tipe);
+            $this->load->library('telegram_service');
+            $this->telegram_service->sendSuratNotification($surat, $itemCount, $user, $surat->tipe);
         } catch (\Throwable $e) {
             log_message('error', 'Gagal mengirim notifikasi Telegram surat usulan: ' . $e->getMessage());
         }
@@ -969,8 +969,8 @@ class Ssh_model extends CI_Model
 
         // Notifikasi Otomatis ke Telegram Bot Admin BKAD
         try {
-            $this->load->library('telegram');
-            $this->telegram->sendItemNotification($existing, $user, $existing->tipe);
+            $this->load->library('telegram_service');
+            $this->telegram_service->sendItemNotification($existing, $user, $existing->tipe);
         } catch (\Throwable $e) {
             log_message('error', 'Gagal mengirim notifikasi Telegram usulan: ' . $e->getMessage());
         }

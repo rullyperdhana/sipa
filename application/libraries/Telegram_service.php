@@ -7,7 +7,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Mengirim notifikasi otomatis secara real-time ke Admin BKAD / Grup Telegram Tim Verifikator
  * setiap kali SKPD mengirimkan usulan Standar Satuan Harga (SSH) atau Standar Biaya Umum (SBU).
  */
-class Telegram
+class Telegram_service
 {
     protected $CI;
 
