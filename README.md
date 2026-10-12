@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BKAD
 
-[![Version](https://img.shields.io/badge/version-2.9.7-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.9.8-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -88,7 +88,15 @@ Tabel referensi pengelompokan standar barang SIPD untuk pengusulan Standar Satua
 - **Manajemen Lengkap (CRUD):** Tambah, ubah, dan hapus kode barang dengan validasi anti-duplikasi di backend dan audit logging.
 - **Endpoint AJAX Select2:** Terintegrasi di `/ajax/kode_barang_sipd/search` untuk mempermudah pemilihan kode barang pada dropdown form usulan standar harga.
 
-### 9. Modul Master Data Barang BMD (Kinerja Tinggi)
+### 9. Modul Master Referensi Satuan Standar
+Tabel referensi ukuran dan satuan standar barang/jasa untuk modul SSH, SBU, dan RKBMD:
+- **392 Satuan Resmi Terintegrasi:** Diimpor dari berkas resmi `satuan.xlsx` memuat seluruh satuan fisik, kemasan, volume, bobot, durasi waktu kerja, dan paket kegiatan.
+- **Struktur Idempotent & Berkinerja Tinggi:** Tabel `ref_satuan` dilengkapi kunci unik (`nama_satuan`), indeks status aktif, dan Fulltext Index.
+- **Integrasi Otomatis ke Form Usulan:** Otomatis mengisi `<datalist id="listSatuan">` pada form pengusulan SSH & SBU tanpa menggantikan prioritas rekomendasi utama.
+- **Manajemen Lengkap (CRUD):** Tambah, ubah, dan hapus satuan standar lengkap dengan audit logging dan validasi anti-duplikasi.
+- **Endpoint AJAX Autocomplete:** Terintegrasi di `/ajax/satuan/search`.
+
+### 10. Modul Master Data Barang BMD (Kinerja Tinggi)
 Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Kapasitas Besar:** Mengelola **13.367 barang terdaftar**.
 - **Server-Side Pagination:** Menggunakan `LIMIT` dan `OFFSET` presisi sehingga respon halaman selalu instan (**< 50ms**) dan konsumsi RAM server **< 1 MB** (menghemat 99% memori dibandingkan client-side rendering).
@@ -97,13 +105,13 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Validasi Anti-Duplikasi:** Pengecekan otomatis di backend untuk mencegah database error 1062 saat menambah atau mengedit kode barang.
 - **Import Excel:** Unggah data massal dari file `.xlsx` / `.xls`.
 
-### 9. Antarmuka UI/UX Responsif & Modern
+### 11. Antarmuka UI/UX Responsif & Modern
 - **Responsive Sidebar Toggle:**
   - **Layar Desktop ($\ge 992\text{px}$):** Tombol hamburger melipat sidebar (*sidebar collapse*) dan memperluas canvas konten ke lebar penuh (*full-width*). Status tersimpan di `localStorage` (anti-FOUC).
   - **Layar Mobile ($< 992\text{px}$):** Sidebar berfungsi sebagai drawer samping (*off-canvas*) dengan latar belakang redup (*backdrop blur*), tombol tutup `X`, dan dukungan tombol `Escape`.
 - **Auto DataTables Column Adjust:** Penyesuaian lebar kolom tabel otomatis saat sidebar dilipat/dibuka.
 
-### 10. Pusat Laporan & Dashboard Eksekutif SIPA (`/laporan`)
+### 12. Pusat Laporan & Dashboard Eksekutif SIPA (`/laporan`)
 - **4 Kartu KPI Eksekutif:** Ringkasan makro Total Usulan Terdata (RKBMD + Standar Harga), Total Pagu Diusulkan (Rp), Realisasi Nilai Disetujui/Ditetapkan (Rp) dengan indikator persentase *Approval Rate*, dan Tingkat Partisipasi SKPD aktif.
 - **Visualisasi Interaktif (Chart.js):**
   - *Distribusi Pagu Anggaran RKBMD:* Diagram batang alokasi dana per instrumen perencanaan.
@@ -116,14 +124,14 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
   - Ekspor Spreadsheet Excel/CSV per modul (`/laporan/export/{modul}/excel`).
   - Lembar cetak laporan resmi ber-kop Pemerintah Kabupaten Tapin & BKAD (`/laporan/cetak`) siap ditandatangani Kepala BKAD.
 
-### 11. Modul Integrasi WhatsApp & Notifikasi Cepat Operator (`/wa`)
+### 13. Modul Integrasi WhatsApp & Notifikasi Cepat Operator (`/wa`)
 - **Pemberitahuan 1-Klik:** Tombol aksi langsung WhatsApp pada lembar verifikasi RKBMD (`/verifikasi/detail`) dan verifikasi Standar Harga (`/ssh/verifikasi` & `/sbu/verifikasi`).
 - **Format Pesan Kedinasan Otomatis (Markdown WA):** Otomatis menyusun kop instansi resmi BKAD Kab. Tapin, nama operator/SKPD, nomor usulan, status usulan (⚠️ *Perlu Perbaikan*, ✅ *Selesai / Disetujui*, ❌ *Ditolak*), catatan verifikator, serta tautan langsung untuk perbaikan data.
 - **Pencarian Nomor Kontak Cerdas:** Mengambil nomor WhatsApp akun pengguna operator SKPD secara otomatis (`users.no_wa`) dengan fallback ke nomor kontak dinas SKPD (`skpd.telepon`).
 - **Modal Interaktif Notifikasi WhatsApp Global (`templates/wa_modal`):** Memungkinkan verifikator memeriksa nomor tujuan, mengedit isi pesan leluasa sebelum dikirim, menyalin teks, atau langsung membuka WhatsApp Web / Desktop / HP.
 - **Dua Mode Integrasi:** Mode *Direct Click-to-Chat* (100% gratis tanpa biaya gateway pihak ketiga) dan mode *WhatsApp Gateway API* (opsional latar belakang via Fonnte / Webhook).
 
-### 12. Modul Pendaftaran Mandiri & Persetujuan Akun Operator (`/register`)
+### 14. Modul Pendaftaran Mandiri & Persetujuan Akun Operator (`/register`)
 - **Kendali Penuh Administrator (Buka/Tutup Pendaftaran):** Admin BKAD dapat mengaktifkan atau menonaktifkan registrasi mandiri publik sewaktu-waktu melalui modal pengaturan di `/master/user`.
 - **Alur Persetujuan Bertingkat (Admin Approval Workflow):** Pendaftar mandiri otomatis berstatus *Nonaktif / Menunggu Verifikasi* (`is_active = 0`) agar keamanan data aset daerah tetap terjaga dari pihak yang tidak berwenang.
 - **Aktivasi Cepat 1-Klik:** Tombol *Setujui & Aktifkan* langsung pada tabel pengguna admin untuk mengesahkan akun pemohon.
@@ -131,7 +139,7 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Formulir Pendaftaran Lengkap:** Menyediakan input Nama Lengkap, NIP, Username, Email, Nomor WhatsApp aktif, Pilihan SKPD, Password kuat (minimal 8 karakter), serta verifikasi Anti-Bot matematika dinamis.
 - **Halaman Penanganan Adaptif:** Menampilkan pemberitahuan kedinasan yang ramah saat pendaftaran sedang ditutup oleh administrator.
 
-### 13. Arsitektur Keamanan & Proteksi Sistem Online (Security Hardening)
+### 15. Arsitektur Keamanan & Proteksi Sistem Online (Security Hardening)
 - **Auto-Environment Detection (`index.php`):** Otomatis beralih ke `ENVIRONMENT = 'production'` pada domain online untuk menonaktifkan tampilan error trace PHP dan mencegah kebocoran informasi sistem (*Information Disclosure*).
 - **Proteksi Brute-Force Berbasis IP & Akun (`Auth.php`):** Pemblokiran IP otomatis jika terdeteksi $\ge 10$ kegagalan login dalam kurun waktu 15 menit.
 - **Mitigasi Timing Attack (`Auth.php`):** Menjalankan kalkulasi dummy bcrypt hash saat username tidak ditemukan untuk meratakan durasi respon server.
@@ -141,19 +149,19 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Hardening Root Web Server (`.htaccess`):** Menonaktifkan *Directory Listing* (`Options -Indexes`) dan memblokir akses langsung ke file sensitif (`.env`, `.sql`, `.json`, `.lock`, `.log`, `database.local.php`).
 - **Autentikasi Remember-Me Aman:** Verifikasi token hash Bcrypt dengan auto-rotasi token acak, `HttpOnly`, dan atribut cookie `SameSite=Lax`.
 
-### 14. Konteks Tahun Periode Anggaran Global & Multi-Tahun
+### 16. Konteks Tahun Periode Anggaran Global & Multi-Tahun
 - **Dropdown Pemilih Tahun pada Halaman Login (`/login`):** Pengguna dapat langsung menentukan tahun periode kerja saat masuk (pilihan dinamis: TA 2028, TA 2027 Perencanaan [default], TA 2026 Berjalan, TA 2025 Arsip).
 - **Quick Year Switcher di Header / Topbar (`templates/header.php`):** Tombol badge dropdown di navbar (`[ 📅 TA 2027 ▼ ]`) yang memungkinkan pengguna beralih tahun anggaran aktif kapan saja dalam 1 kali klik tanpa perlu logout.
 - **Route Cepat `/switch-year/(:num)`:** Endpoint pengalihan konteks tahun aktif dengan validasi sesi dan pemuatan ulang halaman otomatis.
 - **Sinkronisasi Otomatis Seluruh Modul:** Dashboard, Pusat Laporan, Form Usulan SSH/SBU, Form Usulan RKBMD, dan filter antrean usulan otomatis mengikuti tahun aktif yang terpilih.
 
-### 15. Manajemen Nomenklatur & Histori SKPD Per Tahun Anggaran
+### 17. Manajemen Nomenklatur & Histori SKPD Per Tahun Anggaran
 - **Dukungan Perubahan Perda / Regulasi Kelembagaan:** Mengatasi potensi perubahan nama dinas, kode sub-unit, atau pejabat Kepala SKPD di tahun mendatang tanpa merusak integritas cetak laporan dan usulan tahun lampau.
 - **Tabel Basis Data `skpd_nomenklatur`:** Mencatat riwayat nama SKPD, kode unit, pejabat kepala SKPD & NIP, pengurus barang, dan dasar regulasi/keterangan per tahun anggaran.
 - **Resolusi Otomatis Berbasis Tahun pada Master Model:** Method `findSkpd($id, $tahun)` dan `getAllSkpd($activeOnly, $tahun)` otomatis mengambil nomenklatur resmi pada tahun bersangkutan (fallback ke master pokok jika belum ada aturan khusus).
 - **Modal Interaktif di Master SKPD (`/master/skpd`):** Tombol aksi *"Riwayat & Nomenklatur Per Tahun"* dengan modal interaktif untuk menambah, melihat, mengedit, dan menghapus aturan nomenklatur per tahun anggaran.
 
-### 16. Modul Dokumentasi & Pembaruan Sistem di Aplikasi (`/dokumentasi`)
+### 18. Modul Dokumentasi & Pembaruan Sistem di Aplikasi (`/dokumentasi`)
 - **Akses Khusus Administrator (Role: admin):** Halaman dokumentasi terpadu yang dapat diakses langsung oleh admin melalui menu sidebar *"Dokumentasi & Update"* atau mengklik badge versi pada sidebar footer.
 - **Log Rilis & Changelog Interaktif:** Otomatis membaca riwayat rilis dari `CHANGELOG.md` dengan visual timeline modern dan fitur pencarian keyword cepat.
 - **Panduan Alur Modul Kedinasan:** Rangkuman alur 6 status usulan SSH & SBU (termasuk status *Ditolak*), 5 instrumen perencanaan RKBMD, penjadwalan BKAD, dan notifikasi WhatsApp.
@@ -377,13 +385,16 @@ sipa/
 
    # Migrasi v2.9.7 (Tabel Referensi Kode Barang SIPD 3.646 data SSH & SBU)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_ref_kode_barang_sipd.sql
+
+   # Migrasi v2.9.8 (Tabel Referensi Satuan Standar 392 data)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_ref_satuan.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
    > [!TIP]
    > Alternatif eksekusi migrasi otomatis tanpa password MySQL root VPS:
    > ```bash
-   > php -r 'define("BASEPATH",true);define("ENVIRONMENT","production");require "application/config/database.php";$cfg=$db["default"];$pdo=new PDO("mysql:host=".($cfg["hostname"]??"localhost").";port=".($cfg["port"]??3306).";dbname=".$cfg["database"],$cfg["username"],$cfg["password"]);$pdo->exec(file_get_contents("database/migrations/create_ref_kode_barang_sipd.sql"));echo "Migrasi Berhasil!\n";'
+   > php -r 'define("BASEPATH",true);define("ENVIRONMENT","production");require "application/config/database.php";$cfg=$db["default"];$pdo=new PDO("mysql:host=".($cfg["hostname"]??"localhost").";port=".($cfg["port"]??3306).";dbname=".$cfg["database"],$cfg["username"],$cfg["password"]);$pdo->exec(file_get_contents("database/migrations/create_ref_satuan.sql"));echo "Migrasi Berhasil!\n";'
    > ```
 
 ---
@@ -392,6 +403,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`create_ref_satuan.sql`](database/migrations/create_ref_satuan.sql) | Membuat tabel `ref_satuan` lengkap dengan kunci unik, indeks status aktif, Fulltext Index, dan 392 data satuan standar resmi dari berkas `satuan.xlsx` secara idempotent. |
 | [`create_ref_kode_barang_sipd.sql`](database/migrations/create_ref_kode_barang_sipd.sql) | Membuat tabel `ref_kode_barang_sipd` lengkap dengan indeks unik, indeks kelompok & status aktif, Fulltext Index, dan 3.646 data kode kelompok barang SIPD (613 SSH & 3.033 SBU) idempotent. |
 | [`add_idle_timeout_settings.sql`](database/migrations/add_idle_timeout_settings.sql) | Menambahkan konfigurasi bawaan auto-logout pengguna saat tidak aktif (`idle_timeout_enabled`, `idle_timeout_minutes`, `idle_warning_seconds`) pada tabel `ex_settings`. |
 | [`create_standar_harga_surat_and_link_usulan.sql`](database/migrations/create_standar_harga_surat_and_link_usulan.sql) | Membuat tabel `standar_harga_surat` untuk menampung surat dinas pengantar resmi (upload scan PDF bertanda tangan Kepala SKPD) dan relasi `surat_id` pada tabel `standar_harga_usulan`. |
@@ -436,6 +448,12 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
   GET /ajax/kode_barang_sipd/search?q={keyword}&kelompok={SSH|SBU}&limit={30}
   ```
   *Response:* `{"results": [{"id": "1.1.12.01.03.0006", "text": "1.1.12.01.03.0006 - Bahan Komputer [SSH]", "kode": "1.1.12.01.03.0006", "uraian": "Bahan Komputer", "kelompok": "SSH"}]}`
+
+- **Pencarian Master Satuan Standar:**
+  ```http
+  GET /ajax/satuan/search?q={keyword}&limit={30}
+  ```
+  *Response:* `{"results": [{"id": "Botol", "text": "Botol"}, {"id": "Buah", "text": "Buah"}]}`
 
 - **Pencarian Cerdas Akun Belanja SIPD RI (Berdasarkan Nama atau Kode):**
   ```http
@@ -494,6 +512,7 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.9.8 (2026-10-12):** Modul Master Referensi Satuan Standar (`ref_satuan`) - Integrasi 392 satuan standar resmi dari file `satuan.xlsx`, skrip migrasi idempotent (`create_ref_satuan.sql`), model mandiri `Satuan_model`, endpoint AJAX Select2 autocomplete (`/ajax/satuan/search`), antarmuka manajemen master data `/master/satuan` lengkap dengan kartu KPI, filter status, sliding window pagination, modal CRUD, menu navigasi sidebar, dan integrasi otomatis pengisian `<datalist id="listSatuan">` pada form pengusulan SSH & SBU.
 - **v2.9.7 (2026-10-12):** Modul Master Referensi Kode Barang SIPD (`ref_kode_barang_sipd`) - Integrasi 3.646 data resmi kode kelompok barang SIPD (613 SSH & 3.033 SBU) dari file `KODE BARANG SIPD.xlsx`, skrip migrasi idempotent (`create_ref_kode_barang_sipd.sql`), model mandiri `Kode_barang_sipd_model`, endpoint AJAX Select2 autocomplete (`/ajax/kode_barang_sipd/search`), antarmuka manajemen master data `/master/kode_barang_sipd` lengkap dengan kartu KPI, filter kelompok, sliding window pagination, modal CRUD, dan menu navigasi sidebar.
 - **v2.9.6 (2026-10-12):** Fitur Auto-Logout Otomatis Pengguna saat Idle (Inactivity Auto-Logout System) - Pelacak aktivitas mouse, keyboard, touch, dan scroll dengan *throttling* performa, Sinkronisasi Multi-Tab Peramban via `localStorage` dan Storage Event, Dialog Peringatan Hitung Mundur Interaktif (SweetAlert2 Countdown Modal) dengan opsi *"Tetap Masuk"* (AJAX Heartbeat Ping) atau *"Logout Sekarang"*, Proteksi Ganda Sisi Server (`Auth.php`), Penanganan Otomatis Background Polling (`X-Background-Poll: 1`) & Jeda Polling saat idle > 2 menit, Global AJAX 401 Error Handler, Pengaturan Administrator Fleksibel di Master Data User, dan Migrasi Konfigurasi Database `add_idle_timeout_settings.sql`.
 - **v2.9.5 (2026-10-11):** Pembaruan Menyeluruh Fitur Cetak Katalog Master Data Standar Harga (SSH & SBU) - Lembar Dokumen Resmi Kedinasan (`cetak_master`) lengkap dengan Kop Surat Pemkab Tapin & BKAD, Judul Resmi, Ringkasan Parameter Filter, Tabel Landscape Berulang (*repeating thead*), dan Blok Tanda Tangan Kepala BKAD. Menu Dropdown Cetak Fleksibel (*Cetak Halaman Ini*, *Cetak 250 Data*, *Cetak 500 Data*, *Cetak Tampilan Web*), Toolbar Layar Interaktif (`.no-print-toolbar`), dan Global CSS Media Print (`@media print`) Anti-Sidebar/Navbar.

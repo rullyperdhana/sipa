@@ -3,6 +3,26 @@ Semua perubahan penting pada proyek **SIPA (Sistem Informasi Pengelolaan Aset) -
 
 Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachangelog.com/id/1.0.0/) dan mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.8] - 2026-10-12
+
+### 🚀 Ditambahkan (Added)
+- **Tabel & Modul Referensi Master Satuan Standar (`ref_satuan`):**
+  - **Dataset Resmi Terintegrasi (392 Satuan Standar Unik):** Diimpor langsung dari sumber berkas resmi `satuan.xlsx`, memuat seluruh klasifikasi satuan unit, wadah, ukuran berat/volume, waktu kerja (OB, OH, OJ, dsb.), dan paket kegiatan tanpa duplikasi (menggabungkan duplikasi case-insensitive secara bersih).
+  - **Skema Basis Data Modular & Idempotent (`database/migrations/create_ref_satuan.sql`):** Tabel `ref_satuan` dilengkapi kunci unik (`nama_satuan`), indeks status aktif, dan Fulltext Index untuk pencarian kilat. Menggunakan batch insert dengan klausa `ON DUPLICATE KEY UPDATE` sehingga aman dieksekusi berkali-kali.
+  - **Model CodeIgniter 3 Mandiri (`Satuan_model.php`):** Menyediakan fungsionalitas pengambilan data berpaginasi (`getSatuan`), penghitungan data (`countSatuan`), ringkasan statistik KPI (`getStatistik`), live search autocomplete (`searchSelect2`), pengambilan nama aktif untuk datalist (`getAllActiveNames`), dan operasi CRUD (`save`, `delete`).
+  - **Endpoint AJAX Terproteksi (`/ajax/satuan/search`):** Endpoint JSON untuk integrasi autocomplete Select2 dengan dukungan kata kunci `q` dan parameter pembatas `limit`.
+  - **Halaman Manajemen Master Data (`/master/satuan`):**
+    - 3 Kartu KPI: Total Satuan Terdaftar, Satuan Aktif, dan Satuan Nonaktif.
+    - Filter pencarian teks nama satuan, filter status aktif/nonaktif, dan selektor kuota per halaman (25, 50, 100 data).
+    - Tabel responsif lengkap dengan badge nama satuan, keterangan, badge status, dan tombol aksi Edit & Hapus.
+    - Paginasi pintar berbasis sliding window.
+    - Modal interaktif Tambah dan Edit Satuan dengan validasi keunikan nama di sisi backend dan pencatatan audit log.
+    - Modal konfirmasi hapus aman.
+  - **Integrasi Otomatis ke Form Usulan SSH & SBU (`Ssh_model.php`):** Method `getSatuanSsh()` dan `getSatuanSbu()` otomatis memuat 392 satuan standar dari tabel `ref_satuan` ke dalam `<datalist id="listSatuan">` pada formulir pengusulan harga tanpa menggeser posisi rekomendasi satuan utama.
+  - **Integrasi Navigasi Sidebar (`templates/header.php`):** Menambahkan menu navigasi *"Satuan Standar"* pada kelompok menu **Master Data** untuk pengguna dengan hak akses Administrator.
+
+---
+
 ## [2.9.7] - 2026-10-12
 
 ### 🚀 Ditambahkan (Added)

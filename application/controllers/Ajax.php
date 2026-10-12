@@ -94,6 +94,18 @@ class Ajax extends Auth_Controller
             ->set_output(json_encode(['results' => $results]));
     }
 
+    public function search_satuan()
+    {
+        $this->load->model('satuan_model');
+        $q = $this->input->get('q', TRUE);
+        $limit = (int) ($this->input->get('limit') ?: 30);
+
+        $results = $this->satuan_model->searchSelect2($q, $limit);
+
+        $this->output->set_content_type('application/json')
+            ->set_output(json_encode(['results' => $results]));
+    }
+
     public function notifikasi()
     {
         if (!$this->currentUser) {

@@ -187,6 +187,9 @@ $userRole = !empty($user->role) ? $user->role : '';
         <a href="<?= site_url('master/akun_belanja') ?>" class="nav-link <?= in_array($this->uri->segment(2), ['akun_belanja', 'akun']) ? 'active' : '' ?>">
             <i class="bi bi-journal-text"></i> <span>Akun Belanja SIPD</span>
         </a>
+        <a href="<?= site_url('master/satuan') ?>" class="nav-link <?= $this->uri->segment(2) === 'satuan' ? 'active' : '' ?>">
+            <i class="bi bi-rulers"></i> <span>Satuan Standar</span>
+        </a>
         <a href="<?= site_url('master/periode') ?>" class="nav-link <?= $this->uri->segment(2) === 'periode' ? 'active' : '' ?>">
             <i class="bi bi-calendar3"></i> <span>Periode</span>
         </a>

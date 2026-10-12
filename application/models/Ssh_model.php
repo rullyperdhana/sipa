@@ -1307,18 +1307,46 @@ class Ssh_model extends CI_Model
 
     public function getSatuanSsh()
     {
-        return [
+        $primary = [
             'Unit', 'Buah', 'Rim', 'Dus', 'Kotak', 'Paket', 'Set',
             'Lembar', 'Rol', 'Meter', 'M2', 'M3', 'Kg', 'Ton', 'Liter', 'Sak', 'Batang', 'Kaleng', 'Botol'
         ];
+
+        if ($this->db->table_exists('ref_satuan')) {
+            $fromDb = $this->db->select('nama_satuan')
+                ->where('is_active', 1)
+                ->order_by('nama_satuan', 'ASC')
+                ->get('ref_satuan')
+                ->result_array();
+            if (!empty($fromDb)) {
+                $dbSatuan = array_column($fromDb, 'nama_satuan');
+                return array_values(array_unique(array_merge($primary, $dbSatuan)));
+            }
+        }
+
+        return $primary;
     }
 
     public function getSatuanSbu()
     {
-        return [
+        $primary = [
             'Orang/Bulan (OB)', 'Orang/Hari (OH)', 'Orang/Jam (OJ)', 'Orang/Tahun (OT)',
             'Orang/Kegiatan (OK)', 'Orang/Paket (OP)', 'Jam', 'Hari', 'Bulan', 'Tahun', 'Kegiatan', 'Kali', 'Titik', 'Hari/Orang'
         ];
+
+        if ($this->db->table_exists('ref_satuan')) {
+            $fromDb = $this->db->select('nama_satuan')
+                ->where('is_active', 1)
+                ->order_by('nama_satuan', 'ASC')
+                ->get('ref_satuan')
+                ->result_array();
+            if (!empty($fromDb)) {
+                $dbSatuan = array_column($fromDb, 'nama_satuan');
+                return array_values(array_unique(array_merge($primary, $dbSatuan)));
+            }
+        }
+
+        return $primary;
     }
 
     public function generateKodeUsulan($tipe = 'SSH', $tahun = 2026)

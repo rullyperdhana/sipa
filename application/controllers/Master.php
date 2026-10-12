@@ -6,7 +6,7 @@ class Master extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(['master_model', 'user_model', 'akun_model', 'kode_barang_sipd_model']);
+        $this->load->model(['master_model', 'user_model', 'akun_model', 'kode_barang_sipd_model', 'satuan_model']);
     }
 
     // ==================== SKPD ====================
@@ -647,5 +647,89 @@ class Master extends Admin_Controller
             }
         }
     }
+
+    // ==================== SATUAN STANDAR ====================
+    public function satuan()
+    {
+        $action = $this->input->post('action', TRUE);
+        if ($this->input->method() === 'post' && $action) {
+            $this->_handleSatuan($action);
+            redirect('master/satuan');
+        }
+
+        $filter = [];
+        if ($q = trim($this->input->get('q', TRUE) ?? '')) $filter['q'] = $q;
+        if (($act = $this->input->get('is_active', TRUE)) !== null && $act !== '') $filter['is_active'] = (int) $act;
+
+        $page = max(1, (int) $this->input->get('page'));
+        $perPage = (int) ($this->input->get('per_page') ?: 25);
+        if (!in_array($perPage, [25, 50, 100])) $perPage = 25;
+        $offset = ($page - 1) * $perPage;
+
+        $totalRows = $this->satuan_model->countSatuan($filter);
+        $list = $this->satuan_model->getSatuan($filter, $perPage, $offset);
+        $stats = $this->satuan_model->getStatistik();
+        $totalPages = ceil($totalRows / $perPage);
+
+        $data = [
+            'title'      => 'Master Data Referensi Satuan',
+            'list'       => $list,
+            'filter'     => $filter,
+            'stats'      => $stats,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'offset'     => $offset,
+            'totalRows'  => $totalRows,
+            'totalPages' => $totalPages
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('master/satuan', $data);
+        $this->load->view('templates/footer');
+    }
+
+    private function _handleSatuan($action)
+    {
+        if ($action === 'save') {
+            $this->form_validation->set_rules('nama_satuan', 'Nama Satuan', 'required|max_length[100]');
+            if ($this->form_validation->run() === FALSE) {
+                $this->session->set_flashdata('danger', validation_errors());
+                return;
+            }
+
+            $id = (int) $this->input->post('id');
+            $nama = trim($this->input->post('nama_satuan', TRUE));
+
+            // Cek duplikasi nama_satuan
+            $check = $this->db->where('nama_satuan', $nama);
+            if ($id) {
+                $check->where('id !=', $id);
+            }
+            $existing = $check->get('ref_satuan')->row();
+            if ($existing) {
+                $this->session->set_flashdata('danger', "Satuan '<strong>" . htmlspecialchars($nama) . "</strong>' sudah terdaftar (ID #{$existing->id}).");
+                return;
+            }
+
+            $data = [
+                'nama_satuan' => $nama,
+                'keterangan'  => trim($this->input->post('keterangan', TRUE) ?? ''),
+                'is_active'   => (int) $this->input->post('is_active')
+            ];
+
+            $this->satuan_model->save($data, $id ?: NULL);
+            $this->logger->record($id ? 'update' : 'create', 'satuan', "Satuan: {$data['nama_satuan']}");
+            $this->session->set_flashdata('success', 'Data Satuan berhasil disimpan.');
+        } elseif ($action === 'delete') {
+            $id = (int) $this->input->post('id');
+            $item = $this->satuan_model->findById($id);
+            if ($item) {
+                $this->satuan_model->delete($id);
+                $this->logger->record('delete', 'satuan', "Hapus Satuan: {$item->nama_satuan}");
+                $this->session->set_flashdata('success', 'Data Satuan berhasil dihapus.');
+            }
+        }
+    }
 }
+
 
