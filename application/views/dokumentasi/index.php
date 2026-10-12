@@ -150,20 +150,28 @@
             <!-- TAB 2: PANDUAN FITUR & ALUR MODUL                             -->
             <!-- ============================================================= -->
             <div class="tab-pane fade <?= ($activeTab === 'panduan') ? 'show active' : '' ?>" id="tab-panduan" role="tabpanel">
-                <div class="mb-4">
-                    <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-diagram-3-fill text-info me-2"></i>Panduan Alur Kerja & Modul Kedinasan</h5>
-                    <p class="text-muted small mb-0">Penjelasan alur proses bisnis antar role (Operator SKPD, Verifikator BKAD, Penetap, Pimpinan, dan Administrator).</p>
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-diagram-3-fill text-info me-2"></i>Panduan Alur Kerja & Modul Kedinasan</h5>
+                        <p class="text-muted small mb-0">Penjelasan alur proses bisnis, standarisasi regulasi, dan modul integrasi antar role (Operator SKPD, Verifikator BKAD, Penetap, dan Administrator).</p>
+                    </div>
+                    <div class="d-flex gap-2 align-items-center">
+                        <div class="input-group input-group-sm" style="max-width: 250px;">
+                            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="searchPanduan" placeholder="Cari modul atau panduan...">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="row g-4">
+                <div class="row g-4" id="panduanGrid">
                     <!-- Modul 1: SSH -->
-                    <div class="col-md-6">
+                    <div class="col-md-6 panduan-col" data-keywords="ssh standar satuan harga barang fisik atk material bangunan belanja modal rls verifikasi telaah penetapan bkad sk bupati">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-primary">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-primary-subtle text-primary fs-4"><i class="bi bi-box-seam-fill"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Modul Standar Satuan Harga (SSH)</h6>
+                                        <h6 class="mb-0 fw-bold">1. Modul Standar Satuan Harga (SSH)</h6>
                                         <small class="text-muted">Barang fisik, ATK, material bangunan, kendaraan, inventaris</small>
                                     </div>
                                 </div>
@@ -191,17 +199,17 @@
                     </div>
 
                     <!-- Modul 2: SBU -->
-                    <div class="col-md-6">
+                    <div class="col-md-6 panduan-col" data-keywords="sbu standar biaya umum honorarium narasumber tenaga ahli uang harian perjadin sewa gedung tarif ob oh oj ok paket">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-info">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-info-subtle text-info fs-4"><i class="bi bi-receipt-cutoff"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Modul Standar Biaya Umum (SBU)</h6>
+                                        <h6 class="mb-0 fw-bold">2. Modul Standar Biaya Umum (SBU)</h6>
                                         <small class="text-muted">Honorarium, narasumber, tenaga ahli, uang harian perjadin, sewa gedung</small>
                                     </div>
                                 </div>
-                                <h6 class="small fw-bold text-uppercase text-muted">Karakteristik & Satuan:</h6>
+                                <h6 class="small fw-bold text-uppercase text-muted">Karakteristik & Satuan Berbasis Waktu / Kegiatan:</h6>
                                 <p class="small text-secondary mb-2">
                                     SBU mencakup batas tertinggi tarif operasional berbasis kegiatan dan durasi waktu kerja:
                                 </p>
@@ -221,13 +229,13 @@
                     </div>
 
                     <!-- Modul 3: RKBMD -->
-                    <div class="col-md-6">
+                    <div class="col-md-6 panduan-col" data-keywords="rkbmd pengadaan pemeliharaan pemanfaatan pemindahtanganan penghapusan bmd permendagri 19 2016 perencanaan aset">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-warning">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-warning-subtle text-warning fs-4"><i class="bi bi-file-earmark-spreadsheet-fill"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Modul Perencanaan RKBMD (5 Instrumen)</h6>
+                                        <h6 class="mb-0 fw-bold">3. Modul Perencanaan RKBMD (5 Instrumen)</h6>
                                         <small class="text-muted">Berdasarkan Permendagri No. 19 Tahun 2016 tentang Pedoman Pengelolaan BMD</small>
                                     </div>
                                 </div>
@@ -242,15 +250,36 @@
                         </div>
                     </div>
 
-                    <!-- Modul 4: Integrasi Notifikasi WhatsApp -->
-                    <div class="col-md-6">
+                    <!-- Modul 4: Notifikasi Bot Telegram -->
+                    <div class="col-md-6 panduan-col" data-keywords="telegram notifikasi bot pesan instan realtime bkad verifikator botfather getupdates chat id token kirim surat usulan">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-info">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-info-subtle text-info fs-4"><i class="bi bi-telegram"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">4. Notifikasi Otomatis Bot Telegram (`/telegram/settings`)</h6>
+                                        <small class="text-muted">Pemberitahuan otomatis seketika saat SKPD mengirim usulan ke BKAD</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>Pemberitahuan Real-Time ke BKAD:</strong> Setiap kali operator SKPD menekan tombol <em>"Kirim ke BKAD"</em>, bot Telegram otomatis mengirim notifikasi ke Admin BKAD atau Grup Verifikator.</li>
+                                    <li class="mb-1"><strong>Format Pesan Lengkap:</strong> Memuat nama SKPD, nomor surat usulan, tanggal, operator, total nilai usulan, jumlah rincian item, dan tautan langsung untuk menelaah berkas.</li>
+                                    <li class="mb-1"><strong>Deteksi Chat ID Otomatis:</strong> Dilengkapi tombol pemindai getUpdates untuk mendeteksi Chat ID pengguna atau grup Telegram dalam satu klik.</li>
+                                    <li class="mb-1"><strong>Uji Coba Sambungan Bot:</strong> Dilengkapi tombol tes pengiriman langsung untuk memastikan token BotFather dan Chat ID telah terkonfigurasi sempurna.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modul 5: Notifikasi WhatsApp Kedinasan -->
+                    <div class="col-md-6 panduan-col" data-keywords="whatsapp notifikasi wa draf pesan revisi tolak disetujui operator skpd gateway direct click to chat">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-success">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-success-subtle text-success fs-4"><i class="bi bi-whatsapp"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Notifikasi WhatsApp Kedinasan</h6>
-                                        <small class="text-muted">Komunikasi otomatis instan antar Verifikator dan Operator SKPD</small>
+                                        <h6 class="mb-0 fw-bold">5. Notifikasi WhatsApp Kedinasan (`/wa`)</h6>
+                                        <small class="text-muted">Komunikasi tindak lanjut satu klik dari Verifikator ke Operator SKPD</small>
                                     </div>
                                 </div>
                                 <ul class="small text-secondary ps-3 mb-0">
@@ -262,14 +291,14 @@
                         </div>
                     </div>
 
-                    <!-- Modul 5: Surat Usulan Resmi SKPD (Header-Detail) -->
-                    <div class="col-md-6">
+                    <!-- Modul 6: Surat Usulan Resmi SKPD -->
+                    <div class="col-md-6 panduan-col" data-keywords="surat usulan scan pdf kepala skpd stempel dinas pratinjau header detail verifikasi berkas">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-danger">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-danger-subtle text-danger fs-4"><i class="bi bi-file-earmark-pdf-fill"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Surat Usulan Resmi SKPD (Header-Detail)</h6>
+                                        <h6 class="mb-0 fw-bold">6. Surat Usulan Resmi SKPD (Header-Detail & Viewer PDF)</h6>
                                         <small class="text-muted">Prasyarat unggah scan PDF surat dinas dan manajemen rincian item</small>
                                     </div>
                                 </div>
@@ -283,35 +312,136 @@
                         </div>
                     </div>
 
-                    <!-- Modul 6: Penjadwalan & Countdown Timer -->
-                    <div class="col-md-6">
+                    <!-- Modul 7: Smart Similarity Check & Guardrail Anti-Duplikasi -->
+                    <div class="col-md-6 panduan-col" data-keywords="similarity check kemiripan item baru uraian master standar harga guardrail penyesuaian harga anti duplikasi riwayat harga">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-primary">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-primary-subtle text-primary fs-4"><i class="bi bi-search-heart"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">7. Smart Similarity Check & Anti-Duplikasi SSH/SBU</h6>
+                                        <small class="text-muted">Pencegahan dini pembuatan item baru saat barang sudah ada di master acuan</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>Deteksi Real-Time saat Mengetik:</strong> Saat operator memilih mode 'Input Item Baru' dan mengetik uraian barang, sistem secara otomatis mengecek kemiripan ke database master tahun sebelumnya.</li>
+                                    <li class="mb-1"><strong>Banner Rekomendasi Penyesuaian Harga:</strong> Jika terdeteksi item serupa, sistem menampilkan kartu informasi master lengkap dengan harga acuan dan spesifikasi.</li>
+                                    <li class="mb-1"><strong>1-Click Switch:</strong> Tombol <em>"Alihkan ke Penyesuaian Harga"</em> langsung mengisi otomatis seluruh atribut item master dan memfokuskan kursor ke kolom harga usulan baru.</li>
+                                    <li class="mb-1"><strong>Guardrail Submission Interaktif:</strong> Mencegah pembuatan data ganda dan menjaga kesinambungan historis data harga di BKAD.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modul 8: Pengaturan Input Manual Rekening Belanja SIPD RI -->
+                    <div class="col-md-6 panduan-col" data-keywords="pengaturan input manual rekening belanja sipd ri toggle aktif nonaktif master akun belanja kustom kode koma">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-success">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-success-subtle text-success fs-4"><i class="bi bi-sliders"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">8. Pengaturan Input Manual Rekening SIPD RI</h6>
+                                        <small class="text-muted">Kendali Admin BKAD untuk mewajibkan katalog resmi atau mengizinkan kode manual</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>Kendali Sistem Terpusat:</strong> Administrator BKAD dapat mengaktifkan atau menonaktifkan fitur input kode manual melalui menu <em>Master Data &gt; Akun Belanja SIPD RI</em>.</li>
+                                    <li class="mb-1"><strong>Mode Dinonaktifkan (Rekomendasi Disiplin Data):</strong> Tombol <code>[ Manual ]</code> disembunyikan. Operator SKPD diwajibkan memilih rekening belanja dari katalog resmi SIPD RI untuk menjamin validitas saat diekspor.</li>
+                                    <li class="mb-1"><strong>Mode Diaktifkan (Fleksibilitas Tambahan):</strong> Memberikan akses tombol manual bagi operator untuk mengetik kode kustom darurat atau multi-kode koma jika rekening baru belum terdaftar di database.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modul 9: Penyelarasan & Ekspor Format Upload SIPD RI -->
+                    <div class="col-md-6 panduan-col" data-keywords="ekspor sipd ri form upload sipd xlsx 14 kolom excel tkdn zonasi multi rekening kode barang sipd penetapan">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-warning">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-warning-subtle text-warning fs-4"><i class="bi bi-file-earmark-excel-fill"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">9. Ekspor Berkas Format Upload SIPD RI (`.xlsx`)</h6>
+                                        <small class="text-muted">Penyelarasan 14 kolom resmi template SIPD RI (`form_upload_SIPD.xlsx`)</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>14 Kolom Standar SIPD RI:</strong> Memetakan otomatis Kode, Uraian, Spek, Satuan, Harga 1-3, Rekening 1-3, Sumber, Keterangan, Kelompok, dan Nilai TKDN.</li>
+                                    <li class="mb-1"><strong>Multi-Rekening & Zonasi Wilayah:</strong> Mendukung penginputan hingga 3 pos rekening belanja dan 3 tingkatan harga zona untuk masing-masing item standar.</li>
+                                    <li class="mb-1"><strong>Ekspor 1-Klik di Menu Penetapan:</strong> Verifikator/Admin dapat mengunduh berkas usulan final yang siap diunggah ke portal SIPD RI Kemendagri tanpa perlu konversi manual.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modul 10: Master Kode Barang SIPD -->
+                    <div class="col-md-6 panduan-col" data-keywords="kode barang sipd ref kode barang sipd 3646 kelompok ssh sbu select2 autocomplete searchable">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-dark">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-dark-subtle text-dark fs-4"><i class="bi bi-tags-fill"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">10. Master Referensi Kode Barang SIPD (3.646 Data)</h6>
+                                        <small class="text-muted">Standarisasi klasifikasi kelompok barang & jasa SIPD RI</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>3.646 Kode Barang Resmi:</strong> Terdiri dari 613 kode kelompok SSH dan 3.033 kode kelompok SBU terintegrasi resmi.</li>
+                                    <li class="mb-1"><strong>Searchable Select2 Dropdown:</strong> Memudahkan operator memilih kelompok barang resmi saat pengusulan item baru dengan pencarian nama atau kode.</li>
+                                    <li class="mb-1"><strong>Terkoneksi Langsung ke Template SIPD:</strong> Kode barang yang dipilih otomatis menjadi pengisi kolom Kode pada berkas ekspor SIPD.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modul 11: Master Satuan Standar -->
+                    <div class="col-md-6 panduan-col" data-keywords="satuan standar ref satuan 392 ukuran berat kemasan waktu kerja select2 anti salah ketik">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-info">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-info-subtle text-info fs-4"><i class="bi bi-rulers"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">11. Master Satuan Standar Terintegrasi (392 Satuan)</h6>
+                                        <small class="text-muted">Standardisasi ukuran fisik, volume, bobot, durasi kerja, dan kemasan</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>392 Satuan Standar Resmi:</strong> Mencegah perbedaan ejaan dan variasi satuan liar yang kerap memicu kegagalan upload pada SIPD RI.</li>
+                                    <li class="mb-1"><strong>Enforcement Select2 Dropdown:</strong> Mengganti input teks bebas menjadi dropdown terfilter dengan opsi paling umum berada di urutan atas.</li>
+                                    <li class="mb-1"><strong>Validasi Sisi Server:</strong> Sistem memvalidasi dan menormalisasi kapitalisasi satuan saat usulan disimpan oleh SKPD.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modul 12: Penjadwalan & Countdown Timer -->
+                    <div class="col-md-6 panduan-col" data-keywords="jadwal bkad countdown timer hitung mundur pengusulan buka tutup batas waktu 23 59 wita urgent login banner">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-secondary">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-secondary-subtle text-secondary fs-4"><i class="bi bi-alarm-fill"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Jadwal BKAD & Live Countdown Timer</h6>
+                                        <h6 class="mb-0 fw-bold">12. Jadwal BKAD & Live Countdown Timer</h6>
                                         <small class="text-muted">Kontrol pembukaan usulan dan hitungan mundur real-time</small>
                                     </div>
                                 </div>
                                 <ul class="small text-secondary ps-3 mb-0">
                                     <li class="mb-1"><strong>Kontrol Periode Terpusat:</strong> BKAD mengatur waktu buka/tutup usulan. Form terkunci otomatis jika jadwal belum dibuka atau telah berakhir.</li>
-                                    <li class="mb-1"><strong>Live Countdown Timer:</strong> Kartu informasi interaktif menampilkan sisa waktu detik (Hari, Jam, Menit, Detik) menuju batas penutupan jadwal resmi (23:59 WITA).</li>
-                                    <li class="mb-1"><strong>Mode Kritis (&lt; 24 Jam):</strong> Penegasan visual otomatis dengan aksen merah berkedip saat masa pengusulan mendekati batas akhir.</li>
+                                    <li class="mb-1"><strong>Live Countdown Timer:</strong> Menampilkan sisa waktu per detik (Hari, Jam, Menit, Detik) menuju batas penutupan jadwal resmi (23:59 WITA).</li>
+                                    <li class="mb-1"><strong>Mode Kritis (&lt; 24 Jam):</strong> Penegasan visual otomatis dengan aksen merah menyala saat masa pengusulan mendekati batas akhir.</li>
                                     <li class="mb-1"><strong>Pengumuman Halaman Login:</strong> Banner jadwal dan live countdown dapat dilihat langsung oleh seluruh SKPD di halaman login tanpa perlu masuk akun.</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Modul 7: Sistem Notifikasi Aplikasi In-App -->
-                    <div class="col-md-6">
+                    <!-- Modul 13: Sistem Notifikasi Aplikasi In-App -->
+                    <div class="col-md-6 panduan-col" data-keywords="lonceng notifikasi header in app realtime unread badge tandai semua dibaca waktu lalu">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-info">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-info-subtle text-info fs-4"><i class="bi bi-bell-fill"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Sistem Notifikasi Aplikasi (In-App)</h6>
+                                        <h6 class="mb-0 fw-bold">13. Sistem Notifikasi Internal Aplikasi (In-App)</h6>
                                         <small class="text-muted">Pusat pemberitahuan realtime pada header lonceng sistem</small>
                                     </div>
                                 </div>
@@ -325,20 +455,20 @@
                         </div>
                     </div>
 
-                    <!-- Modul 8: Master Data Terintegrasi SIPD RI -->
-                    <div class="col-md-6">
+                    <!-- Modul 14: Master Data Terintegrasi SIPD RI & Acuan 2027 -->
+                    <div class="col-md-6 panduan-col" data-keywords="master data 11519 katalog 2027 akun belanja sipd 9617 permendagri 90 nomenklatur skpd server side datatables">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-dark">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-dark-subtle text-dark fs-4"><i class="bi bi-database-fill-gear"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Master Data & Integrasi SIPD RI</h6>
-                                        <small class="text-muted">Standarisasi rekening belanja dan katalog acuan 2027</small>
+                                        <h6 class="mb-0 fw-bold">14. Master Data & Integrasi Katalog Acuan 2027</h6>
+                                        <small class="text-muted">Standarisasi rekening belanja dan katalog acuan dasar TA 2027</small>
                                     </div>
                                 </div>
                                 <ul class="small text-secondary ps-3 mb-0">
-                                    <li class="mb-1"><strong>11.519 Master Standar Harga:</strong> 5.786 item SSH dan 5.733 item SBU resmi Kabupaten Tapin.</li>
-                                    <li class="mb-1"><strong>Pencarian Cerdas Rekening:</strong> Cukup ketik nama kebutuhan belanja dan kode akun resmi SIPD RI langsung tersaji.</li>
+                                    <li class="mb-1"><strong>11.519 Master Standar Harga:</strong> 5.786 item SSH dan 5.733 item SBU resmi Kabupaten Tapin sebagai baseline acuan 2027.</li>
+                                    <li class="mb-1"><strong>9.617 Akun Belanja SIPD RI:</strong> Referensi resmi Permendagri 90 dan Kepmendagri 050 terintegrasi pencarian cerdas berdasarkan nama pos belanja.</li>
                                     <li class="mb-1"><strong>Histori Nomenklatur SKPD:</strong> Rekam jejak nama dinas dan pejabat per tahun anggaran agar dokumen lampau otentik.</li>
                                     <li class="mb-1"><strong>High-Performance DataTables:</strong> Server-side pagination hemat memori RAM (&lt; 1MB).</li>
                                 </ul>
@@ -346,14 +476,14 @@
                         </div>
                     </div>
 
-                    <!-- Modul 9: Keamanan Sesi & Auto-Logout Pengguna Saat Idle -->
-                    <div class="col-md-6">
+                    <!-- Modul 15: Keamanan Sesi & Auto-Logout Pengguna Saat Idle -->
+                    <div class="col-md-6 panduan-col" data-keywords="keamanan sesi auto logout idle timeout inaktivitas countdown warning multi tab brute force timing attack">
                         <div class="card h-100 border-0 shadow-sm border-top border-4 border-danger">
                             <div class="card-body">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <div class="p-2 rounded bg-danger-subtle text-danger fs-4"><i class="bi bi-clock-history"></i></div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">Keamanan Sesi & Auto-Logout Idle</h6>
+                                        <h6 class="mb-0 fw-bold">15. Keamanan Sesi & Auto-Logout Idle</h6>
                                         <small class="text-muted">Proteksi akun saat perangkat ditinggalkan tanpa aktivitas</small>
                                     </div>
                                 </div>
@@ -366,6 +496,29 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Modul 16: Pusat Laporan & Dashboard Eksekutif -->
+                    <div class="col-md-6 panduan-col" data-keywords="laporan dashboard eksekutif chart js grafik rekapitulasi kepatuhan 66 skpd cetak resmi kepala bkad rkbm ssh sbu">
+                        <div class="card h-100 border-0 shadow-sm border-top border-4 border-primary">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="p-2 rounded bg-primary-subtle text-primary fs-4"><i class="bi bi-file-earmark-bar-graph"></i></div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">16. Pusat Laporan & Dashboard Eksekutif (`/laporan`)</h6>
+                                        <small class="text-muted">Rekapitulasi makro, grafik Chart.js, matriks kepatuhan SKPD, dan cetak resmi</small>
+                                    </div>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    <li class="mb-1"><strong>4 Kartu KPI Eksekutif:</strong> Total usulan, akumulasi pagu diusulkan, realisasi disetujui (approval rate), dan tingkat partisipasi SKPD.</li>
+                                    <li class="mb-1"><strong>Visualisasi Interaktif:</strong> Diagram batang alokasi instrumen RKBMD dan diagram lingkaran proporsi status usulan.</li>
+                                    <li class="mb-1"><strong>Matriks Kepatuhan 66 SKPD:</strong> Pemantauan kepatuhan pengusulan seluruh SKPD se-Kabupaten Tapin secara transparan.</li>
+                                    <li class="mb-1"><strong>Ekspor & Lembar Cetak Resmi:</strong> Ekspor Excel/CSV per modul serta lembar cetak ber-kop resmi Pemerintah Kabupaten Tapin siap ditandatangani Kepala BKAD.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
                 </div>
             </div>
 
@@ -499,21 +652,88 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Fitur Live Search Changelog
-    const searchInput = document.getElementById('searchChangelog');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
+    // 1. Sinkronisasi Hash URL dengan Navigasi Tab
+    const currentHash = window.location.hash;
+    if (currentHash) {
+        let targetId = currentHash;
+        if (!targetId.startsWith('#tab-')) {
+            targetId = '#tab-' + targetId.replace('#', '');
+        }
+        const targetBtn = document.querySelector(`button[data-bs-target="${targetId}"]`);
+        if (targetBtn && typeof bootstrap !== 'undefined') {
+            const tabInstance = bootstrap.Tab.getOrCreateInstance(targetBtn);
+            tabInstance.show();
+        }
+    }
+
+    // Perbarui URL hash saat tab berpindah tanpa reload halaman
+    const tabButtons = document.querySelectorAll('#docTabs button[data-bs-toggle="tab"]');
+    tabButtons.forEach(function(btn) {
+        btn.addEventListener('shown.bs.tab', function(e) {
+            const targetSelector = e.target.getAttribute('data-bs-target');
+            if (targetSelector) {
+                const cleanHash = targetSelector.replace('#tab-', '#');
+                if (history.replaceState) {
+                    history.replaceState(null, null, cleanHash);
+                } else {
+                    window.location.hash = cleanHash;
+                }
+            }
+        });
+    });
+
+    // 2. Fitur Live Search Changelog
+    const searchChangelog = document.getElementById('searchChangelog');
+    if (searchChangelog) {
+        searchChangelog.addEventListener('input', function() {
             const query = this.value.toLowerCase().trim();
             const cards = document.querySelectorAll('.changelog-card');
             
             cards.forEach(function(card) {
                 const keywords = card.getAttribute('data-keywords') || '';
-                if (keywords.includes(query)) {
+                const title = card.innerText.toLowerCase();
+                if (keywords.includes(query) || title.includes(query)) {
                     card.style.display = '';
                 } else {
                     card.style.display = 'none';
                 }
             });
+        });
+    }
+
+    // 3. Fitur Live Search Panduan Modul & Alur
+    const searchPanduan = document.getElementById('searchPanduan');
+    if (searchPanduan) {
+        searchPanduan.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            const cols = document.querySelectorAll('#panduanGrid .panduan-col');
+            let matchCount = 0;
+
+            cols.forEach(function(col) {
+                const keywords = col.getAttribute('data-keywords') || '';
+                const text = col.innerText.toLowerCase();
+                if (keywords.includes(query) || text.includes(query)) {
+                    col.style.display = '';
+                    matchCount++;
+                } else {
+                    col.style.display = 'none';
+                }
+            });
+
+            // Feedback jika tidak ada hasil
+            let noResultMsg = document.getElementById('panduanNoResult');
+            if (matchCount === 0) {
+                if (!noResultMsg) {
+                    noResultMsg = document.createElement('div');
+                    noResultMsg.id = 'panduanNoResult';
+                    noResultMsg.className = 'col-12 text-center py-5 text-muted';
+                    noResultMsg.innerHTML = '<i class="bi bi-search fs-1 d-block mb-2 text-secondary"></i><h6 class="fw-bold">Tidak ada modul yang cocok</h6><p class="small mb-0">Coba gunakan kata kunci lain seperti "ssh", "sbu", "telegram", "sipd", "rekening", atau "satuan".</p>';
+                    document.getElementById('panduanGrid').appendChild(noResultMsg);
+                }
+                noResultMsg.style.display = '';
+            } else if (noResultMsg) {
+                noResultMsg.style.display = 'none';
+            }
         });
     }
 });

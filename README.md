@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BKAD
 
-[![Version](https://img.shields.io/badge/version-2.9.9-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.10.0-blue.svg)](https://github.com/rullyperdhana/sipa/blob/main/application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -168,7 +168,7 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Panel Diagnostik & Status Server:** Menampilkan runtime PHP, versi MySQL, batas memori, izin direktori upload (`/uploads`), dan rekap total data sistem.
 - **Tampilan Manual Teknis (README):** Menampilkan dokumentasi manual teknis arsitektur sistem secara rapi di dalam dashboard dengan dukungan cetak halaman (*print-friendly*).
 
-### 17. Pengusulan Standar Harga Berbasis Berkas Surat Resmi SKPD (Header-Detail)
+### 19. Pengusulan Standar Harga Berbasis Berkas Surat Resmi SKPD (Header-Detail)
 - **Prasyarat Unggah Surat Pengantar Resmi (Format PDF):** Sebelum SKPD dapat mengusulkan rincian item barang/biaya (SSH/SBU), SKPD diwajibkan terlebih dahulu membuat berkas Surat Usulan resmi dengan mengunggah pindaian (*scan*) surat pengantar bertanda tangan Kepala SKPD dan berstempel dinas dalam format PDF.
 - **Struktur Induk-Rincian (Header-Detail):** Satu Surat Usulan resmi (`standar_harga_surat`) menampung banyak rincian item usulan (`standar_harga_usulan.surat_id`). Seluruh item usulan terikat langsung pada dokumen surat resmi dinas pengusul.
 - **Pratinjau Langsung Berkas Surat Usulan PDF di Browser:** Tersedia modal viewer interaktif dan endpoint inline preview (`/ssh/surat/preview/(:num)` & `/sbu/surat/preview/(:num)`) untuk membaca berkas surat usulan secara langsung di layar tanpa memaksa pengunduhan.
@@ -176,22 +176,43 @@ Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Ruang Kerja Verifikator BKAD Berbasis Berkas Surat:** Verifikator menelaah surat dinas SKPD dan memverifikasi item di dalamnya secara komprehensif, dilengkapi bilah progres verifikasi real-time (*real-time progress bar*) serta otomatisasi sinkronisasi status induk surat (`syncStatusSurat`).
 - **Antarmuka Tab Kapsul Simetris Modern (`.sipa-segmented-tabs`):** Desain navigasi tab terpadu dengan standar kontras WCAG AA yang simetris dan jelas terbaca, diperkuat dengan *automatic CSS cache-busting* (`?v=filemtime(...)`) pada header aplikasi.
 
-### 18. Live Countdown Timer Interaktif & Pengumuman Jadwal Halaman Login
+### 20. Live Countdown Timer Interaktif & Pengumuman Jadwal Halaman Login
 - **Kartu Informasi Jadwal Interaktif (`.sipa-schedule-card`):** Banner jadwal pengusulan yang sedang dibuka menampilkan kartu informasi modern dengan latar hijau emerald lembut, aksen border tegas, dan animasi denyut (*pulse indicator*) pada badge "JADWAL PENGUSULAN AKTIF".
 - **Penghitung Waktu Mundur Real-Time (Countdown):** Menampilkan sisa waktu pengusulan secara langsung per detik dalam 4 kotak digital presisi: **Hari, Jam, Menit, dan Detik** menuju batas akhir tanggal penutupan jadwal resmi (pukul 23:59 WITA).
 - **Pengumuman Jadwal & Countdown Terbuka di Halaman Login (`/login`):** Memungkinkan seluruh operator SKPD dan publik melihat status jadwal resmi yang sedang dibuka beserta live countdown batas akhir langsung dari halaman depan tanpa harus login terlebih dahulu.
 - **Peringatan Batas Waktu Kritis (*Urgent Mode*):** Indikator countdown otomatis berubah menjadi aksen merah menyala dengan penegasan visual ketika sisa waktu pengusulan kurang dari 24 jam.
 - **Integrasi Menyeluruh:** Fitur live countdown diterapkan pada halaman Pengusulan SSH, Pengusulan SBU, Penyusunan RKBMD, Halaman Login Publik, serta indikator badge sisa hari pada dashboard utama.
 
-### 19. Sistem Notifikasi Internal Aplikasi (In-App Notification & Lonceng Terpadu)
+### 21. Sistem Notifikasi Internal Aplikasi (In-App Notification & Lonceng Terpadu)
 - **Autoload Global & Helper Terpadu (`Notifikasi_model`):** Mendukung pencatatan dan distribusi notifikasi otomatis lintas peran pengguna via fungsi `create()`, `sendToRoles()`, dan `sendToSkpd()`.
 - **Format Waktu Relatif Humanis (`waktu_lalu`):** Menampilkan estimasi waktu notifikasi yang informatif (*"Baru saja"*, *"5 mnt lalu"*, *"2 jam lalu"*, *"Kemarin"*, *"d M Y"*) pada daftar dropdown lonceng notifikasi header.
 - **Fitur 1-Klik "Tandai Semua Dibaca" (*Mark All as Read*):** Tombol cepat pada dropdown header notifikasi untuk mengosongkan status belum dibaca seketika melalui endpoint AJAX terproteksi `/ajax/notif/read/all`.
-- **Integrasi Penuh Siklus Bisnis:**
-  - *RKBMD:* Pengajuan usulan ke verifikator dan hasil telaah ke pembuat usulan SKPD.
-  - *SSH & SBU:* Pengajuan berkas Surat Usulan resmi dan rincian item ke Verifikator BKAD, serta pemberitahuan otomatis ke SKPD saat usulan Disetujui, Direvisi, Ditolak, atau Ditetapkan sebagai SK.
-  - *Autentikasi & Akun:* Pendaftaran operator baru ke Admin dan konfirmasi aktivasi akun ke pengguna.
-- **Normalisasi Tautan & Keamanan CSRF:** Seluruh tautan notifikasi otomatis dinormalkan ke host aktif sistem, serta rotasi CSRF token tersinkronisasi otomatis pada setiap aksi AJAX.
+- **Integrasi Penuh Siklus Bisnis:** Notifikasi otomatis terkirim pada seluruh tahapan alur RKBMD, pengajuan surat usulan SSH/SBU, verifikasi telaah, penetapan SK, registrasi mandiri, dan aktivasi akun.
+
+### 22. Modul Notifikasi Otomatis Bot Telegram (`/telegram/settings`)
+- **Pemberitahuan Real-Time ke Verifikator BKAD:** Saat SKPD mengirim usulan resmi, Bot Telegram secara otomatis mengirim pesan notifikasi ke akun pengelola atau grup verifikator BKAD.
+- **Rincian Pesan Terstruktur:** Memuat nama SKPD, nomor surat usulan, tanggal, operator penanggung jawab, total nilai usulan, jumlah rincian item, dan tautan langsung untuk telaah berkas.
+- **Pemindai Chat ID Otomatis (`getUpdates`):** Tombol 1-klik untuk mendeteksi Chat ID pengguna atau grup Telegram tanpa perlu mencari ID secara manual.
+- **Uji Coba Pengiriman Bot:** Tombol uji coba sambungan seketika untuk memastikan token Telegram BotFather dan Chat ID telah terhubung dengan benar.
+
+### 23. Smart Similarity Check & Guardrail Anti-Duplikasi Uraian Standar Harga
+- **Pendeteksi Kemiripan Teks Otomatis:** Saat operator SKPD mengetikkan usulan item baru, sistem secara cerdas mencocokkan uraian barang dengan data tahun sebelumnya dan katalog master berjalan via AJAX (`/ajax/check_similarity`).
+- **Modal Konfirmasi Interaktif:** Jika ditemukan barang yang identik atau sangat mirip (skor kesamaan tinggi), sistem menampilkan dialog konfirmasi yang menganjurkan operator untuk melakukan penyesuaian/perubahan harga daripada membuat item baru ganda.
+- **Efisiensi Database & Kerapian Katalog:** Mencegah redundansi data standar harga di tingkat daerah dan mempermudah konsolidasi pada SIPD RI.
+
+### 24. Pengaturan Fleksibel Input Manual Rekening Belanja SIPD RI
+- **Kontrol Sakelar Administrator (`/master/rekening-belanja`):** Administrator BKAD dapat mengaktifkan atau menonaktifkan fitur input teks manual kode rekening belanja melalui sakelar (*toggle switch*).
+- **Validasi Berkelanjutan:** Saat mode manual dinonaktifkan, operator SKPD diwajibkan memilih rekening dari 9.617 referensi resmi SIPD RI. Saat diaktifkan, operator dapat menginput rekening baru yang belum terakomodir dalam regulasi dengan audit log tercatat.
+
+### 25. Fitur Ekspor Format Upload SIPD RI (`.xlsx`)
+- **Standar 14 Kolom Resmi Kemendagri:** Mengekspor data usulan standar harga SSH dan SBU yang telah diverifikasi atau ditetapkan langsung ke format berkas Excel siap impor SIPD RI.
+- **Preservasi Tipe Data Teks:** Menggunakan pustaka PhpSpreadsheet dengan *explicit string typing* (`DataType::TYPE_STRING`) pada kolom kode barang dan kode rekening belanja sehingga tidak terpotong menjadi format ilmiah (*scientific notation*).
+
+### 26. Pembaruan Modul Dokumentasi & Diagnostik Sistem v2.10.0 (`/dokumentasi`)
+- **16 Kartu Panduan Modul Kedinasan:** Menjelaskan secara tuntas seluruh instrumen RKBMD, SSH, SBU, Bot Telegram, WhatsApp, Surat Usulan, Smart Similarity Check, Pengaturan Manual Rekening, Ekspor SIPD, Master Kode Barang, Satuan Standar, Countdown Jadwal, In-App Notif, Katalog 2027, Idle Auto-Logout, dan Pusat Laporan.
+- **Live Search & Filter Interaktif:** Pencarian instan pada tab Panduan Modul dan tab Changelog.
+- **Parser Markdown Handal:** Mampu merender tabel Markdown bertingkat, format teks, badge Shields.io, dan daftar bertingkat.
+- **Integrasi Tautan Repositori GitHub:** Seluruh referensi file repositori internal dalam dokumentasi secara otomatis diarahkan ke repositori resmi GitHub (`https://github.com/rullyperdhana/sipa/blob/main/...`) dengan target tab baru (`target="_blank"`).
 
 ---
 
@@ -516,6 +537,7 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.10.0 (2026-10-12):** Perombakan Komprehensif Dokumentasi Sistem & Integrasi Repositori GitHub - Penyempurnaan halaman dokumentasi (`/dokumentasi`) dengan 16 kartu panduan modul kedinasan lengkap, parser Markdown berkemampuan rendering tabel dan badge shields.io, konversi otomatis tautan internal berkas repositori menjadi pranala GitHub (`https://github.com/rullyperdhana/sipa/blob/main/...`), sinkronisasi navigasi hash URL tab, fitur live filter pencarian modul panduan dan changelog, modul notifikasi Bot Telegram (`/telegram/settings`), smart similarity check anti-duplikasi uraian standar harga, serta pengaturan toggle switch fleksibel input manual kode rekening belanja SIPD RI.
 - **v2.9.9 (2026-10-12):** Penyelarasan Form Usulan Standar Harga & Ekspor Format Upload SIPD RI (14 Kolom) - Mengganti input kode kelompok/barang dengan Select2 searchable dropdown AJAX (`/ajax/kode_barang_sipd/search`) dari tabel `ref_kode_barang_sipd` (3.646 referensi resmi SIPD); penambahan field Nilai TKDN (%), Multi-Rekening Belanja 2 & 3, Harga Zona 2 & 3, dan Keterangan usulan; fitur ekspor 1-klik format `form_upload_SIPD.xlsx` pada menu Penetapan dan Master Data SSH & SBU lengkap dengan formatting tipe data string teks anti-scientific notation.
 - **v2.9.8 (2026-10-12):** Modul Master Referensi Satuan Standar (`ref_satuan`) - Integrasi 392 satuan standar resmi dari file `satuan.xlsx`, skrip migrasi idempotent (`create_ref_satuan.sql`), model mandiri `Satuan_model`, endpoint AJAX Select2 autocomplete (`/ajax/satuan/search`), antarmuka manajemen master data `/master/satuan` lengkap dengan kartu KPI, filter status, sliding window pagination, modal CRUD, menu navigasi sidebar, dan integrasi otomatis pengisian `<datalist id="listSatuan">` pada form pengusulan SSH & SBU.
 - **v2.9.7 (2026-10-12):** Modul Master Referensi Kode Barang SIPD (`ref_kode_barang_sipd`) - Integrasi 3.646 data resmi kode kelompok barang SIPD (613 SSH & 3.033 SBU) dari file `KODE BARANG SIPD.xlsx`, skrip migrasi idempotent (`create_ref_kode_barang_sipd.sql`), model mandiri `Kode_barang_sipd_model`, endpoint AJAX Select2 autocomplete (`/ajax/kode_barang_sipd/search`), antarmuka manajemen master data `/master/kode_barang_sipd` lengkap dengan kartu KPI, filter kelompok, sliding window pagination, modal CRUD, dan menu navigasi sidebar.
