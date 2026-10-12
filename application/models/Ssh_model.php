@@ -325,7 +325,7 @@ class Ssh_model extends CI_Model
             $this->logActivity($it->id, $user, $statusSebelum, 'Diajukan', "Usulan diajukan ke BKAD melalui Surat Usulan #{$surat->nomor_surat}.");
         }
 
-        // Notifikasi ke verifikator dan admin
+        // Notifikasi ke verifikator dan admin (In-App)
         try {
             $this->load->model('notifikasi_model');
             $skpd = $this->db->get_where('skpd', ['id' => (int)$surat->id_skpd])->row();
@@ -340,6 +340,14 @@ class Ssh_model extends CI_Model
                 $user->id
             );
         } catch (\Throwable $e) {}
+
+        // Notifikasi Otomatis ke Telegram Bot Admin BKAD
+        try {
+            $this->load->library('telegram');
+            $this->telegram->sendSuratNotification($surat, $itemCount, $user, $surat->tipe);
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi Telegram surat usulan: ' . $e->getMessage());
+        }
 
         return [
             'success' => TRUE, 
@@ -945,7 +953,7 @@ class Ssh_model extends CI_Model
 
         $this->logActivity($id, $user, $statusSebelum, 'Diajukan', 'Usulan diajukan ke BKAD untuk verifikasi.');
 
-        // Notifikasi ke verifikator dan admin
+        // Notifikasi ke verifikator dan admin (In-App)
         try {
             $this->load->model('notifikasi_model');
             $modulUrl = strtolower($existing->tipe);
@@ -958,6 +966,14 @@ class Ssh_model extends CI_Model
                 $user->id
             );
         } catch (\Throwable $e) {}
+
+        // Notifikasi Otomatis ke Telegram Bot Admin BKAD
+        try {
+            $this->load->library('telegram');
+            $this->telegram->sendItemNotification($existing, $user, $existing->tipe);
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi Telegram usulan: ' . $e->getMessage());
+        }
 
         return ['success' => TRUE, 'message' => 'Usulan berhasil dikirim ke BKAD untuk diverifikasi.'];
     }

@@ -199,6 +199,9 @@ $userRole = !empty($user->role) ? $user->role : '';
         <a href="<?= site_url('wa/settings') ?>" class="nav-link <?= $this->uri->segment(1) === 'wa' ? 'active' : '' ?>">
             <i class="bi bi-whatsapp"></i> <span>Integrasi WhatsApp</span>
         </a>
+        <a href="<?= site_url('telegram/settings') ?>" class="nav-link <?= $this->uri->segment(1) === 'telegram' ? 'active' : '' ?>">
+            <i class="bi bi-telegram text-info"></i> <span>Notifikasi Telegram</span>
+        </a>
         <a href="<?= site_url('dokumentasi') ?>" class="nav-link <?= $this->uri->segment(1) === 'dokumentasi' ? 'active' : '' ?>">
             <i class="bi bi-journal-code"></i> <span>Dokumentasi & Update</span>
         </a>
