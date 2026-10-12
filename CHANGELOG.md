@@ -34,6 +34,10 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - Menampilkan badge Kode Barang SIPD, rincian multi-rekening belanja, persentase TKDN, harga zona, dan keterangan SIPD.
 
 ### 🐛 Perbaikan (Fixed)
+- **Perbaikan Pemformatan Nilai Input Harga Usulan SSH & SBU ([`assets/js/ssh_module.js`](assets/js/ssh_module.js)):**
+  - Memperbaiki helper `parseRupiah()` dan `formatRupiah()` yang sebelumnya salah mengevaluasi tanda titik pemisah ribuan pada angka (seperti `50.000` atau `10.000`) sebagai pecahan desimal (`50.000` dianggap bernilai float `50`), yang mengakibatkan nilai terpotong kembali menjadi 2 digit saat diketik.
+  - Menyelaraskan event handler input `[data-format-rupiah]` secara global menggunakan konversi digit numerik murni dan pemformatan pemisah ribuan standar Indonesia (`id-ID`) sehingga pengguna dapat menginput nominal dengan jumlah digit bebas tanpa batas.
+  - Menghilangkan listener duplikat inline pada `usulan_form.php` untuk mencegah konflik event listener ganda.
 - **Perbaikan Mode Input Item Baru pada Form Usulan SSH & SBU ([`usulan_form.php`](application/views/ssh/usulan_form.php)):**
   - Memperbaiki tag div penutup pada kartu acuan master (`#cardAcuanMaster`) yang sebelumnya tidak tertutup sempurna sehingga meng-engulf seluruh input form di bawahnya dengan kelas `d-none` saat mode manual dipilih.
   - Menambahkan banner informatif *"Mode Input Item Baru (Non-Master)"* yang aktif ketika memilih opsi *"Input Item Baru (Item belum ada di Master)"*.

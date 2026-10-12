@@ -88,8 +88,10 @@
             // Jika input berupa string dari database format desimal standard (contoh "13500000.00" atau "25000.00")
             if (typeof angka === 'string') {
                 angka = angka.trim();
-                if (/^-?\d+(\.\d+)?$/.test(angka)) {
+                if (/^-?\d+\.\d{1,2}$/.test(angka)) {
                     angka = parseFloat(angka);
+                } else if (/^-?\d+$/.test(angka)) {
+                    angka = parseInt(angka, 10);
                 }
             }
 
@@ -98,35 +100,27 @@
                 return Math.round(angka).toLocaleString('id-ID');
             }
 
-            let numberString = angka.toString().replace(/[^,\d]/g, '');
-            let split = numberString.split(',');
-            let sisa = split[0].length % 3;
-            let rupiah = split[0].substr(0, sisa);
-            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-            if (ribuan) {
-                let separator = sisa ? '.' : '';
-                rupiah += separator + ribuan.join('.');
-            }
-
-            return split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+            let numberString = angka.toString().replace(/[^0-9]/g, '');
+            if (!numberString) return '0';
+            return parseInt(numberString, 10).toLocaleString('id-ID');
         },
 
         /**
-         * Parse string Rupiah ke float murni
+         * Parse string Rupiah ke float murni (Titik adalah pemisah ribuan)
          */
         parseRupiah: function (rupiahStr) {
             if (rupiahStr === null || rupiahStr === undefined || rupiahStr === '') return 0;
             if (typeof rupiahStr === 'number') return rupiahStr;
 
             let s = rupiahStr.toString().trim();
-            // Jika format desimal murni dari DB (misal "13500000.00")
-            if (/^-?\d+(\.\d+)?$/.test(s)) {
+            // Jika format desimal murni dari DB (hanya 1-2 digit desimal di belakang titik, misal "13500000.00")
+            if (/^-?\d+\.\d{1,2}$/.test(s)) {
                 return parseFloat(s) || 0;
             }
 
-            let cleaned = s.replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.-]/g, '');
-            let val = parseFloat(cleaned);
+            // Pada format angka Rupiah Indonesia, titik adalah pemisah ribuan (bukan desimal)
+            let cleaned = s.replace(/[^0-9]/g, '');
+            let val = parseInt(cleaned, 10);
             return isNaN(val) ? 0 : val;
         },
 
@@ -244,12 +238,14 @@
     $(function () {
 
         // Auto formatting input dengan atribut [data-format-rupiah]
-        $(document).on('keyup input', '[data-format-rupiah]', function () {
-            let raw = $(this).val();
-            let parsed = SshModule.helpers.parseRupiah(raw);
-            if (parsed > 0) {
-                $(this).val(SshModule.helpers.formatRupiah(parsed));
+        $(document).on('input', '[data-format-rupiah]', function () {
+            let val = $(this).val().replace(/[^0-9]/g, '');
+            if (val === '') {
+                $(this).val('');
+                return;
             }
+            let num = parseInt(val, 10);
+            $(this).val(num.toLocaleString('id-ID'));
         });
 
         // Realtime removal of is-invalid on selecting survey file

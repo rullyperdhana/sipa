@@ -973,18 +973,6 @@ document.addEventListener('DOMContentLoaded', function() {
             width: '100%'
         });
     }
-
-    // Format Rupiah pada semua input yang memiliki atribut data-format-rupiah
-    document.querySelectorAll('[data-format-rupiah]').forEach(function(el) {
-        el.addEventListener('input', function() {
-            let val = this.value.replace(/[^0-9]/g, '');
-            if (val === '') {
-                this.value = '';
-                return;
-            }
-            this.value = parseInt(val, 10).toLocaleString('id-ID');
-        });
-    });
 });
 </script>
 
