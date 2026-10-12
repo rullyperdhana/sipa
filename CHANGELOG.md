@@ -26,6 +26,12 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
     - Pemicu cadangan pada pengiriman usulan individu via `kirimUsulan()`.
   - **Navigasi Sidebar (`application/views/templates/header.php`):**
     - Menambahkan menu **Notifikasi Telegram** di bawah menu *Integrasi WhatsApp* untuk kemudahan akses Admin BKAD.
+- **Redesain Modern Tampilan Halaman Login SIPA ([`application/views/auth/login.php`](application/views/auth/login.php)):**
+  - **Tipografi & Estetika Visual Modern:** Mengadopsi Google Font **Plus Jakarta Sans** dengan palet warna *Deep Oceanic Navy* dan *ambient glowing mesh gradient overlay* yang elegan dan berstandar portal pemerintahan modern.
+  - **Banner Identitas Resmi Pemkab Tapin:** Panel kiri dengan emblem institusi, logo SIPA, subtitle resmi BKAD Kabupaten Tapin, dan kartu fitur mini transparan (*glassmorphism*) untuk modul SSH/SBU, RKBMD, dan Notifikasi Multi-Kanal.
+  - **Optimalisasi Digital Countdown Jadwal Pengusulan:** Desain kartu waktu hitung mundur digital yang lebih bersih, proporsional, dan adaptif dengan animasi denyut otomatis pada batas waktu genting (*urgent state*).
+  - **Peningkatan UX Form Autentikasi:** Kolom Username dan Password dilengkapi *leading icons*, toggle reveal password, penanda visual khusus Tahun Anggaran Perencanaan 2027, serta *button loading spinner* ("Memverifikasi Akun...") saat proses submit untuk mencegah klik ganda.
+  - **Modal Layanan Bantuan Operator SKPD:** Menambahkan modal pop-up kontak bantuan cepat (*helpdesk WhatsApp BKAD, Telegram Bot, dan lokasi kantor pelayanan*) untuk mempermudah operator SKPD yang mengalami kendala akun.
 
 ## [2.9.9] - 2026-10-12
 
