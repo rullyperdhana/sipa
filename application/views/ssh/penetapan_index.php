@@ -19,10 +19,48 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                 : 'Pengesahan dan penetapan akhir standar satuan harga barang yang telah diverifikasi menjadi Master Data resmi.' ?>
         </p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="<?= site_url("{$prefixUrl}/export_sipd?source=penetapan&status=Ditetapkan") ?>" class="btn btn-success shadow-sm" title="Unduh berkas Excel usulan final berformat resmi SIPD RI (form_upload_SIPD.xlsx)">
+    <?php
+    $activeStatus = $filter['status_proses'] ?? '';
+    $exportQueryBase = [
+        'source' => 'penetapan',
+    ];
+    if (!empty($filter['id_skpd'])) $exportQueryBase['skpd_id'] = $filter['id_skpd'];
+    if (!empty($filter['kategori'])) $exportQueryBase['kategori'] = $filter['kategori'];
+    if (!empty($filter['tahun'])) $exportQueryBase['tahun'] = $filter['tahun'];
+    if (!empty($filter['q'])) $exportQueryBase['q'] = $filter['q'];
+
+    $urlExportCurrent = site_url("{$prefixUrl}/export_sipd?" . http_build_query(array_merge($exportQueryBase, array_filter(['status' => $activeStatus]))));
+    $urlExportAll = site_url("{$prefixUrl}/export_sipd?" . http_build_query(array_merge($exportQueryBase, ['status' => 'all'])));
+    $urlExportDitetapkan = site_url("{$prefixUrl}/export_sipd?" . http_build_query(array_merge($exportQueryBase, ['status' => 'Ditetapkan'])));
+    $urlExportDiverifikasi = site_url("{$prefixUrl}/export_sipd?" . http_build_query(array_merge($exportQueryBase, ['status' => 'Diverifikasi'])));
+    ?>
+    <div class="dropdown">
+        <button class="btn btn-success shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Unduh berkas Excel usulan berformat resmi SIPD RI (form_upload_SIPD.xlsx)">
             <i class="bi bi-file-earmark-excel-fill me-1"></i> Ekspor Format Upload SIPD (.xlsx)
-        </a>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <li>
+                <a class="dropdown-item fw-semibold" href="<?= $urlExportCurrent ?>">
+                    <i class="bi bi-funnel-fill text-primary me-2"></i> Ekspor Sesuai Tampilan Tabel (<?= $activeStatus ?: 'Semua Status' ?>)
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item" href="<?= $urlExportAll ?>">
+                    <i class="bi bi-check2-all text-success me-2"></i> Ekspor Semua Usulan Siap SIPD (Ditetapkan &amp; Diverifikasi)
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="<?= $urlExportDitetapkan ?>">
+                    <i class="bi bi-shield-check text-success me-2"></i> Ekspor Hanya yang Telah Ditetapkan (SK Bupati)
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="<?= $urlExportDiverifikasi ?>">
+                    <i class="bi bi-hourglass-split text-warning me-2"></i> Ekspor Menunggu Penetapan (Diverifikasi BKAD)
+                </a>
+            </li>
+        </ul>
     </div>
 </div>
 

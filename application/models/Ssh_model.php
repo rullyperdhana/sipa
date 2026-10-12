@@ -1607,10 +1607,19 @@ class Ssh_model extends CI_Model
         }
 
         if (!empty($filter['status'])) {
-            $this->db->where('u.status_proses', $filter['status']);
+            $st = $filter['status'];
+            if (is_array($st)) {
+                $this->db->where_in('u.status_proses', $st);
+            } elseif (in_array(strtolower(trim($st)), ['all', 'semua', 'final'], TRUE)) {
+                $this->db->where_in('u.status_proses', ['Ditetapkan', 'Diverifikasi']);
+            } elseif (strpos($st, ',') !== false) {
+                $this->db->where_in('u.status_proses', array_map('trim', explode(',', $st)));
+            } else {
+                $this->db->where('u.status_proses', trim($st));
+            }
         } else {
-            // Default: ambil yang sudah Ditetapkan (Final)
-            $this->db->where('u.status_proses', 'Ditetapkan');
+            // Default di penetapan: ambil semua usulan yang sudah final (Ditetapkan maupun Diverifikasi)
+            $this->db->where_in('u.status_proses', ['Ditetapkan', 'Diverifikasi']);
         }
 
         if (!empty($filter['id_skpd'])) {
@@ -1619,6 +1628,15 @@ class Ssh_model extends CI_Model
 
         if (!empty($filter['kategori'])) {
             $this->db->where('u.kategori', $filter['kategori']);
+        }
+
+        if (!empty($filter['q'])) {
+            $q = trim($filter['q']);
+            $this->db->group_start()
+                ->like('u.kode_usulan', $q)
+                ->or_like('u.uraian', $q)
+                ->or_like('u.spesifikasi', $q)
+                ->group_end();
         }
 
         $this->db->order_by('u.kode_kelompok', 'ASC');

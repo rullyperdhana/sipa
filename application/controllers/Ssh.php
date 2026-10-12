@@ -957,27 +957,48 @@ class Ssh extends Auth_Controller
             show_error("Fitur ekspor Excel memerlukan ekstensi PHP 'zip' (ZipArchive) aktif pada server. Silakan hubungi administrator atau pasang paket 'php-zip' pada VPS Anda.", 500, 'Ekstensi PHP Zip Belum Aktif');
         }
 
-        $thAktif = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027;
-        $tahun = (int)($this->input->get('tahun', TRUE) ?: $thAktif);
+        $thParam = $this->input->get('tahun', TRUE);
+        $tahun = !empty($thParam) ? (int)$thParam : NULL;
         $source = $this->input->get('source', TRUE) ?: 'penetapan';
-        $status = $this->input->get('status', TRUE) ?: 'Ditetapkan';
+        $status = $this->input->get('status', TRUE);
         $skpdId = $this->input->get('skpd_id', TRUE);
+        $kategori = $this->input->get('kategori', TRUE);
+        $q = $this->input->get('q', TRUE);
 
         if (in_array($this->currentUser->role, ['operator_skpd', 'skpd'], TRUE)) {
             $skpdId = $this->currentUser->skpd_id;
         }
 
         if ($source === 'master') {
-            $items = $this->ssh_model->getMasterDataForSipdExport($this->tipe, $tahun, [
-                'kategori' => $this->input->get('kategori', TRUE)
+            $items = $this->ssh_model->getMasterDataForSipdExport($this->tipe, $tahun ?: 2027, [
+                'kategori' => $kategori
             ]);
         } else {
             $filter = [
                 'status'   => $status,
                 'id_skpd'  => $skpdId,
-                'kategori' => $this->input->get('kategori', TRUE)
+                'kategori' => $kategori,
+                'q'        => $q
             ];
             $items = $this->ssh_model->getFinalUsulanForSipdExport($this->tipe, $tahun, $filter);
+
+            // Fallback Cerdas: Jika user meminta status 'Ditetapkan' namun belum ada item yang dikunci 'Ditetapkan'
+            // (semua usulan masih berstatus 'Diverifikasi' di antrean penetapan), sertakan juga 'Diverifikasi' agar data tidak kosong
+            if (empty($items) && $status === 'Ditetapkan') {
+                $filterFallback = $filter;
+                $filterFallback['status'] = ['Ditetapkan', 'Diverifikasi'];
+                $items = $this->ssh_model->getFinalUsulanForSipdExport($this->tipe, $tahun, $filterFallback);
+            }
+
+            // Fallback Tahun: Jika tahun difilter tapi hasil kosong, coba ambil tanpa batasan tahun
+            if (empty($items) && !empty($tahun)) {
+                $items = $this->ssh_model->getFinalUsulanForSipdExport($this->tipe, NULL, $filter);
+                if (empty($items) && $status === 'Ditetapkan') {
+                    $filterFallback = $filter;
+                    $filterFallback['status'] = ['Ditetapkan', 'Diverifikasi'];
+                    $items = $this->ssh_model->getFinalUsulanForSipdExport($this->tipe, NULL, $filterFallback);
+                }
+            }
         }
 
         // Generate Berkas Excel Mengacu ke form_upload_SIPD.xlsx
@@ -1042,7 +1063,8 @@ class Ssh extends Auth_Controller
             $sheet->getColumnDimension($colID)->setAutoSize(true);
         }
 
-        $filename = "form_upload_SIPD_{$this->tipe}_{$tahun}_" . date('Ymd_His') . ".xlsx";
+        $fileYear = $tahun ?: (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : date('Y'));
+        $filename = "form_upload_SIPD_{$this->tipe}_{$fileYear}_" . date('Ymd_His') . ".xlsx";
 
         if (ob_get_length()) {
             ob_end_clean();

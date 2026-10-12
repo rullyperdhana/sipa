@@ -54,6 +54,8 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - **Penelusuran Template Resmi:** Menambahkan pengecualian `!form_upload_SIPD.xlsx` pada `.gitignore` dan menyertakan berkas template `form_upload_SIPD.xlsx` ke dalam git repository agar otomatis tersedia di server VPS.
   - **Ketahanan Ekstensi & Error Handling:** Menambahkan pengecekan ketersediaan ekstensi PHP `ZipArchive`, pembungkusan *try-catch* pada pembuatan file Excel, serta pembersihan *output buffer* (`ob_end_clean()`) untuk mencegah rusaknya stream biner berkas Excel.
   - **Ketahanan Kueri Database:** Menambahkan proteksi `table_exists('ref_kode_barang_sipd')` pada `Ssh_model.php` agar proses ekspor tetap berjalan aman meskipun tabel referensi kode barang SIPD belum dimigrasikan pada basis data server.
+  - **Penyelarasan Status Usulan & Fallback Penetapan:** Mengatasi masalah berkas Excel kosong akibat link ekspor sebelumnya memaksa kriteria `status=Ditetapkan` sementara data usulan di halaman penetapan masih berstatus `Diverifikasi` (menunggu pengesahan). Menambahkan dropdown filter ekspor di [`penetapan_index.php`](application/views/ssh/penetapan_index.php) (Tampilan Tabel, Semua Siap SIPD, Hanya Ditetapkan, dan Menunggu Penetapan) serta logika fallback otomatis di [`Ssh.php`](application/controllers/Ssh.php) dan [`Sbu.php`](application/controllers/Sbu.php) agar jika status `Ditetapkan` kosong, sistem otomatis menyertakan usulan `Diverifikasi` sehingga data selalu terisi.
+  - **Fleksibilitas Filter Tahun Anggaran:** Menghapus paksaan filter tahun jika parameter tahun tidak diberikan pada URL ekspor, sehingga usulan dari berbagai periode anggaran tidak tereliminasi secara tidak sengaja.
 
 ---
 
