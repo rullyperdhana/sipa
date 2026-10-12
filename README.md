@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BKAD
 
-[![Version](https://img.shields.io/badge/version-2.9.8-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.9.9-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -388,6 +388,9 @@ sipa/
 
    # Migrasi v2.9.8 (Tabel Referensi Satuan Standar 392 data)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_ref_satuan.sql
+
+   # Migrasi v2.9.9 (Field Upload SIPD RI: Nilai TKDN, Multi-Rekening, Harga Zona & Keterangan)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_sipd_upload_fields_to_standar_harga.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
@@ -403,6 +406,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`add_sipd_upload_fields_to_standar_harga.sql`](database/migrations/add_sipd_upload_fields_to_standar_harga.sql) | Menambahkan kolom dukungan format upload SIPD RI (`nilai_tkdn`, `harga_2`, `harga_3`, `kode_rekening_2`, `nama_rekening_2`, `kode_rekening_3`, `nama_rekening_3`, `keterangan_usulan` / `keterangan`) pada tabel `standar_harga_usulan` dan `ref_standar_harga`. |
 | [`create_ref_satuan.sql`](database/migrations/create_ref_satuan.sql) | Membuat tabel `ref_satuan` lengkap dengan kunci unik, indeks status aktif, Fulltext Index, dan 392 data satuan standar resmi dari berkas `satuan.xlsx` secara idempotent. |
 | [`create_ref_kode_barang_sipd.sql`](database/migrations/create_ref_kode_barang_sipd.sql) | Membuat tabel `ref_kode_barang_sipd` lengkap dengan indeks unik, indeks kelompok & status aktif, Fulltext Index, dan 3.646 data kode kelompok barang SIPD (613 SSH & 3.033 SBU) idempotent. |
 | [`add_idle_timeout_settings.sql`](database/migrations/add_idle_timeout_settings.sql) | Menambahkan konfigurasi bawaan auto-logout pengguna saat tidak aktif (`idle_timeout_enabled`, `idle_timeout_minutes`, `idle_warning_seconds`) pada tabel `ex_settings`. |
@@ -512,6 +516,7 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.9.9 (2026-10-12):** Penyelarasan Form Usulan Standar Harga & Ekspor Format Upload SIPD RI (14 Kolom) - Mengganti input kode kelompok/barang dengan Select2 searchable dropdown AJAX (`/ajax/kode_barang_sipd/search`) dari tabel `ref_kode_barang_sipd` (3.646 referensi resmi SIPD); penambahan field Nilai TKDN (%), Multi-Rekening Belanja 2 & 3, Harga Zona 2 & 3, dan Keterangan usulan; fitur ekspor 1-klik format `form_upload_SIPD.xlsx` pada menu Penetapan dan Master Data SSH & SBU lengkap dengan formatting tipe data string teks anti-scientific notation.
 - **v2.9.8 (2026-10-12):** Modul Master Referensi Satuan Standar (`ref_satuan`) - Integrasi 392 satuan standar resmi dari file `satuan.xlsx`, skrip migrasi idempotent (`create_ref_satuan.sql`), model mandiri `Satuan_model`, endpoint AJAX Select2 autocomplete (`/ajax/satuan/search`), antarmuka manajemen master data `/master/satuan` lengkap dengan kartu KPI, filter status, sliding window pagination, modal CRUD, menu navigasi sidebar, dan integrasi otomatis pengisian `<datalist id="listSatuan">` pada form pengusulan SSH & SBU.
 - **v2.9.7 (2026-10-12):** Modul Master Referensi Kode Barang SIPD (`ref_kode_barang_sipd`) - Integrasi 3.646 data resmi kode kelompok barang SIPD (613 SSH & 3.033 SBU) dari file `KODE BARANG SIPD.xlsx`, skrip migrasi idempotent (`create_ref_kode_barang_sipd.sql`), model mandiri `Kode_barang_sipd_model`, endpoint AJAX Select2 autocomplete (`/ajax/kode_barang_sipd/search`), antarmuka manajemen master data `/master/kode_barang_sipd` lengkap dengan kartu KPI, filter kelompok, sliding window pagination, modal CRUD, dan menu navigasi sidebar.
 - **v2.9.6 (2026-10-12):** Fitur Auto-Logout Otomatis Pengguna saat Idle (Inactivity Auto-Logout System) - Pelacak aktivitas mouse, keyboard, touch, dan scroll dengan *throttling* performa, Sinkronisasi Multi-Tab Peramban via `localStorage` dan Storage Event, Dialog Peringatan Hitung Mundur Interaktif (SweetAlert2 Countdown Modal) dengan opsi *"Tetap Masuk"* (AJAX Heartbeat Ping) atau *"Logout Sekarang"*, Proteksi Ganda Sisi Server (`Auth.php`), Penanganan Otomatis Background Polling (`X-Background-Poll: 1`) & Jeda Polling saat idle > 2 menit, Global AJAX 401 Error Handler, Pengaturan Administrator Fleksibel di Master Data User, dan Migrasi Konfigurasi Database `add_idle_timeout_settings.sql`.

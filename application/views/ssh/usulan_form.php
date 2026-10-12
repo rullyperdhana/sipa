@@ -93,7 +93,6 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                     <input type="hidden" name="tipe" value="<?= $tipe ?>">
                     <input type="hidden" name="surat_id" value="<?= (int)$suratId ?>">
                     <input type="hidden" name="master_standar_id" id="master_standar_id" value="<?= $isEdit ? (int)($item->master_standar_id ?? 0) : (!empty($masterItem) ? (int)$masterItem->id : '') ?>">
-                    <input type="hidden" name="kode_kelompok" id="kode_kelompok" value="<?= $isEdit ? e($item->kode_kelompok ?? '') : (!empty($masterItem) ? e($masterItem->kode_kelompok) : '') ?>">
                     <input type="hidden" name="harga_acuan_master" id="harga_acuan_master" value="<?= $isEdit ? (float)($item->harga_acuan_master ?? 0) : (!empty($masterItem) ? (float)$masterItem->harga_satuan : '') ?>">
 
                     <!-- Kotak Pilihan Sumber Usulan (Master Data 2027 vs Item Baru) -->
@@ -161,7 +160,35 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                                 <i class="bi bi-x-circle me-1"></i>Lepas Acuan
                             </button>
                             <?php endif; ?>
+                    </div>
+
+                    <!-- Pilihan Kode Barang SIPD RI (Standar Referensi SIPD) -->
+                    <?php 
+                        $curKodeKel = $isEdit ? ($item->kode_kelompok ?? '') : (!empty($masterItem) ? ($masterItem->kode_kelompok ?? '') : '');
+                        $curNamaKel = !empty($itemKodeBarangSipd) ? $itemKodeBarangSipd->uraian : '';
+                    ?>
+                    <div class="mb-3 p-3 border rounded-3 bg-light-subtle">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="kode_kelompok" class="form-label fw-semibold mb-0">
+                                <i class="bi bi-upc-scan text-primary me-1"></i> Kode Barang SIPD RI <span class="text-danger">*</span>
+                            </label>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                <i class="bi bi-database-check me-1"></i>Referensi Resmi SIPD
+                            </span>
                         </div>
+                        <select id="kode_kelompok" name="kode_kelompok" class="form-select select2-kode-sipd" required style="width: 100%;">
+                            <?php if (!empty($curKodeKel)): ?>
+                            <option value="<?= e($curKodeKel) ?>" selected>
+                                <?= e($curKodeKel) ?><?= !empty($curNamaKel) ? ' - ' . e($curNamaKel) : '' ?>
+                            </option>
+                            <?php else: ?>
+                            <option value="">-- Ketik nama barang/uraian SIPD atau kode (contoh: 1.1.12...) --</option>
+                            <?php endif; ?>
+                        </select>
+                        <div class="form-text small text-muted mt-1">
+                            <i class="bi bi-info-circle me-1"></i>Pilih klasifikasi kode barang resmi dari referensi SIPD RI (bukan kode barang BMD). Nilai ini mengisi kolom <strong>Kode</strong> pada berkas template <code>form_upload_SIPD.xlsx</code>.
+                        </div>
+                        <div class="invalid-feedback">Kode Barang SIPD wajib dipilih.</div>
                     </div>
 
                     <div class="row g-3 mb-3">
@@ -296,9 +323,9 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
 
                     <div class="row g-3 mb-3">
                         <!-- Satuan -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="satuan" class="form-label fw-semibold">
-                                Satuan Standar <?= $isSbu ? '(Waktu / Orang / Kegiatan)' : '(Unit / Fisik)' ?> <span class="text-danger">*</span>
+                                Satuan Standar <?= $isSbu ? '(Waktu / Orang)' : '(Fisik)' ?> <span class="text-danger">*</span>
                             </label>
                             <select class="form-select select2-satuan" id="satuan" name="satuan" required>
                                 <option value="">-- Pilih Satuan Standar --</option>
@@ -316,15 +343,15 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                                 <?php endif; ?>
                             </select>
                             <div class="form-text text-muted">
-                                <i class="bi bi-info-circle me-1"></i>Pilih satuan resmi dari tabel referensi standar untuk menghindari perbedaan satuan.
+                                <i class="bi bi-info-circle me-1"></i>Pilih satuan resmi dari tabel referensi standar.
                             </div>
                             <div class="invalid-feedback">Satuan standar wajib dipilih.</div>
                         </div>
 
-                        <!-- Harga Usulan -->
-                        <div class="col-md-6">
+                        <!-- Harga Usulan (Harga 1) -->
+                        <div class="col-md-5">
                             <label for="harga_usulan" class="form-label fw-semibold">
-                                <?= $isSbu ? 'Besaran Biaya / Tarif Usulan (Rp)' : 'Harga Satuan Usulan (Rp)' ?> <span class="text-danger">*</span>
+                                <?= $isSbu ? 'Tarif Usulan / Harga 1 (Rp)' : 'Harga Usulan / Harga 1 (Rp)' ?> <span class="text-danger">*</span>
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light fw-bold text-muted">Rp</span>
@@ -332,8 +359,91 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                                        value="<?= $isEdit ? number_format($item->harga_usulan, 0, ',', '.') : '' ?>" 
                                        placeholder="0" required data-format-rupiah>
                             </div>
-                            <div class="form-text text-muted" id="terbilang_helper">Masukkan nilai nominal harga (tanpa sen).</div>
+                            <div class="form-text text-muted" id="terbilang_helper">Nilai nominal harga acuan utama (tanpa sen).</div>
                             <div class="invalid-feedback" id="hargaFeedback">Harga usulan harus diisi dan lebih besar dari Rp 0 (tidak boleh minus).</div>
+                        </div>
+
+                        <!-- Nilai TKDN (%) -->
+                        <div class="col-md-3">
+                            <label for="nilai_tkdn" class="form-label fw-semibold">
+                                Nilai TKDN (%) <span class="badge bg-secondary-subtle text-secondary small">SIPD</span>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" min="0" max="100" class="form-control form-control-lg font-monospace" id="nilai_tkdn" name="nilai_tkdn" 
+                                       value="<?= $isEdit ? (float)($item->nilai_tkdn ?? 0) : (!empty($masterItem) ? (float)($masterItem->nilai_tkdn ?? 0) : '0') ?>" placeholder="0.00">
+                                <span class="input-group-text bg-light fw-bold">%</span>
+                            </div>
+                            <div class="form-text text-muted">Kandungan DN (0 - 100%).</div>
+                        </div>
+                    </div>
+
+                    <!-- Parameter Tambahan SIPD (Zonasi Harga 2 & 3, Rekening 2 & 3, Keterangan) -->
+                    <div class="card border mb-4 shadow-none bg-light-subtle rounded-3">
+                        <div class="card-header bg-white py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center">
+                            <div class="fw-semibold text-dark small d-flex align-items-center gap-2">
+                                <i class="bi bi-sliders text-primary"></i>
+                                <span>Kelengkapan Tambahan SIPD (Zonasi Wilayah, Rekening Belanja 2 & 3, Keterangan)</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSipdExtra">
+                                <i class="bi bi-chevron-expand me-1"></i> Opsi Tambahan
+                            </button>
+                        </div>
+                        <div class="collapse <?= ($isEdit && (!empty($item->harga_2) || !empty($item->harga_3) || !empty($item->kode_rekening_2) || !empty($item->keterangan_usulan))) ? 'show' : '' ?>" id="collapseSipdExtra">
+                            <div class="card-body p-3">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="harga_2" class="form-label small fw-semibold text-muted">Harga Zona 2 (Rp) <span class="badge bg-light text-secondary border">Opsional</span></label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-light">Rp</span>
+                                            <input type="text" class="form-control font-monospace" id="harga_2" name="harga_2" 
+                                                   value="<?= $isEdit && !empty($item->harga_2) ? number_format($item->harga_2, 0, ',', '.') : '' ?>" 
+                                                   placeholder="Kosongkan jika sama dengan Harga 1" data-format-rupiah>
+                                        </div>
+                                        <div class="form-text text-muted" style="font-size:11px;">Jika dikosongkan, nilai otomatis mengikuti Harga 1 saat diunggah ke SIPD.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="harga_3" class="form-label small fw-semibold text-muted">Harga Zona 3 (Rp) <span class="badge bg-light text-secondary border">Opsional</span></label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-light">Rp</span>
+                                            <input type="text" class="form-control font-monospace" id="harga_3" name="harga_3" 
+                                                   value="<?= $isEdit && !empty($item->harga_3) ? number_format($item->harga_3, 0, ',', '.') : '' ?>" 
+                                                   placeholder="Kosongkan jika sama dengan Harga 1" data-format-rupiah>
+                                        </div>
+                                        <div class="form-text text-muted" style="font-size:11px;">Jika dikosongkan, nilai otomatis mengikuti Harga 1 saat diunggah ke SIPD.</div>
+                                    </div>
+                                </div>
+
+                                <!-- Rekening Belanja Tambahan (Rekening 2 & 3) -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-muted mb-1">Rekening Belanja 2 SIPD (Opsional)</label>
+                                        <div class="input-group input-group-sm mb-1">
+                                            <span class="input-group-text font-monospace bg-light">Kode</span>
+                                            <input type="text" class="form-control font-monospace" id="kode_rekening_2" name="kode_rekening_2" 
+                                                   value="<?= $isEdit ? e($item->kode_rekening_2 ?? '') : '' ?>" placeholder="Contoh: 5.1.02.01.001.00038">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm" id="nama_rekening_2" name="nama_rekening_2" 
+                                               value="<?= $isEdit ? e($item->nama_rekening_2 ?? '') : '' ?>" placeholder="Uraian Rekening Belanja 2">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-muted mb-1">Rekening Belanja 3 SIPD (Opsional)</label>
+                                        <div class="input-group input-group-sm mb-1">
+                                            <span class="input-group-text font-monospace bg-light">Kode</span>
+                                            <input type="text" class="form-control font-monospace" id="kode_rekening_3" name="kode_rekening_3" 
+                                                   value="<?= $isEdit ? e($item->kode_rekening_3 ?? '') : '' ?>" placeholder="Contoh: 5.1.02.01.001.00038">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm" id="nama_rekening_3" name="nama_rekening_3" 
+                                               value="<?= $isEdit ? e($item->nama_rekening_3 ?? '') : '' ?>" placeholder="Uraian Rekening Belanja 3">
+                                    </div>
+                                </div>
+
+                                <!-- Keterangan Tambahan SIPD -->
+                                <div>
+                                    <label for="keterangan_usulan" class="form-label small fw-semibold text-muted">Keterangan Tambahan untuk SIPD <span class="badge bg-light text-secondary border">Opsional</span></label>
+                                    <textarea class="form-control form-control-sm" id="keterangan_usulan" name="keterangan_usulan" rows="2" 
+                                              placeholder="Catatan tambahan yang akan dicantumkan pada kolom Keterangan berkas upload SIPD..."><?= $isEdit ? e($item->keterangan_usulan ?? '') : (!empty($masterItem) ? e($masterItem->keterangan ?? '') : '') ?></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -565,6 +675,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetMasterAcuan() {
         document.getElementById('master_standar_id').value = '';
         document.getElementById('harga_acuan_master').value = '';
+        if ($('#kode_kelompok').length) {
+            $('#kode_kelompok').val(null).trigger('change');
+        }
         if (cardAcuan) cardAcuan.classList.add('d-none');
         clearRekeningBelanja();
     }
@@ -683,10 +796,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = e.params.data;
             if (!data) return;
 
-            // Isi nilai terhubung
+            // Set Nilai Terhubung Master
             document.getElementById('master_standar_id').value = data.id;
-            document.getElementById('kode_kelompok').value = data.kode_kelompok || '';
             document.getElementById('harga_acuan_master').value = data.harga_satuan || 0;
+
+            // Set Kode Barang SIPD ke Select2
+            if (data.kode_kelompok) {
+                const $selectKode = $('#kode_kelompok');
+                const optText = data.kode_kelompok + (data.nama_kelompok ? ' - ' + data.nama_kelompok : '');
+                const opt = new Option(optText, data.kode_kelompok, true, true);
+                $selectKode.empty().append(opt).trigger('change');
+            }
 
             document.getElementById('uraian').value = data.uraian || '';
             document.getElementById('spesifikasi').value = data.spesifikasi || '';
@@ -732,6 +852,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearRekeningBelanja();
             }
 
+            // Set TKDN jika ada
+            if (typeof data.nilai_tkdn !== 'undefined' && document.getElementById('nilai_tkdn')) {
+                document.getElementById('nilai_tkdn').value = data.nilai_tkdn || 0;
+            }
+
+            // Set Keterangan jika ada
+            if (data.keterangan && document.getElementById('keterangan_usulan')) {
+                document.getElementById('keterangan_usulan').value = data.keterangan;
+            }
+
             // Set Harga Acuan & Default Harga Usulan
             const inputHarga = document.getElementById('harga_usulan');
             if (inputHarga) {
@@ -750,6 +880,51 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Inisialisasi Select2 untuk Kode Barang SIPD RI
+    if (typeof jQuery !== 'undefined' && $('#kode_kelompok').length) {
+        $('#kode_kelompok').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Ketik nama barang/uraian SIPD atau kode (contoh: 1.1.12...) --',
+            allowClear: true,
+            width: '100%',
+            ajax: {
+                url: '<?= site_url("ajax/kode_barang_sipd/search") ?>',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term || '',
+                        kelompok: '<?= $tipe ?>'
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results || []
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+            templateResult: function(repo) {
+                if (repo.loading) return repo.text;
+                if (!repo.kode) return repo.text;
+                return $(`
+                    <div class="py-1">
+                        <div class="fw-semibold text-dark">${repo.uraian}</div>
+                        <div class="small text-muted d-flex align-items-center gap-2 mt-1">
+                            <span class="font-monospace text-primary fw-bold"><i class="bi bi-tag-fill me-1"></i>${repo.kode}</span>
+                            <span class="badge bg-secondary-subtle text-secondary border">${repo.kelompok}</span>
+                        </div>
+                    </div>
+                `);
+            },
+            templateSelection: function(repo) {
+                if (!repo.kode) return repo.text || '-- Pilih Kode Barang SIPD --';
+                return repo.kode + ' - ' + (repo.uraian || repo.text);
+            }
+        });
+    }
+
     // Inisialisasi Select2 untuk Satuan Standar (Mencegah input teks bebas)
     if (typeof jQuery !== 'undefined' && $('#satuan').length) {
         $('#satuan').select2({
@@ -760,10 +935,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Format Rupiah pada input harga
-    const inputHarga = document.getElementById('harga_usulan');
-    if (inputHarga) {
-        inputHarga.addEventListener('input', function(e) {
+    // Format Rupiah pada semua input yang memiliki atribut data-format-rupiah
+    document.querySelectorAll('[data-format-rupiah]').forEach(function(el) {
+        el.addEventListener('input', function() {
             let val = this.value.replace(/[^0-9]/g, '');
             if (val === '') {
                 this.value = '';
@@ -771,7 +945,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             this.value = parseInt(val, 10).toLocaleString('id-ID');
         });
-    }
+    });
 });
 </script>
 

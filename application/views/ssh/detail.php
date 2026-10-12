@@ -53,17 +53,54 @@
                             <td class="bg-light p-3 rounded text-secondary" style="white-space: pre-line;"><?= e($item->spesifikasi) ?></td>
                         </tr>
                         <tr>
-                            <th class="text-muted fw-normal">Satuan</th>
+                            <th class="text-muted fw-normal">Kode Barang SIPD</th>
+                            <td>
+                                <span class="badge bg-light text-dark font-monospace border px-2 py-1"><?= e($item->kode_kelompok ?: '-') ?></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-normal align-top">Rekening Belanja SIPD</th>
+                            <td>
+                                <div><strong class="font-monospace text-primary"><?= e($item->kode_rekening ?: '-') ?></strong> <?= !empty($item->nama_rekening) ? ' - ' . e($item->nama_rekening) : '' ?></div>
+                                <?php if (!empty($item->kode_rekening_2)): ?>
+                                <div class="mt-1 small"><strong class="font-monospace text-secondary">Rek 2: <?= e($item->kode_rekening_2) ?></strong> <?= !empty($item->nama_rekening_2) ? ' - ' . e($item->nama_rekening_2) : '' ?></div>
+                                <?php endif; ?>
+                                <?php if (!empty($item->kode_rekening_3)): ?>
+                                <div class="mt-1 small"><strong class="font-monospace text-secondary">Rek 3: <?= e($item->kode_rekening_3) ?></strong> <?= !empty($item->nama_rekening_3) ? ' - ' . e($item->nama_rekening_3) : '' ?></div>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-normal">Satuan Standar</th>
                             <td><span class="badge bg-light text-dark border"><?= e($item->satuan) ?></span></td>
                         </tr>
                         <tr>
-                            <th class="text-muted fw-normal">Harga Usulan</th>
+                            <th class="text-muted fw-normal">Nilai TKDN (%)</th>
+                            <td><span class="badge bg-info-subtle text-info border border-info-subtle font-monospace"><?= (float)($item->nilai_tkdn ?? 0) ?>%</span></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted fw-normal">Harga Usulan (Zona 1)</th>
                             <td class="fs-5 fw-bold text-primary"><?= rupiah($item->harga_usulan) ?></td>
                         </tr>
+                        <?php if (!empty($item->harga_2) || !empty($item->harga_3)): ?>
+                        <tr>
+                            <th class="text-muted fw-normal">Harga Zona 2 & 3</th>
+                            <td class="small text-muted">
+                                Zona 2: <strong><?= !empty($item->harga_2) ? rupiah($item->harga_2) : '-' ?></strong> &bull;
+                                Zona 3: <strong><?= !empty($item->harga_3) ? rupiah($item->harga_3) : '-' ?></strong>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
                         <?php if ($item->harga_ditetapkan): ?>
                         <tr class="table-success rounded">
                             <th class="text-success fw-bold">Harga Ditetapkan</th>
                             <td class="fs-5 fw-bold text-success"><?= rupiah($item->harga_ditetapkan) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if (!empty($item->keterangan_usulan)): ?>
+                        <tr>
+                            <th class="text-muted fw-normal align-top">Keterangan SIPD</th>
+                            <td class="text-muted small"><?= nl2br(e($item->keterangan_usulan)) ?></td>
                         </tr>
                         <?php endif; ?>
                         <tr>

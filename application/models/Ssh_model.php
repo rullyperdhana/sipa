@@ -782,7 +782,15 @@ class Ssh_model extends CI_Model
             'satuan'            => trim($data['satuan']),
             'kode_rekening'     => trim($data['kode_rekening'] ?? ''),
             'nama_rekening'     => trim($data['nama_rekening'] ?? ''),
+            'kode_rekening_2'   => !empty($data['kode_rekening_2']) ? trim($data['kode_rekening_2']) : NULL,
+            'nama_rekening_2'   => !empty($data['nama_rekening_2']) ? trim($data['nama_rekening_2']) : NULL,
+            'kode_rekening_3'   => !empty($data['kode_rekening_3']) ? trim($data['kode_rekening_3']) : NULL,
+            'nama_rekening_3'   => !empty($data['nama_rekening_3']) ? trim($data['nama_rekening_3']) : NULL,
             'harga_usulan'      => (float) $data['harga_usulan'],
+            'harga_2'           => isset($data['harga_2']) ? (float)$data['harga_2'] : 0,
+            'harga_3'           => isset($data['harga_3']) ? (float)$data['harga_3'] : 0,
+            'nilai_tkdn'        => isset($data['nilai_tkdn']) ? (float)$data['nilai_tkdn'] : 0,
+            'keterangan_usulan' => !empty($data['keterangan_usulan']) ? trim($data['keterangan_usulan']) : NULL,
             'harga_acuan_master'=> !empty($data['harga_acuan_master']) ? (float)$data['harga_acuan_master'] : NULL,
             'harga_ditetapkan'  => NULL,
             'file_lampiran'     => $data['file_lampiran'] ?? NULL,
@@ -861,7 +869,15 @@ class Ssh_model extends CI_Model
             'satuan'            => trim($data['satuan']),
             'kode_rekening'     => trim($data['kode_rekening'] ?? $existing->kode_rekening),
             'nama_rekening'     => trim($data['nama_rekening'] ?? $existing->nama_rekening),
+            'kode_rekening_2'   => array_key_exists('kode_rekening_2', $data) ? $data['kode_rekening_2'] : $existing->kode_rekening_2,
+            'nama_rekening_2'   => array_key_exists('nama_rekening_2', $data) ? $data['nama_rekening_2'] : $existing->nama_rekening_2,
+            'kode_rekening_3'   => array_key_exists('kode_rekening_3', $data) ? $data['kode_rekening_3'] : $existing->kode_rekening_3,
+            'nama_rekening_3'   => array_key_exists('nama_rekening_3', $data) ? $data['nama_rekening_3'] : $existing->nama_rekening_3,
             'harga_usulan'      => (float) $data['harga_usulan'],
+            'harga_2'           => isset($data['harga_2']) ? (float)$data['harga_2'] : $existing->harga_2,
+            'harga_3'           => isset($data['harga_3']) ? (float)$data['harga_3'] : $existing->harga_3,
+            'nilai_tkdn'        => isset($data['nilai_tkdn']) ? (float)$data['nilai_tkdn'] : $existing->nilai_tkdn,
+            'keterangan_usulan' => array_key_exists('keterangan_usulan', $data) ? $data['keterangan_usulan'] : $existing->keterangan_usulan,
             'harga_acuan_master'=> !empty($data['harga_acuan_master']) ? (float)$data['harga_acuan_master'] : $existing->harga_acuan_master,
             'updated_at'        => date('Y-m-d H:i:s')
         ];
@@ -1401,10 +1417,20 @@ class Ssh_model extends CI_Model
         $now = date('Y-m-d H:i:s');
         if (!empty($usulan->master_standar_id)) {
             // Update item yang ada di katalog master
-            $this->db->where('id', (int)$usulan->master_standar_id)->update($this->table_master, [
+            $updateMaster = [
                 'harga_satuan' => (float)$hargaFinal,
                 'updated_at'   => $now
-            ]);
+            ];
+            if (!empty($usulan->nilai_tkdn)) $updateMaster['nilai_tkdn'] = (float)$usulan->nilai_tkdn;
+            if (!empty($usulan->harga_2)) $updateMaster['harga_2'] = (float)$usulan->harga_2;
+            if (!empty($usulan->harga_3)) $updateMaster['harga_3'] = (float)$usulan->harga_3;
+            if (!empty($usulan->kode_rekening_2)) $updateMaster['kode_rekening_2'] = $usulan->kode_rekening_2;
+            if (!empty($usulan->nama_rekening_2)) $updateMaster['nama_rekening_2'] = $usulan->nama_rekening_2;
+            if (!empty($usulan->kode_rekening_3)) $updateMaster['kode_rekening_3'] = $usulan->kode_rekening_3;
+            if (!empty($usulan->nama_rekening_3)) $updateMaster['nama_rekening_3'] = $usulan->nama_rekening_3;
+            if (!empty($usulan->keterangan_usulan)) $updateMaster['keterangan'] = $usulan->keterangan_usulan;
+
+            $this->db->where('id', (int)$usulan->master_standar_id)->update($this->table_master, $updateMaster);
         } else {
             // Item baru ditambahkan ke katalog master untuk tahun anggaran berkenaan
             $kodeStandar = $this->generateKodeStandarMaster($usulan->tipe, $usulan->tahun_anggaran);
@@ -1417,8 +1443,16 @@ class Ssh_model extends CI_Model
                 'spesifikasi'    => $usulan->spesifikasi,
                 'satuan'         => $usulan->satuan,
                 'harga_satuan'   => (float)$hargaFinal,
+                'harga_2'        => (float)(!empty($usulan->harga_2) ? $usulan->harga_2 : $hargaFinal),
+                'harga_3'        => (float)(!empty($usulan->harga_3) ? $usulan->harga_3 : $hargaFinal),
+                'nilai_tkdn'     => (float)($usulan->nilai_tkdn ?? 0),
                 'kode_rekening'  => !empty($usulan->kode_rekening) ? $usulan->kode_rekening : NULL,
                 'nama_rekening'  => !empty($usulan->nama_rekening) ? $usulan->nama_rekening : NULL,
+                'kode_rekening_2'=> !empty($usulan->kode_rekening_2) ? $usulan->kode_rekening_2 : NULL,
+                'nama_rekening_2'=> !empty($usulan->nama_rekening_2) ? $usulan->nama_rekening_2 : NULL,
+                'kode_rekening_3'=> !empty($usulan->kode_rekening_3) ? $usulan->kode_rekening_3 : NULL,
+                'nama_rekening_3'=> !empty($usulan->nama_rekening_3) ? $usulan->nama_rekening_3 : NULL,
+                'keterangan'     => !empty($usulan->keterangan_usulan) ? $usulan->keterangan_usulan : NULL,
                 'kategori'       => !empty($usulan->kategori) ? $usulan->kategori : 'Umum',
                 'is_active'      => 1,
                 'created_at'     => $now,
@@ -1550,5 +1584,63 @@ class Ssh_model extends CI_Model
     public function deleteJadwal($id)
     {
         return $this->db->delete($this->table_jadwal, ['id' => (int)$id]);
+    }
+
+    /**
+     * Mengambil daftar usulan final (Ditetapkan / Diverifikasi) untuk Ekspor Format Upload SIPD
+     */
+    public function getFinalUsulanForSipdExport($tipe = 'SSH', $tahun = NULL, $filter = [])
+    {
+        $this->db->select('u.*, skpd.nama_skpd, skpd.kode_skpd, kb.uraian as nama_kelompok_sipd');
+        $this->db->from($this->table . ' u');
+        $this->db->join('skpd', 'skpd.id = u.id_skpd', 'left');
+        $this->db->join('ref_kode_barang_sipd kb', 'kb.kode_barang = u.kode_kelompok', 'left');
+
+        if (!empty($tipe)) {
+            $this->db->where('u.tipe', $tipe);
+        }
+        if (!empty($tahun)) {
+            $this->db->where('u.tahun_anggaran', (int)$tahun);
+        }
+
+        if (!empty($filter['status'])) {
+            $this->db->where('u.status_proses', $filter['status']);
+        } else {
+            // Default: ambil yang sudah Ditetapkan (Final)
+            $this->db->where('u.status_proses', 'Ditetapkan');
+        }
+
+        if (!empty($filter['id_skpd'])) {
+            $this->db->where('u.id_skpd', (int)$filter['id_skpd']);
+        }
+
+        if (!empty($filter['kategori'])) {
+            $this->db->where('u.kategori', $filter['kategori']);
+        }
+
+        $this->db->order_by('u.kode_kelompok', 'ASC');
+        $this->db->order_by('u.uraian', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Mengambil Master Data resmi (ref_standar_harga) untuk Ekspor Format Upload SIPD
+     */
+    public function getMasterDataForSipdExport($tipe = 'SSH', $tahun = 2027, $filter = [])
+    {
+        $this->db->from($this->table_master);
+        if (!empty($tipe)) {
+            $this->db->where('tipe', $tipe);
+        }
+        if (!empty($tahun)) {
+            $this->db->where('tahun_anggaran', (int)$tahun);
+        }
+        if (!empty($filter['kategori'])) {
+            $this->db->where('kategori', $filter['kategori']);
+        }
+        $this->db->where('is_active', 1);
+        $this->db->order_by('kode_kelompok', 'ASC');
+        $this->db->order_by('uraian', 'ASC');
+        return $this->db->get()->result();
     }
 }

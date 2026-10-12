@@ -132,6 +132,40 @@ class Ssh_service
             $errors[] = 'Spesifikasi teknis wajib diisi.';
         }
 
+        // Validasi Kode Kelompok / Kode Barang SIPD
+        $kodeKelompok = trim($postData['kode_kelompok'] ?? '');
+        if (empty($kodeKelompok)) {
+            $errors[] = 'Kode Barang SIPD wajib dipilih.';
+        } elseif ($this->CI->db->table_exists('ref_kode_barang_sipd')) {
+            $checkKode = $this->CI->db->where('kode_barang', $kodeKelompok)
+                ->where('is_active', 1)
+                ->get('ref_kode_barang_sipd')
+                ->row();
+            if (!$checkKode && !preg_match('/^[0-9\.]+$/', $kodeKelompok)) {
+                $errors[] = "Kode Barang SIPD '<strong>" . htmlspecialchars($kodeKelompok) . "</strong>' tidak valid.";
+            }
+        }
+
+        // Validasi Nilai TKDN (0.00% - 100.00%)
+        $rawTkdn = str_replace(['%', ' '], ['', ''], $postData['nilai_tkdn'] ?? '0');
+        $nilaiTkdn = is_numeric($rawTkdn) ? (float)$rawTkdn : 0.00;
+        if ($nilaiTkdn < 0 || $nilaiTkdn > 100) {
+            $errors[] = 'Nilai TKDN harus berada dalam rentang 0% hingga 100%.';
+        }
+
+        // Validasi Harga Zona 2 & Zona 3 (Opsional, jika kosong default ke harga_usulan)
+        $rawHarga2 = str_replace(['.', ',', 'Rp', ' '], ['', '.', '', ''], $postData['harga_2'] ?? '');
+        $harga2 = (is_numeric($rawHarga2) && (float)$rawHarga2 > 0) ? (float)$rawHarga2 : (isset($harga) ? $harga : 0);
+
+        $rawHarga3 = str_replace(['.', ',', 'Rp', ' '], ['', '.', '', ''], $postData['harga_3'] ?? '');
+        $harga3 = (is_numeric($rawHarga3) && (float)$rawHarga3 > 0) ? (float)$rawHarga3 : (isset($harga) ? $harga : 0);
+
+        $kodeRekening2 = trim($postData['kode_rekening_2'] ?? '');
+        $namaRekening2 = trim($postData['nama_rekening_2'] ?? '');
+        $kodeRekening3 = trim($postData['kode_rekening_3'] ?? '');
+        $namaRekening3 = trim($postData['nama_rekening_3'] ?? '');
+        $keteranganUsulan = trim($postData['keterangan_usulan'] ?? '');
+
         $rawAcuan = str_replace(['.', ',', 'Rp', ' '], ['', '.', '', ''], $postData['harga_acuan_master'] ?? '');
         $hargaAcuan = is_numeric($rawAcuan) && (float)$rawAcuan > 0 ? (float)$rawAcuan : NULL;
 
@@ -143,13 +177,21 @@ class Ssh_service
                 'surat_id'          => !empty($postData['surat_id']) ? (int)$postData['surat_id'] : NULL,
                 'tipe'              => in_array($postData['tipe'] ?? '', ['SSH', 'SBU']) ? $postData['tipe'] : 'SSH',
                 'kategori'          => $kategori,
-                'kode_kelompok'     => trim($postData['kode_kelompok'] ?? ''),
+                'kode_kelompok'     => $kodeKelompok,
                 'uraian'            => $uraian,
                 'spesifikasi'       => $spesifikasi,
                 'satuan'            => $satuan,
                 'kode_rekening'     => trim($postData['kode_rekening'] ?? ''),
                 'nama_rekening'     => trim($postData['nama_rekening'] ?? ''),
+                'kode_rekening_2'   => $kodeRekening2 ?: NULL,
+                'nama_rekening_2'   => $namaRekening2 ?: NULL,
+                'kode_rekening_3'   => $kodeRekening3 ?: NULL,
+                'nama_rekening_3'   => $namaRekening3 ?: NULL,
                 'harga_usulan'      => isset($harga) ? $harga : 0,
+                'harga_2'           => $harga2,
+                'harga_3'           => $harga3,
+                'nilai_tkdn'        => $nilaiTkdn,
+                'keterangan_usulan' => $keteranganUsulan ?: NULL,
                 'harga_acuan_master'=> $hargaAcuan,
                 'tahun_anggaran'    => (int) ($postData['tahun_anggaran'] ?? date('Y'))
             ]

@@ -19,6 +19,11 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                 : 'Pengesahan dan penetapan akhir standar satuan harga barang yang telah diverifikasi menjadi Master Data resmi.' ?>
         </p>
     </div>
+    <div class="d-flex gap-2">
+        <a href="<?= site_url("{$prefixUrl}/export_sipd?source=penetapan&status=Ditetapkan") ?>" class="btn btn-success shadow-sm" title="Unduh berkas Excel usulan final berformat resmi SIPD RI (form_upload_SIPD.xlsx)">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Ekspor Format Upload SIPD (.xlsx)
+        </a>
+    </div>
 </div>
 
 <?php if (isset($summary)): ?>

@@ -3,6 +3,38 @@ Semua perubahan penting pada proyek **SIPA (Sistem Informasi Pengelolaan Aset) -
 
 Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachangelog.com/id/1.0.0/) dan mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.9] - 2026-10-12
+
+### 🚀 Ditambahkan & Disesuaikan (Added & Changed)
+- **Penyelarasan Form Usulan SSH & SBU dengan Standar Upload SIPD RI (`form_upload_SIPD.xlsx`):**
+  - **Pilihan Kode Barang SIPD Terintegrasi (Pengganti Master BMD):**
+    - Mengintegrasikan elemen `<select id="kode_kelompok" name="kode_kelompok">` berbasis **Select2 Searchable Dropdown** di [`usulan_form.php`](application/views/ssh/usulan_form.php) yang terhubung langsung ke tabel referensi [`ref_kode_barang_sipd`](application/models/Kode_barang_sipd_model.php) via AJAX `/ajax/kode_barang_sipd/search`.
+    - Menggantikan kode master barang BMD (`1.3.2...`) dengan kode klasifikasi barang/jasa resmi SIPD RI (`1.1.12...` dan `8.1.02...`) yang sesuai dengan kolom **Kode** pada template upload SIPD.
+    - Sinkronisasi instan: Saat operator memilih item dari Katalog Master 2027, kode barang SIPD otomatis terisi. Saat memilih input item baru manual, operator dapat mencari dari **3.646 kode barang resmi SIPD**.
+  - **Nilai TKDN (% Tingkat Komponen Dalam Negeri):**
+    - Ditambahkan input persentase TKDN (0.00% s/d 100.00%) pada form usulan untuk memenuhi kewajiban regulasi P3DN di SIPD RI.
+  - **Harga Zonasi Wilayah (Harga Zona 2 & Zona 3):**
+    - Menambahkan sub-input zonasi wilayah pada form usulan (Harga 2 & Harga 3). Jika dikosongkan, sistem secara otomatis menyamakannya dengan Harga 1 (Harga Utama) saat diekspor.
+  - **Multi-Rekening Belanja SIPD (Rekening 2 & Rekening 3):**
+    - Mendukung penambahan kode rekening belanja tambahan (Rekening 2 dan Rekening 3) untuk item yang dialokasikan ke beberapa pos akun belanja di SIPD.
+  - **Keterangan Tambahan Usulan untuk SIPD:**
+    - Input catatan spesifik yang langsung mengisi kolom **Keterangan** pada berkas ekspor SIPD.
+- **Fitur Ekspor Otomatis Berkas Upload SIPD (`form_upload_SIPD.xlsx`):**
+  - Ditambahkan method `export_sipd()` pada [`Ssh.php`](application/controllers/Ssh.php) dan [`Sbu.php`](application/controllers/Sbu.php).
+  - Menghasilkan berkas Excel `.xlsx` yang memetakan seluruh **14 Kolom Resmi SIPD**: `Kode`, `Uraian`, `Spek`, `Satuan`, `Harga 1`, `Harga 2`, `Harga 3`, `Rekening 1`, `Rekening 2`, `Rekening 3`, `Sumber`, `Keterangan`, `Kelompok`, `Nilai TKDN`.
+  - Format kode barang dan kode rekening diformat secara eksplisit sebagai teks (String explicit) agar angka nol di awal tidak hilang dan tidak terkonversi menjadi format eksponensial.
+  - Tombol aksi ekspor telah ditambahkan di:
+    - **Menu Penetapan:** Tombol *"Ekspor Format Upload SIPD (.xlsx)"* untuk mengunduh usulan final berstatus 'Ditetapkan'.
+    - **Menu Master Data:** Tombol *"Ekspor Format SIPD (.xlsx)"* untuk mengunduh seluruh katalog resmi aktif.
+- **Skema Basis Data & Migrasi (`database/migrations/add_sipd_upload_fields_to_standar_harga.sql`):**
+  - Menambahkan kolom `nilai_tkdn`, `harga_2`, `harga_3`, `kode_rekening_2`, `nama_rekening_2`, `kode_rekening_3`, `nama_rekening_3`, dan `keterangan_usulan` pada tabel `standar_harga_usulan`.
+  - Menambahkan kolom `nilai_tkdn`, `harga_2`, `harga_3`, `kode_rekening_2`, `nama_rekening_2`, `kode_rekening_3`, `nama_rekening_3`, dan `keterangan` pada tabel `ref_standar_harga`.
+  - Sinkronisasi otomatis saat penetapan usulan: menyalin seluruh parameter SIPD ke tabel `ref_standar_harga`.
+- **Pembaruan Tampilan Halaman Rincian Usulan ([`detail.php`](application/views/ssh/detail.php)):**
+  - Menampilkan badge Kode Barang SIPD, rincian multi-rekening belanja, persentase TKDN, harga zona, dan keterangan SIPD.
+
+---
+
 ## [2.9.8] - 2026-10-12
 
 ### 🚀 Ditambahkan (Added)

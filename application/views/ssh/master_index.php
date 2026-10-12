@@ -99,6 +99,11 @@ $endItem = min($totalRows, $page * $perPage);
             <i class="bi bi-calendar-range me-1"></i> Jadwal Pengusulan
         </a>
         <?php endif; ?>
+        <a href="<?= site_url("{$prefixUrl}/export_sipd?source=master&tahun=" . ($filter['tahun'] ?? 2027)) ?>" 
+           class="btn btn-success" 
+           title="Unduh Katalog Master Data dalam format template Excel upload SIPD (form_upload_SIPD.xlsx)">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Ekspor Format SIPD (.xlsx)
+        </a>
         <div class="btn-group">
             <a href="<?= site_url("{$prefixUrl}/master_data/cetak?" . http_build_query(array_merge($filter, ['limit' => 250]))) ?>" 
                target="_blank" 

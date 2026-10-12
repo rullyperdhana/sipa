@@ -554,17 +554,24 @@ class Sbu extends Auth_Controller
 
         $jadwalAktif = $this->ssh_model->getJadwalAktif($this->tipe, $thAktif);
 
+        // Resolusi info Kode Barang SIPD jika dari master
+        $itemKodeBarangSipd = NULL;
+        if (!empty($masterItem) && !empty($masterItem->kode_kelompok)) {
+            $itemKodeBarangSipd = $this->db->get_where('ref_kode_barang_sipd', ['kode_barang' => $masterItem->kode_kelompok])->row();
+        }
+
         $data = [
-            'title'       => 'Tambah Rincian Usulan ' . $this->moduleTitle,
-            'tipe'        => $this->tipe,
-            'prefixUrl'   => $this->prefixUrl,
-            'moduleTitle' => $this->moduleTitle,
-            'suratInduk'  => $suratInduk,
-            'suratId'     => $suratId,
-            'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
-            'satuan'      => $this->ssh_model->getSatuanList('SBU'),
-            'masterItem'  => $masterItem,
-            'jadwalAktif' => $jadwalAktif
+            'title'              => 'Tambah Rincian Usulan ' . $this->moduleTitle,
+            'tipe'               => $this->tipe,
+            'prefixUrl'          => $this->prefixUrl,
+            'moduleTitle'        => $this->moduleTitle,
+            'suratInduk'         => $suratInduk,
+            'suratId'            => $suratId,
+            'kategori'           => $this->ssh_model->getKategoriList($this->tipe),
+            'satuan'             => $this->ssh_model->getSatuanList('SBU'),
+            'masterItem'         => $masterItem,
+            'itemKodeBarangSipd' => $itemKodeBarangSipd,
+            'jadwalAktif'        => $jadwalAktif
         ];
 
         $this->load->view('templates/header', $data);
@@ -661,16 +668,22 @@ class Sbu extends Auth_Controller
 
         $suratInduk = !empty($item->surat_id) ? $this->ssh_model->getSuratById($item->surat_id) : NULL;
 
+        // Resolusi info Kode Barang SIPD
+        $itemKodeBarangSipd = !empty($item->kode_kelompok) 
+            ? $this->db->get_where('ref_kode_barang_sipd', ['kode_barang' => $item->kode_kelompok])->row() 
+            : NULL;
+
         $data = [
-            'title'       => 'Edit Usulan ' . $this->tipe . ' - ' . $item->kode_usulan,
-            'tipe'        => $this->tipe,
-            'prefixUrl'   => $this->prefixUrl,
-            'moduleTitle' => $this->moduleTitle,
-            'item'        => $item,
-            'suratInduk'  => $suratInduk,
-            'suratId'     => $item->surat_id,
-            'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
-            'satuan'      => $this->ssh_model->getSatuanList('SBU')
+            'title'              => 'Edit Usulan ' . $this->tipe . ' - ' . $item->kode_usulan,
+            'tipe'               => $this->tipe,
+            'prefixUrl'          => $this->prefixUrl,
+            'moduleTitle'        => $this->moduleTitle,
+            'item'               => $item,
+            'suratInduk'         => $suratInduk,
+            'suratId'            => $item->surat_id,
+            'kategori'           => $this->ssh_model->getKategoriList($this->tipe),
+            'satuan'             => $this->ssh_model->getSatuanList('SBU'),
+            'itemKodeBarangSipd' => $itemKodeBarangSipd
         ];
 
         $this->load->view('templates/header', $data);
@@ -933,6 +946,92 @@ class Sbu extends Auth_Controller
         ];
 
         $this->load->view('ssh/cetak_master', $data);
+    }
+
+    /**
+     * Ekspor Data Final Standar Harga ke Format Upload SIPD (form_upload_SIPD.xlsx)
+     */
+    public function export_sipd()
+    {
+        $thAktif = function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027;
+        $tahun = (int)($this->input->get('tahun', TRUE) ?: $thAktif);
+        $source = $this->input->get('source', TRUE) ?: 'penetapan';
+        $status = $this->input->get('status', TRUE) ?: 'Ditetapkan';
+        $skpdId = $this->input->get('skpd_id', TRUE);
+
+        if (in_array($this->currentUser->role, ['operator_skpd', 'skpd'], TRUE)) {
+            $skpdId = $this->currentUser->skpd_id;
+        }
+
+        if ($source === 'master') {
+            $items = $this->ssh_model->getMasterDataForSipdExport($this->tipe, $tahun, [
+                'kategori' => $this->input->get('kategori', TRUE)
+            ]);
+        } else {
+            $filter = [
+                'status'   => $status,
+                'id_skpd'  => $skpdId,
+                'kategori' => $this->input->get('kategori', TRUE)
+            ];
+            $items = $this->ssh_model->getFinalUsulanForSipdExport($this->tipe, $tahun, $filter);
+        }
+
+        // Generate Berkas Excel Mengacu ke form_upload_SIPD.xlsx
+        $templatePath = FCPATH . 'form_upload_SIPD.xlsx';
+        if (file_exists($templatePath)) {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($templatePath);
+            $sheet = $spreadsheet->getActiveSheet();
+        } else {
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle('Sheet 1');
+            $headers = ['Kode', 'Uraian', 'Spek', 'Satuan', 'Harga 1', 'Harga 2', 'Harga 3', 'Rekening 1', 'Rekening 2', 'Rekening 3', 'Sumber', 'Keterangan', 'Kelompok', 'Nilai TKDN'];
+            foreach ($headers as $cIdx => $h) {
+                $sheet->setCellValueByColumnAndRow($cIdx + 1, 1, $h);
+            }
+            $sheet->getStyle('A1:N1')->getFont()->setBold(true);
+        }
+
+        $rowNum = 2;
+        foreach ($items as $item) {
+            $harga1 = (float)(!empty($item->harga_ditetapkan) ? $item->harga_ditetapkan : ($item->harga_satuan ?? $item->harga_usulan));
+            $harga2 = (float)(!empty($item->harga_2) ? $item->harga_2 : $harga1);
+            $harga3 = (float)(!empty($item->harga_3) ? $item->harga_3 : $harga1);
+            $tkdn   = (float)(!empty($item->nilai_tkdn) ? $item->nilai_tkdn : 0);
+            $kode   = (string)(!empty($item->kode_kelompok) ? $item->kode_kelompok : '');
+            $ket    = !empty($item->keterangan_usulan) ? $item->keterangan_usulan : (!empty($item->keterangan) ? $item->keterangan : '');
+
+            $sheet->setCellValueExplicit('A' . $rowNum, $kode, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValue('B' . $rowNum, $item->uraian);
+            $sheet->setCellValue('C' . $rowNum, $item->spesifikasi ?: '-');
+            $sheet->setCellValue('D' . $rowNum, $item->satuan);
+            $sheet->setCellValue('E' . $rowNum, $harga1);
+            $sheet->setCellValue('F' . $rowNum, $harga2);
+            $sheet->setCellValue('G' . $rowNum, $harga3);
+            $sheet->setCellValueExplicit('H' . $rowNum, (string)($item->kode_rekening ?? ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('I' . $rowNum, (string)($item->kode_rekening_2 ?? ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit('J' . $rowNum, (string)($item->kode_rekening_3 ?? ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValue('K' . $rowNum, $this->tipe);
+            $sheet->setCellValue('L' . $rowNum, $ket);
+            $sheet->setCellValue('M' . $rowNum, $this->tipe);
+            $sheet->setCellValue('N' . $rowNum, $tkdn);
+
+            $rowNum++;
+        }
+
+        foreach (range('A', 'N') as $colID) {
+            $sheet->getColumnDimension($colID)->setAutoSize(true);
+        }
+
+        $filename = "form_upload_SIPD_{$this->tipe}_{$tahun}_" . date('Ymd_His') . ".xlsx";
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 
     // =========================================================================
