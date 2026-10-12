@@ -33,7 +33,7 @@
                         </p>
                         <ul class="text-white-50 small mb-0 ps-3">
                             <li><strong>Hak Akses Tunggal:</strong> Hanya dapat dibuka dan dieksekusi oleh akun Administrator.</li>
-                            <li><strong>Password Dinamis Waktu Server:</strong> Menggunakan kombinasi <code>[2-Digit Jam][2-Digit Bulan][2-Digit Tanggal]</code> sesuai waktu server saat ini.</li>
+                            <li><strong>Password Keamanan Rahasia:</strong> Wajib memasukkan kode keamanan otentikasi rahasia Administrator.</li>
                             <li><strong>Konfirmasi Teks Eksplisit:</strong> Wajib mengetik kata kunci <code>HAPUS-[TAHUN]</code> sebelum tombol submit dapat diproses.</li>
                         </ul>
                     </div>
@@ -49,11 +49,6 @@
                     </div>
                     <div class="text-white small">
                         <?= date('d M Y') ?> (Asia/Singapore / WITA)
-                    </div>
-                    <hr class="border-white border-opacity-25 my-2">
-                    <div class="small text-white-50">
-                        Formula Password: <code class="text-warning fw-bold"><?= date('H') ?></code> (Jam) + <code class="text-warning fw-bold"><?= date('m') ?></code> (Bln) + <code class="text-warning fw-bold"><?= date('d') ?></code> (Tgl) 
-                        &rarr; <span class="badge bg-warning text-dark font-monospace fw-bold"><?= date('Hmd') ?></span>
                     </div>
                 </div>
             </div>
@@ -189,41 +184,33 @@
                 </div>
                 <div class="card-body p-4 d-flex flex-column justify-content-between">
                     <div>
-                        <!-- Box Panduan Password Dinamis -->
-                        <div class="alert alert-warning border-0 p-3 mb-3 small">
+                        <div class="alert alert-secondary border-0 p-3 mb-3 small">
                             <div class="fw-bold text-dark mb-1 d-flex align-items-center gap-1.5">
-                                <i class="bi bi-info-circle-fill text-warning"></i> Aturan Password Dinamis:
+                                <i class="bi bi-shield-lock-fill text-danger"></i> Konfirmasi Otorisasi:
                             </div>
                             <div class="text-muted">
-                                Masukkan <strong>Jam</strong>, <strong>Bulan</strong>, dan <strong>Tanggal</strong> waktu server saat ini.
-                                <ul class="mb-1 ps-3 mt-1">
-                                    <li>Format: <code>[Jam 2 digit][Bulan 2 digit][Tanggal 2 digit]</code></li>
-                                    <li>Contoh saat ini (pukul <span class="fw-bold font-monospace"><?= date('H:i') ?> WITA</span> tgl <span class="fw-bold"><?= date('d/m') ?></span>): 
-                                        <code class="fw-bold text-danger fs-6 bg-white px-1.5 py-0.5 rounded border"><?= date('Hmd') ?></code>
-                                    </li>
-                                </ul>
-                                <span class="badge bg-secondary-subtle text-secondary">Toleransi transisi &plusmn;1 jam aktif otomatis</span>
+                                Masukkan kode keamanan rahasia Administrator untuk mengonfirmasi tindakan pembersihan ini.
                             </div>
                         </div>
 
-                        <!-- Input 1: Dynamic Password -->
+                        <!-- Input 1: Security Password -->
                         <div class="mb-3">
                             <label for="inputDynamicPassword" class="form-label fw-bold small text-dark">
-                                <i class="bi bi-lock-fill text-danger me-1"></i> PASSWORD KEAMANAN DINAMIS:
+                                <i class="bi bi-lock-fill text-danger me-1"></i> PASSWORD KEAMANAN RAHASIA:
                             </label>
                             <div class="input-group">
                                 <input type="password" 
                                        class="form-control form-control-lg font-monospace fw-bold" 
                                        id="inputDynamicPassword" 
                                        name="security_password" 
-                                       placeholder="Contoh: <?= date('Hmd') ?>" 
+                                       placeholder="Masukkan password keamanan" 
                                        autocomplete="off" 
                                        required>
                                 <button class="btn btn-outline-secondary" type="button" id="btnTogglePassword" title="Lihat/Sembunyikan Password">
                                     <i class="bi bi-eye-fill"></i>
                                 </button>
                             </div>
-                            <small class="text-muted" style="font-size: 11px;">Lihat jam server di top bar pojok kanan atas layar.</small>
+                            <small class="text-muted" style="font-size: 11px;">Hanya Administrator yang memiliki wewenang untuk mengeksekusi.</small>
                         </div>
 
                         <!-- Input 2: Teks Konfirmasi Eksplisit -->
@@ -345,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire({
                 icon: 'warning',
                 title: 'Password Belum Diisi',
-                text: 'Harap masukkan password keamanan dinamis [Jam][Bulan][Tanggal] sesuai waktu server saat ini.',
+                text: 'Harap masukkan password keamanan rahasia Administrator.',
                 confirmButtonColor: '#3085d6'
             });
             inputDynamicPassword.focus();

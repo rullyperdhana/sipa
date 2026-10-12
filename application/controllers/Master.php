@@ -766,7 +766,7 @@ class Master extends Admin_Controller
 
             // 1. Validasi Password Dinamis [Jam][Bulan][Tanggal]
             if (!$this->ssh_model->verifyDynamicSecurityPassword($passwordInput)) {
-                $this->session->set_flashdata('danger', 'Password keamanan salah! Harap masukkan kombinasi [2-Digit Jam][2-Digit Bulan][2-Digit Tanggal] sesuai jam server saat ini (lihat jam server pada top bar).');
+                $this->session->set_flashdata('danger', 'Password keamanan salah! Akses pembersihan data ditolak.');
                 redirect("master/pembersihan?tahun={$tahunPost}&tipe={$tipePost}");
                 return;
             }
