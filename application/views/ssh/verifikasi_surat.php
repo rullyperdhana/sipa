@@ -44,7 +44,16 @@ $progressPercent = ($totalItems > 0) ? round(($sudahDiproses / $totalItems) * 10
             SKPD: <strong><?= e($surat->nama_skpd) ?></strong> &bull; Tanggal Surat: <strong><?= tanggal_id($surat->tanggal_surat) ?></strong> &bull; TA <?= (int)$surat->tahun_anggaran ?>
         </p>
     </div>
-    <div>
+    <div class="d-flex align-items-center gap-2">
+        <?php if (!empty($items)): ?>
+        <button type="button" class="btn btn-outline-success btn-kirim-wa-ssh" 
+                data-id="<?= $items[0]->id ?>" 
+                data-prefix="<?= $prefixUrl ?>" 
+                data-status="<?= $surat->status_proses ?>"
+                title="Hubungi Operator SKPD via WhatsApp">
+            <i class="bi bi-whatsapp me-1"></i> Hubungi SKPD via WA
+        </button>
+        <?php endif; ?>
         <a href="<?= site_url("{$prefixUrl}/verifikasi") ?>" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i> Kembali ke Antrean
         </a>
@@ -280,6 +289,13 @@ $progressPercent = ($totalItems > 0) ? round(($sudahDiproses / $totalItems) * 10
                                     <i class="bi bi-shield-check me-1"></i>
                                     <?= $row->status_proses === 'Diajukan' ? 'Telaah & Verifikasi' : 'Ubah Putusan' ?>
                                 </button>
+                                <button type="button" class="btn btn-sm btn-outline-success btn-kirim-wa-ssh" 
+                                        data-id="<?= $row->id ?>" 
+                                        data-prefix="<?= $prefixUrl ?>" 
+                                        data-status="<?= $row->status_proses ?>"
+                                        title="Kirim Pemberitahuan WhatsApp ke Operator SKPD">
+                                    <i class="bi bi-whatsapp"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -360,11 +376,16 @@ $progressPercent = ($totalItems > 0) ? round(($sudahDiproses / $totalItems) * 10
                         <textarea name="catatan_verifikator" id="inputCatatanVerifikator" class="form-control" rows="3" placeholder="Masukkan catatan telaah, instruksi perbaikan (bila revisi), atau dasar penolakan..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer bg-light border-top">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                        <i class="bi bi-save me-1"></i> Simpan Putusan
+                <div class="modal-footer bg-light border-top d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-outline-success btn-sm" id="btnWaFromModalTelaah" title="Siapkan draf pesan WhatsApp ke Operator SKPD">
+                        <i class="bi bi-whatsapp me-1"></i> Draf Notif WA
                     </button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                            <i class="bi bi-save me-1"></i> Simpan Putusan
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

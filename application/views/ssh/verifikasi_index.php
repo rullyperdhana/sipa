@@ -423,6 +423,13 @@ $stats = $summarySurat ?? $summary;
                                             <i class="bi bi-eye"></i> Detail
                                         </button>
                                         <?php endif; ?>
+                                        <button type="button" class="btn btn-sm btn-outline-success btn-kirim-wa-ssh" 
+                                                data-id="<?= $row->id ?>" 
+                                                data-prefix="<?= $prefixUrl ?>" 
+                                                data-status="<?= $row->status_proses ?>"
+                                                title="Kirim Pemberitahuan WhatsApp ke Operator SKPD">
+                                            <i class="bi bi-whatsapp"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

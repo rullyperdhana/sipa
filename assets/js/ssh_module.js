@@ -483,7 +483,7 @@
         $(document).on('click', '.btn-kirim-wa-ssh', function (e) {
             e.preventDefault();
             const id = $(this).data('id');
-            const prefix = $(this).data('prefix') || 'ssh';
+            const prefix = ($(this).data('prefix') || $(this).data('tipe') || 'ssh').toString().toLowerCase();
             const status = $(this).data('status') || '';
             let actionType = 'revisi';
             if (status === 'Diverifikasi') actionType = 'setuju';
@@ -499,13 +499,13 @@
             }
         });
 
-        $(document).on('click', '#btnWaFromModalRevisi', function (e) {
+        $(document).on('click', '#btnWaFromModalRevisi, #btnWaFromModal', function (e) {
             e.preventDefault();
             const actionUrl = $('#formRevisiUsulan').attr('action') || '';
             const parts = actionUrl.split('/');
             const id = parts[parts.length - 1];
             const prefix = actionUrl.indexOf('/sbu/') !== -1 ? 'sbu' : 'ssh';
-            const catatan = $('#catatan_verifikator').val() || '';
+            const catatan = $('#revisiCatatan').val() || $('#catatan_verifikator').val() || '';
 
             if (window.SipaWa) {
                 window.SipaWa.open({
@@ -530,6 +530,28 @@
                     module: prefix,
                     id: id,
                     action_type: 'tolak',
+                    catatan: catatan
+                });
+            }
+        });
+
+        $(document).on('click', '#btnWaFromModalTelaah', function (e) {
+            e.preventDefault();
+            const actionUrl = $('#formProsesVerifikasi').attr('action') || '';
+            const parts = actionUrl.split('/');
+            const id = parts[parts.length - 1];
+            const prefix = actionUrl.indexOf('/sbu/') !== -1 ? 'sbu' : 'ssh';
+            const aksi = $('input[name="aksi"]:checked').val() || 'revisi';
+            let actionType = 'revisi';
+            if (aksi === 'setujui') actionType = 'setuju';
+            if (aksi === 'tolak') actionType = 'tolak';
+            const catatan = $('#inputCatatanVerifikator').val() || '';
+
+            if (window.SipaWa) {
+                window.SipaWa.open({
+                    module: prefix,
+                    id: id,
+                    action_type: actionType,
                     catatan: catatan
                 });
             }

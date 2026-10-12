@@ -565,6 +565,15 @@ $role = $this->currentUser->role ?? '';
                                             <i class="bi bi-eye"></i> Detail
                                         </button>
                                         <?php endif; ?>
+                                        <?php if (in_array($role, ['admin', 'verifikator'], TRUE)): ?>
+                                        <button type="button" class="btn btn-sm btn-outline-success py-1 px-2 btn-kirim-wa-ssh" 
+                                                data-id="<?= $row->id ?>" 
+                                                data-prefix="<?= $prefixUrl ?>" 
+                                                data-status="<?= $row->status_proses ?>"
+                                                title="Hubungi Operator SKPD via WhatsApp">
+                                            <i class="bi bi-whatsapp"></i>
+                                        </button>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

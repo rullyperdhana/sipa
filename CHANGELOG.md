@@ -42,6 +42,13 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - Memperbaiki tag div penutup pada kartu acuan master (`#cardAcuanMaster`) yang sebelumnya tidak tertutup sempurna sehingga meng-engulf seluruh input form di bawahnya dengan kelas `d-none` saat mode manual dipilih.
   - Menambahkan banner informatif *"Mode Input Item Baru (Non-Master)"* yang aktif ketika memilih opsi *"Input Item Baru (Item belum ada di Master)"*.
   - Mengoptimalkan peralihan mode radio button untuk menyembunyikan pencarian katalog master dan membuka penuh seluruh input Kode Barang SIPD, Kategori, Rekening Belanja, Uraian, Spesifikasi, Satuan, dan Harga Usulan.
+- **Pemulihan Fitur Notifikasi WhatsApp ke Operator SKPD pada Modul SSH & SBU:**
+  - Mengembalikan tombol kirim WhatsApp (`.btn-kirim-wa-ssh`) yang sebelumnya tidak tersemat saat refaktorisasi alur verifikasi berbasis Surat Usulan (v2.9.0):
+    - **Halaman Verifikasi Surat ([`verifikasi_surat.php`](application/views/ssh/verifikasi_surat.php)):** Menambahkan tombol *"Hubungi SKPD via WA"* pada header halaman, tombol aksi WhatsApp pada setiap baris rincian item, dan tombol WhatsApp terintegrasi (`#btnWaFromModalTelaah`) pada footer Modal Keputusan Telaah Verifikator.
+    - **Halaman Antrean Verifikasi ([`verifikasi_index.php`](application/views/ssh/verifikasi_index.php)):** Menambahkan tombol aksi WhatsApp pada setiap baris tabel serta menyelaraskan tombol draf WA pada modal revisi dan tolak.
+    - **Halaman Penetapan Usulan ([`penetapan_index.php`](application/views/ssh/penetapan_index.php)):** Menambahkan tombol WhatsApp pada kolom aksi setiap item usulan yang siap/telah ditetapkan resmi.
+    - **Halaman Detail Usulan Surat ([`surat_detail.php`](application/views/ssh/surat_detail.php) & [`detail.php`](application/views/ssh/detail.php)):** Menambahkan tombol hubungi SKPD via WA pada header dan baris item usulan bagi verifikator/admin.
+    - **Modul Javascript ([`assets/js/ssh_module.js`](assets/js/ssh_module.js)):** Menyatukan listener modal revisi (`#btnWaFromModalRevisi` dan `#btnWaFromModal`), tolak (`#btnWaFromModalTolak`), telaah (`#btnWaFromModalTelaah`), dan baris tabel (`.btn-kirim-wa-ssh`) ke `window.SipaWa.open()`.
 
 ---
 

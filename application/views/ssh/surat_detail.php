@@ -32,6 +32,16 @@ $isLocked = !in_array($surat->status_proses, ['Draft', 'Direvisi'], TRUE);
         </p>
     </div>
     <div class="d-flex gap-2 flex-wrap align-items-center">
+        <?php if (!empty($items) && in_array($this->currentUser->role, ['admin', 'verifikator', 'pimpinan'], TRUE)): ?>
+        <button type="button" class="btn btn-outline-success btn-kirim-wa-ssh" 
+                data-id="<?= $items[0]->id ?>" 
+                data-prefix="<?= $prefixUrl ?>" 
+                data-status="<?= $surat->status_proses ?>"
+                title="Hubungi Operator SKPD via WhatsApp">
+            <i class="bi bi-whatsapp me-1"></i> Hubungi SKPD via WA
+        </button>
+        <?php endif; ?>
+
         <a href="<?= site_url("{$prefixUrl}/usulan") ?>" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
         </a>
@@ -319,6 +329,15 @@ $isLocked = !in_array($surat->status_proses, ['Draft', 'Direvisi'], TRUE);
                                 <?php else: ?>
                                 <button type="button" class="btn btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Lihat detail item">
                                     <i class="bi bi-eye"></i> Detail
+                                </button>
+                                <?php endif; ?>
+                                <?php if (in_array($this->currentUser->role, ['admin', 'verifikator', 'pimpinan'], TRUE)): ?>
+                                <button type="button" class="btn btn-outline-success btn-kirim-wa-ssh" 
+                                        data-id="<?= $row->id ?>" 
+                                        data-prefix="<?= $prefixUrl ?>" 
+                                        data-status="<?= $row->status_proses ?>"
+                                        title="Kirim notifikasi WA ke SKPD">
+                                    <i class="bi bi-whatsapp"></i>
                                 </button>
                                 <?php endif; ?>
                             </div>

@@ -180,25 +180,34 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                             <?= badge_status($row->status_proses) ?>
                         </td>
                         <td class="text-center">
-                            <?php if ($row->status_proses === 'Diverifikasi'): ?>
-                            <form action="<?= site_url("{$prefixUrl}/proses-penetapan/{$row->id}") ?>" method="post" class="d-inline form-tetapkan-usulan" 
-                                  data-kode="<?= e($row->kode_usulan) ?>" data-uraian="<?= e($row->uraian) ?>">
-                                <?= csrf_input() ?>
-                                <button type="submit" class="btn btn-sm <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> shadow-sm" title="Tetapkan dan kunci standar harga resmi">
-                                    <i class="bi bi-shield-check me-1"></i> Tetapkan
+                            <div class="d-inline-flex gap-1 align-items-center">
+                                <?php if ($row->status_proses === 'Diverifikasi'): ?>
+                                <form action="<?= site_url("{$prefixUrl}/proses-penetapan/{$row->id}") ?>" method="post" class="d-inline form-tetapkan-usulan mb-0" 
+                                      data-kode="<?= e($row->kode_usulan) ?>" data-uraian="<?= e($row->uraian) ?>">
+                                    <?= csrf_input() ?>
+                                    <button type="submit" class="btn btn-sm <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> shadow-sm" title="Tetapkan dan kunci standar harga resmi">
+                                        <i class="bi bi-shield-check me-1"></i> Tetapkan
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Detail">
+                                    <i class="bi bi-eye"></i>
                                 </button>
-                            </form>
-                            <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Detail">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <?php else: ?>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle">
-                                <i class="bi bi-lock-fill me-1"></i> Terkunci
-                            </span>
-                            <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh ms-1" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <?php endif; ?>
+                                <?php else: ?>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    <i class="bi bi-lock-fill me-1"></i> Terkunci
+                                </span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-detail-ssh" data-id="<?= $row->id ?>" data-prefix="<?= $prefixUrl ?>" title="Detail">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <?php endif; ?>
+                                <button type="button" class="btn btn-sm btn-outline-success btn-kirim-wa-ssh" 
+                                        data-id="<?= $row->id ?>" 
+                                        data-prefix="<?= $prefixUrl ?>" 
+                                        data-status="<?= $row->status_proses ?>"
+                                        title="Kirim Notifikasi WhatsApp ke SKPD">
+                                    <i class="bi bi-whatsapp"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; endif; ?>
