@@ -17,6 +17,13 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
   - Menampilkan jam server aktif dalam zona waktu **WITA** (GMT+8 / Asia/Makassar) di samping pemilih tahun anggaran pada top bar.
   - Sinkronisasi presisi setiap detik berbasis delta waktu klien tanpa membebani request jaringan server, memudahkan pengguna memantau waktu server yang akurat.
 
+### 🔧 Diperbaiki (Fixed)
+- **Sinkronisasi Filter Tahun Anggaran & Summary Counts Modul Penetapan SSH & SBU ([`application/controllers/Ssh.php`](application/controllers/Ssh.php), [`application/controllers/Sbu.php`](application/controllers/Sbu.php), [`application/models/Ssh_model.php`](application/models/Ssh_model.php), [`application/views/ssh/penetapan_index.php`](application/views/ssh/penetapan_index.php)):**
+  - **Filter Tahun pada Kartu Statistik (`getSummaryCounts`):** Menambahkan filter `tahun_anggaran` aktif pada pemanggilan `getSummaryCounts()`, menyelesaikan masalah munculnya sisa 3 berkas SSH dan 2 berkas SBU dari data sampel bawaan TA 2026 saat membuka dashboard penetapan TA 2028.
+  - **Default Filter Tahun Anggaran Controller Penetapan:** Mengikat parameter filter tahun anggaran secara konsisten ke tahun anggaran aktif (`get_tahun_anggaran()`) di method `penetapan()`, `usulan()`, dan `verifikasi()` pada controller `Ssh.php` dan `Sbu.php`.
+  - **Penanganan Status Fleksibel pada `getUsulanPenetapan`:** Memperbaiki logika query builder agar parameter status kosong (`?status=`) atau `all` menampilkan seluruh usulan sesuai tahun anggaran berkenaan tanpa memaksakan status `Diverifikasi`.
+  - **Preservasi Parameter Tahun pada View Penetapan:** Menyematkan parameter `&tahun=` pada link kartu ringkasan status serta elemen `<input type="hidden" name="tahun">` pada formulir pencarian di `penetapan_index.php`.
+
 ## [2.10.1] - 2026-10-12
 
 ### 🔧 Diperbaiki (Fixed)

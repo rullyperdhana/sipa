@@ -555,9 +555,11 @@ class Ssh_model extends CI_Model
         $this->db->join('users usr', 'usr.id = u.user_id', 'left');
         $this->db->join('users v', 'v.id = u.verifikator_id', 'left');
 
-        // Penetap hanya memproses data 'Diverifikasi'
-        if (isset($filter['status_proses']) && $filter['status_proses'] !== '') {
-            $this->db->where('u.status_proses', $filter['status_proses']);
+        // Filter status usulan (default ke 'Diverifikasi' jika tidak dispesifikasikan)
+        if (isset($filter['status_proses'])) {
+            if ($filter['status_proses'] !== '' && $filter['status_proses'] !== 'all') {
+                $this->db->where('u.status_proses', $filter['status_proses']);
+            }
         } else {
             $this->db->where('u.status_proses', 'Diverifikasi');
         }
@@ -571,7 +573,7 @@ class Ssh_model extends CI_Model
         if (!empty($filter['kategori'])) {
             $this->db->where('u.kategori', $filter['kategori']);
         }
-        if (!empty($filter['tahun'])) {
+        if (!empty($filter['tahun']) && $filter['tahun'] !== 'all') {
             $this->db->where('u.tahun_anggaran', (int) $filter['tahun']);
         }
         if (!empty($filter['q'])) {
@@ -1460,10 +1462,11 @@ class Ssh_model extends CI_Model
         return $prefix . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
     }
 
-    public function getSummaryCounts($user, $tipe = NULL)
+    public function getSummaryCounts($user, $tipe = NULL, $tahun = NULL)
     {
         $role = $user->role;
         $skpdId = (int) $user->skpd_id;
+        $thAktif = ($tahun !== NULL && $tahun !== '') ? $tahun : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : NULL);
 
         $this->db->select("
             COUNT(CASE WHEN status_proses = 'Draft' THEN 1 END) as draft,
@@ -1481,6 +1484,10 @@ class Ssh_model extends CI_Model
 
         if (!empty($tipe)) {
             $this->db->where('tipe', $tipe);
+        }
+
+        if (!empty($thAktif) && $thAktif !== 'all') {
+            $this->db->where('tahun_anggaran', (int)$thAktif);
         }
 
         return $this->db->get($this->table)->row();

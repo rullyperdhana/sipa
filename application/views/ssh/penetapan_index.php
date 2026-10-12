@@ -74,10 +74,11 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
 </div>
 
 <?php if (isset($summary)): ?>
+<?php $tahunParam = !empty($filter['tahun']) ? '&tahun=' . $filter['tahun'] : ''; ?>
 <!-- Statistik Antrean Penetapan -->
 <div class="row g-3 mb-4">
     <div class="col-md-4">
-        <a href="<?= site_url("{$prefixUrl}/penetapan?status=Diverifikasi") ?>" class="text-decoration-none">
+        <a href="<?= site_url("{$prefixUrl}/penetapan?status=Diverifikasi" . $tahunParam) ?>" class="text-decoration-none">
             <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-warning">
                 <div class="card-body p-2">
                     <small class="text-muted fw-semibold d-block text-uppercase">Menunggu Penetapan Resmi</small>
@@ -88,7 +89,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
         </a>
     </div>
     <div class="col-md-4">
-        <a href="<?= site_url("{$prefixUrl}/penetapan?status=Ditetapkan") ?>" class="text-decoration-none">
+        <a href="<?= site_url("{$prefixUrl}/penetapan?status=Ditetapkan" . $tahunParam) ?>" class="text-decoration-none">
             <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-success">
                 <div class="card-body p-2">
                     <small class="text-muted fw-semibold d-block text-uppercase">Telah Ditetapkan (SK Bupati)</small>
@@ -99,7 +100,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
         </a>
     </div>
     <div class="col-md-4">
-        <a href="<?= site_url("{$prefixUrl}/penetapan?status=") ?>" class="text-decoration-none">
+        <a href="<?= site_url("{$prefixUrl}/penetapan?status=" . $tahunParam) ?>" class="text-decoration-none">
             <div class="card border-0 shadow-sm text-center py-2 h-100 border-start border-4 border-secondary">
                 <div class="card-body p-2">
                     <small class="text-muted fw-semibold d-block text-uppercase">Total Seluruh Berkas</small>
@@ -116,6 +117,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
         <form method="get" action="<?= site_url("{$prefixUrl}/penetapan") ?>" class="row g-2 align-items-end">
+            <input type="hidden" name="tahun" value="<?= (int)($filter['tahun'] ?? $thAktif ?? 2027) ?>">
             <div class="col-md-3">
                 <label class="form-label small fw-semibold text-muted mb-1">Status Usulan</label>
                 <select class="form-select form-select-sm" name="status">
@@ -152,7 +154,7 @@ $modTitle = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
                 <button type="submit" class="btn btn-sm <?= $isSbu ? 'btn-info text-white' : 'btn-primary' ?> w-100" title="Filter">
                     <i class="bi bi-funnel"></i>
                 </button>
-                <a href="<?= site_url("{$prefixUrl}/penetapan") ?>" class="btn btn-sm btn-outline-secondary" title="Reset filter">
+                <a href="<?= site_url("{$prefixUrl}/penetapan" . (!empty($filter['tahun']) ? '?tahun=' . $filter['tahun'] : '')) ?>" class="btn btn-sm btn-outline-secondary" title="Reset filter">
                     <i class="bi bi-arrow-clockwise"></i>
                 </a>
             </div>

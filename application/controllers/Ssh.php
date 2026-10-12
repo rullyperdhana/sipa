@@ -48,7 +48,8 @@ class Ssh extends Auth_Controller
     {
         $this->_restrictRoles(['operator_skpd', 'skpd', 'admin']);
 
-        $thAktif = ($this->input->get('tahun') !== NULL) ? (int)$this->input->get('tahun', TRUE) : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027);
+        $rawTahun = $this->input->get('tahun', TRUE);
+        $thAktif = ($rawTahun !== NULL && $rawTahun !== '') ? (int)$rawTahun : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027);
 
         $filter = [
             'tipe'          => $this->tipe,
@@ -78,7 +79,7 @@ class Ssh extends Auth_Controller
             'suratList'    => $suratList,
             'summarySurat' => $summarySurat,
             'list'         => $this->ssh_model->getUsulanBySkpd($skpdId, $filter),
-            'summary'      => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
+            'summary'      => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe, $thAktif),
             'filter'       => $filter,
             'kategori'     => $this->ssh_model->getKategoriList($this->tipe),
             'skpdList'     => ($this->currentUser->role === 'admin') ? $this->master_model->getAllSkpd() : [],
@@ -760,7 +761,7 @@ class Ssh extends Auth_Controller
             'suratList'    => $this->ssh_model->getSuratVerifikasi($filter),
             'summarySurat' => $this->ssh_model->getSummaryCountsSurat($this->currentUser, $this->tipe, $thAktif),
             'list'         => $this->ssh_model->getUsulanVerifikasi($filter),
-            'summary'      => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
+            'summary'      => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe, $thAktif),
             'filter'       => $filter,
             'kategori'     => $this->ssh_model->getKategoriList($this->tipe),
             'skpdList'     => $this->master_model->getAllSkpd(),
@@ -834,12 +835,18 @@ class Ssh extends Auth_Controller
     {
         $this->_restrictRoles(['penetap', 'pimpinan', 'admin']);
 
+        $tahunFilter = $this->input->get('tahun', TRUE);
+        $thAktif = ($tahunFilter !== NULL && $tahunFilter !== '') ? (int)$tahunFilter : (function_exists('get_tahun_anggaran') ? get_tahun_anggaran() : 2027);
+
+        $rawStatus = $this->input->get('status', TRUE);
+        $statusProses = ($rawStatus !== NULL) ? $rawStatus : 'Diverifikasi';
+
         $filter = [
-            'tipe'          => 'SSH',
-            'status_proses' => $this->input->get('status', TRUE) ?: 'Diverifikasi',
+            'tipe'          => $this->tipe,
+            'status_proses' => $statusProses,
             'id_skpd'       => $this->input->get('skpd_id', TRUE),
             'kategori'      => $this->input->get('kategori', TRUE),
-            'tahun'         => $this->input->get('tahun', TRUE),
+            'tahun'         => $thAktif,
             'q'             => $this->input->get('q', TRUE)
         ];
 
@@ -849,10 +856,11 @@ class Ssh extends Auth_Controller
             'prefixUrl'   => $this->prefixUrl,
             'moduleTitle' => $this->moduleTitle,
             'list'        => $this->ssh_model->getUsulanPenetapan($filter),
-            'summary'     => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe),
+            'summary'     => $this->ssh_model->getSummaryCounts($this->currentUser, $this->tipe, $thAktif),
             'filter'      => $filter,
             'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
-            'skpdList'    => $this->master_model->getAllSkpd()
+            'skpdList'    => $this->master_model->getAllSkpd(),
+            'thAktif'     => $thAktif
         ];
 
         $this->load->view('templates/header', $data);

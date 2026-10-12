@@ -811,10 +811,7 @@ class Master extends Admin_Controller
             'tahun'      => $tahun,
             'tipe'       => $tipe,
             'stats'      => $stats,
-            'allYears'   => $allYears,
-            'serverHour' => date('H'),
-            'serverMonth'=> date('m'),
-            'serverDay'  => date('d')
+            'allYears'   => $allYears
         ];
 
         $this->load->view('templates/header', $data);
