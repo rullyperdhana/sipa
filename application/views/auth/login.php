@@ -806,7 +806,7 @@ body::before {
             <div class="text-center mt-4 text-muted small pt-2 border-top" style="font-size: 11.5px;">
                 Badan Pengelolaan Keuangan dan Aset Daerah &bull; Kabupaten Tapin
                 <div class="mt-0.5 opacity-75">
-                    SIPA v<?= $this->config->item('app_version') ?? '2.10.0' ?> &copy; <?= date('Y') ?>
+                    SIPA v<?= $this->config->item('app_version') ?? '2.10.1' ?> &copy; <?= date('Y') ?>
                 </div>
             </div>
         </div>

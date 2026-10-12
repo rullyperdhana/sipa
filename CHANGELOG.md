@@ -3,6 +3,18 @@ Semua perubahan penting pada proyek **SIPA (Sistem Informasi Pengelolaan Aset) -
 
 Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachangelog.com/id/1.0.0/) dan mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.1] - 2026-10-12
+
+### 🔧 Diperbaiki (Fixed)
+- **Penanganan Variabel Tahun Anggaran pada Verifikasi SSH & SBU ([`application/controllers/Ssh.php`](application/controllers/Ssh.php), [`application/controllers/Sbu.php`](application/controllers/Sbu.php)):**
+  - Mengatasi galat PHP `Severity: Warning --> Undefined variable $thAktif` pada pemanggilan `getSummaryCountsSurat()` di method `verifikasi()`.
+  - Inisialisasi variabel `$thAktif` terintegrasi dengan fungsi global `get_tahun_anggaran()`, mendukung query string filter `?tahun=`, dan diteruskan secara presisi ke view template.
+- **Navigasi Hash Tab & Deep Linking Halaman Dokumentasi ([`application/views/dokumentasi/index.php`](application/views/dokumentasi/index.php), [`application/controllers/Dokumentasi.php`](application/controllers/Dokumentasi.php)):**
+  - Menyempurnakan pembukaan langsung tab dokumentasi via URL hash (`http://localhost:8000/dokumentasi#panduan`) dengan mekanisme tab switcher mandiri berbasis manipulasi class DOM langsung (`active`, `fw-bold`, `show active`), menghilangkan ketergantungan sepihak pada waktu pemuatan CDN Bootstrap JS.
+  - Menambahkan multi-stage trigger: inisialisasi instan saat parse script, event `DOMContentLoaded`, `window.onload`, dan `window.onhashchange`.
+  - Menyematkan elemen jangkar fisik `<span id="panduan">`, `<span id="changelog">`, `<span id="sistem">`, dan `<span id="readme">` di setiap tab pane.
+  - Normalisasi query parameter server-side `?tab=panduan` dan `?tab=tab-panduan` pada controller `Dokumentasi.php`.
+
 ## [2.10.0] - 2026-10-12
 
 ### 🚀 Ditambahkan (Added)
