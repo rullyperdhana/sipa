@@ -86,9 +86,14 @@
 
                     <!-- Input Chat ID -->
                     <div class="mb-4">
-                        <label class="form-label fw-semibold text-dark small mb-1">
-                            <i class="bi bi-chat-square-text-fill text-info me-1"></i>Chat ID Penerima (Pribadi / Grup) <span class="text-danger">*</span>
-                        </label>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label fw-semibold text-dark small mb-0">
+                                <i class="bi bi-chat-square-text-fill text-info me-1"></i>Chat ID Penerima (Pribadi / Grup) <span class="text-danger">*</span>
+                            </label>
+                            <button type="button" class="btn btn-outline-primary py-0 px-2 fw-semibold" id="btnDetectChat" style="font-size: 0.78rem;">
+                                <i class="bi bi-radar me-1"></i>Deteksi Chat ID Otomatis
+                            </button>
+                        </div>
                         <div class="input-group">
                             <span class="input-group-text bg-light text-muted font-monospace small"><i class="bi bi-hash"></i></span>
                             <input type="text" name="telegram_chat_id" id="inputChatId" 
@@ -139,8 +144,12 @@
                     <li>
                         <strong class="text-dark">Dapatkan Chat ID Pribadi / Grup:</strong>
                         <div class="mt-1 ps-2 border-start border-2 border-primary">
-                            <div>• <strong>Pribadi:</strong> Chat ke bot <a href="https://t.me/userinfobot" target="_blank" class="fw-semibold text-decoration-none">@userinfobot</a> untuk melihat ID Anda (contoh: <code>123456789</code>). Pastikan Anda sudah klik <strong>Start</strong> di bot Anda.</div>
-                            <div class="mt-1">• <strong>Grup BKAD:</strong> Buat Grup di Telegram, undang bot Anda ke dalam grup, lalu undang <a href="https://t.me/getidsbot" target="_blank" class="fw-semibold text-decoration-none">@getidsbot</a> ke grup tersebut untuk mendapatkan ID Grup (biasanya diawali tanda minus <code>-100...</code>).</div>
+                            <div class="p-2 bg-warning-subtle text-warning-emphasis rounded small mb-2 border border-warning-subtle">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i><strong>WAJIB:</strong> Buka bot yang Anda buat di Telegram, lalu klik tombol <u>START</u> (atau kirim pesan) terlebih dahulu! Jika belum pernah klik START, Telegram akan menolak pengiriman dengan pesan <em>"Bad Request: chat not found"</em>.
+                            </div>
+                            <div>• <strong class="text-primary">Deteksi Otomatis (Termudah):</strong> Masukkan Bot Token, klik <strong>START</strong> di bot Anda, lalu klik tombol <strong>Deteksi Chat ID Otomatis</strong> di atas form. ID Anda akan otomatis terdeteksi &amp; terisi!</div>
+                            <div class="mt-1">• <strong>Pribadi (Manual):</strong> Chat ke bot <a href="https://t.me/userinfobot" target="_blank" class="fw-semibold text-decoration-none">@userinfobot</a> untuk melihat ID numerik Anda (contoh: <code>123456789</code>).</div>
+                            <div class="mt-1">• <strong>Grup BKAD:</strong> Buat Grup di Telegram, undang bot Anda ke dalam grup (sebagai anggota/admin), lalu undang <a href="https://t.me/getidsbot" target="_blank" class="fw-semibold text-decoration-none">@getidsbot</a> ke grup tersebut untuk mendapatkan ID Grup (biasanya diawali tanda minus <code>-100...</code>).</div>
                         </div>
                     </li>
                     <li>
@@ -264,15 +273,46 @@ document.addEventListener('DOMContentLoaded', function() {
                             alert('Uji Coba Berhasil! Pesan telah terkirim ke Telegram.');
                         }
                     } else {
+                        const errMsg = res.message || 'Terjadi kesalahan.';
+                        const isChatNotFound = errMsg.toLowerCase().includes('chat not found');
+
                         if (typeof Swal !== 'undefined') {
+                            let customHtml = '<div class="text-danger fw-semibold mb-2">' + errMsg + '</div>';
+                            if (isChatNotFound) {
+                                customHtml += '<div class="alert alert-warning text-start small mb-0 border-warning-subtle mt-3">' +
+                                    '<div class="fw-bold text-dark mb-1"><i class="bi bi-info-circle-fill text-warning me-1"></i>Penyebab "Chat Not Found":</div>' +
+                                    '<ol class="ps-3 mb-2 text-secondary">' +
+                                        '<li><strong>Belum klik START:</strong> Anda belum pernah membuka bot di aplikasi Telegram dan mengklik tombol <u>START</u>. Telegram melarang bot menghubungi pengguna terlebih dahulu.</li>' +
+                                        '<li><strong>Belum diundang ke grup:</strong> Jika menggunakan ID Grup, pastikan bot sudah dimasukkan/diundang ke dalam grup.</li>' +
+                                        '<li><strong>Format Chat ID:</strong> Harus berupa angka ID numerik (contoh: <code>123456789</code> atau <code>-100...</code>), bukan username (@...).</li>' +
+                                    '</ol>' +
+                                    '<div class="text-center pt-1">' +
+                                        '<button type="button" class="btn btn-sm btn-primary fw-semibold" id="btnTriggerDetectFromSwal">' +
+                                            '<i class="bi bi-radar me-1"></i>Gunakan Fitur Deteksi Chat ID Otomatis' +
+                                        '</button>' +
+                                    '</div>' +
+                                '</div>';
+                            } else {
+                                customHtml += '<small class="text-muted">Pastikan Token Bot dan Chat ID sudah benar serta bot dalam kondisi aktif.</small>';
+                            }
+
                             Swal.fire({
-                                title: 'Gagal Mengirim',
-                                html: '<span class="text-danger">' + (res.message || 'Terjadi kesalahan.') + '</span><br><br><small class="text-muted">Pastikan Token Bot dan Chat ID sudah benar serta Anda sudah mengklik <strong>Start</strong> pada bot Anda di Telegram.</small>',
+                                title: isChatNotFound ? 'Chat Tidak Ditemukan' : 'Gagal Mengirim',
+                                html: customHtml,
                                 icon: 'error',
-                                confirmButtonColor: '#dc3545'
+                                confirmButtonColor: '#dc3545',
+                                didOpen: function() {
+                                    const btnFromSwal = document.getElementById('btnTriggerDetectFromSwal');
+                                    if (btnFromSwal) {
+                                        btnFromSwal.addEventListener('click', function() {
+                                            Swal.close();
+                                            if (btnDetectChat) btnDetectChat.click();
+                                        });
+                                    }
+                                }
                             });
                         } else {
-                            alert('Gagal: ' + res.message);
+                            alert('Gagal: ' + errMsg);
                         }
                     }
                 },
@@ -283,6 +323,158 @@ document.addEventListener('DOMContentLoaded', function() {
                         Swal.fire({
                             title: 'Kesalahan Server',
                             text: 'Gagal menghubungi endpoint pengujian Telegram (' + xhr.status + ').',
+                            icon: 'error',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    } else {
+                        alert('Terjadi kesalahan menghubungi server.');
+                    }
+                }
+            });
+        });
+    }
+
+    // Tombol Deteksi Chat ID Otomatis
+    const btnDetectChat = document.getElementById('btnDetectChat');
+    if (btnDetectChat) {
+        btnDetectChat.addEventListener('click', function(e) {
+            e.preventDefault();
+            const token = inputToken ? inputToken.value.trim() : '';
+
+            if (!token) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Token Belum Diisi',
+                        text: 'Silakan masukkan Telegram Bot Token terlebih dahulu.',
+                        icon: 'warning',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                } else {
+                    alert('Silakan masukkan Telegram Bot Token terlebih dahulu.');
+                }
+                inputToken.focus();
+                return;
+            }
+
+            const originalHtml = btnDetectChat.innerHTML;
+            btnDetectChat.disabled = true;
+            btnDetectChat.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>Mendeteksi...';
+
+            const csrfTokenName = (window.appConfig && window.appConfig.csrfName) ? window.appConfig.csrfName : 'rkbmd_csrf_token';
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            const csrfHash = csrfMeta ? csrfMeta.getAttribute('content') : '<?= $this->security->get_csrf_hash() ?>';
+
+            const postData = { telegram_bot_token: token };
+            postData[csrfTokenName] = csrfHash;
+
+            $.ajax({
+                url: '<?= site_url("telegram/ajax_detect_chat") ?>',
+                type: 'POST',
+                data: postData,
+                dataType: 'json',
+                success: function(res) {
+                    btnDetectChat.disabled = false;
+                    btnDetectChat.innerHTML = originalHtml;
+
+                    if (res.csrfHash && csrfMeta) {
+                        csrfMeta.setAttribute('content', res.csrfHash);
+                    }
+
+                    if (!res.success) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                title: 'Gagal Deteksi',
+                                text: res.message || 'Token bot tidak valid.',
+                                icon: 'error',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        } else {
+                            alert(res.message);
+                        }
+                        return;
+                    }
+
+                    const botUsername = res.bot.username || '';
+                    const botName = res.bot.first_name || 'Bot SIPA';
+                    const botLink = botUsername ? 'https://t.me/' + botUsername : '#';
+
+                    if (res.chats && res.chats.length > 0) {
+                        let listHtml = '<div class="text-start small mb-3">' +
+                            '<div class="mb-2 text-muted">Bot: <strong class="text-dark">' + botName + '</strong> (<code>@' + botUsername + '</code>)</div>' +
+                            '<div class="text-secondary mb-2">Pilih Chat ID yang terdeteksi untuk dimasukkan ke form:</div>' +
+                            '<div class="list-group">';
+
+                        res.chats.forEach(function(c) {
+                            const icon = c.type === 'private' ? 'bi-person-fill text-primary' : 'bi-people-fill text-info';
+                            const badge = c.type === 'private' ? 'Pribadi' : 'Grup';
+                            listHtml += '<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center btn-select-chat-id" data-chat-id="' + c.id + '">' +
+                                '<div>' +
+                                    '<div class="fw-bold text-dark"><i class="bi ' + icon + ' me-1.5"></i>' + c.title + '</div>' +
+                                    '<div class="font-monospace text-muted small">ID: <strong>' + c.id + '</strong> (' + badge + ')</div>' +
+                                '</div>' +
+                                '<span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2">Gunakan ID Ini <i class="bi bi-arrow-right-short"></i></span>' +
+                            '</button>';
+                        });
+
+                        listHtml += '</div></div>';
+
+                        Swal.fire({
+                            title: 'Chat ID Terdeteksi! 🎯',
+                            html: listHtml,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            showCloseButton: true,
+                            didOpen: function() {
+                                const buttons = document.querySelectorAll('.btn-select-chat-id');
+                                buttons.forEach(function(b) {
+                                    b.addEventListener('click', function() {
+                                        const selectedId = this.getAttribute('data-chat-id');
+                                        const inputChat = document.getElementById('inputChatId');
+                                        if (inputChat) {
+                                            inputChat.value = selectedId;
+                                        }
+                                        Swal.fire({
+                                            title: 'Chat ID Terpasang!',
+                                            text: 'Chat ID ' + selectedId + ' berhasil dimasukkan ke form. Silakan klik tombol "Simpan Pengaturan".',
+                                            icon: 'success',
+                                            timer: 2500,
+                                            showConfirmButton: false
+                                        });
+                                    });
+                                });
+                            }
+                        });
+                    } else {
+                        // Belum ada chat masuk
+                        let emptyHtml = '<div class="text-start small mb-2">' +
+                            '<p class="mb-2">Bot <strong>' + botName + '</strong> (<code>@' + botUsername + '</code>) terhubung, tetapi <strong>belum ada pesan yang masuk</strong>.</p>' +
+                            '<div class="alert alert-info py-2 px-3 small border-info-subtle mb-3">' +
+                                '<i class="bi bi-info-circle-fill me-1"></i>Telegram melarang bot menyapa pengguna terlebih dahulu. Anda harus memulai chat secara manual.' +
+                            '</div>' +
+                            '<p class="mb-3 text-center">' +
+                                '<a href="' + botLink + '" target="_blank" class="btn btn-primary btn-sm fw-semibold shadow-sm">' +
+                                    '<i class="bi bi-telegram me-1"></i>Buka @' + botUsername + ' &amp; Klik START' +
+                                '</a>' +
+                            '</p>' +
+                            '<div class="text-muted small text-center">Setelah mengklik <strong>START</strong> (atau mengirim pesan) di Telegram, silakan klik tombol <strong>Deteksi Chat ID Otomatis</strong> ini lagi.</div>' +
+                        '</div>';
+
+                        Swal.fire({
+                            title: 'Belum Ada Pesan Masuk',
+                            html: emptyHtml,
+                            icon: 'info',
+                            confirmButtonText: 'Tutup',
+                            confirmButtonColor: '#0d6efd'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    btnDetectChat.disabled = false;
+                    btnDetectChat.innerHTML = originalHtml;
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Gagal Menghubungi Server',
+                            text: 'Gagal mendeteksi chat ID (' + xhr.status + ').',
                             icon: 'error',
                             confirmButtonColor: '#dc3545'
                         });

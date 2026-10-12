@@ -70,4 +70,50 @@ class Telegram extends Admin_Controller
 
         return $this->output->set_content_type('application/json')->set_output(json_encode($res));
     }
+
+    /**
+     * Endpoint AJAX Verifikasi Bot & Deteksi Chat ID Otomatis
+     */
+    public function ajax_detect_chat()
+    {
+        if ($this->input->method() !== 'post') {
+            return $this->output->set_status_header(405)->set_output(json_encode([
+                'success' => false, 
+                'message' => 'Method tidak diizinkan.'
+            ]));
+        }
+
+        $token = trim($this->input->post('telegram_bot_token', TRUE) ?? '');
+        if (empty($token)) {
+            return $this->output->set_content_type('application/json')->set_output(json_encode([
+                'success'  => false,
+                'message'  => 'Masukkan Telegram Bot Token terlebih dahulu.',
+                'csrfHash' => $this->security->get_csrf_hash()
+            ]));
+        }
+
+        $meRes = $this->telegram_service->getMe($token);
+        if (!$meRes['success']) {
+            return $this->output->set_content_type('application/json')->set_output(json_encode([
+                'success'  => false,
+                'message'  => 'Token Bot tidak valid: ' . $meRes['message'],
+                'csrfHash' => $this->security->get_csrf_hash()
+            ]));
+        }
+
+        $bot = $meRes['bot'];
+        $updRes = $this->telegram_service->getUpdates($token);
+
+        return $this->output->set_content_type('application/json')->set_output(json_encode([
+            'success'  => true,
+            'message'  => 'Bot berhasil diverifikasi.',
+            'bot'      => [
+                'id'         => $bot['id'] ?? '',
+                'first_name' => $bot['first_name'] ?? '',
+                'username'   => $bot['username'] ?? ''
+            ],
+            'chats'    => $updRes['chats'] ?? [],
+            'csrfHash' => $this->security->get_csrf_hash()
+        ]));
+    }
 }

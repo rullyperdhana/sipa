@@ -247,6 +247,102 @@ class Telegram_service
     }
 
     /**
+     * Mendapatkan informasi akun Bot Telegram (getMe)
+     * @param string|null $token
+     * @return array
+     */
+    public function getMe($token = null)
+    {
+        $settings = $this->getSettings();
+        $botToken = !empty($token) ? trim($token) : $settings['telegram_bot_token'];
+
+        if (empty($botToken)) {
+            return ['success' => false, 'message' => 'Token Bot Telegram belum diisi.', 'bot' => null];
+        }
+
+        $url = "https://api.telegram.org/bot{$botToken}/getMe";
+        $res = $this->postHttp($url, []);
+
+        if ($res['success'] && !empty($res['raw']['result'])) {
+            return [
+                'success' => true,
+                'message' => 'Bot valid dan terhubung.',
+                'bot'     => $res['raw']['result']
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => $res['message'] ?? 'Token bot tidak valid atau tidak dapat diakses.',
+            'bot'     => null
+        ];
+    }
+
+    /**
+     * Mengambil daftar pesan terbaru dari Telegram Bot API (getUpdates)
+     * untuk mendeteksi Chat ID (User / Grup) yang pernah mengirim pesan atau klik START
+     * 
+     * @param string|null $token
+     * @return array
+     */
+    public function getUpdates($token = null)
+    {
+        $settings = $this->getSettings();
+        $botToken = !empty($token) ? trim($token) : $settings['telegram_bot_token'];
+
+        if (empty($botToken)) {
+            return ['success' => false, 'message' => 'Token Bot Telegram belum diisi.', 'chats' => []];
+        }
+
+        $url = "https://api.telegram.org/bot{$botToken}/getUpdates";
+        $res = $this->postHttp($url, ['limit' => 50]);
+
+        if (!$res['success']) {
+            return ['success' => false, 'message' => $res['message'], 'chats' => []];
+        }
+
+        $results = $res['raw']['result'] ?? [];
+        $chats = [];
+
+        foreach ($results as $update) {
+            $msg = $update['message'] ?? $update['channel_post'] ?? $update['my_chat_member'] ?? null;
+            if (!$msg || empty($msg['chat']['id'])) {
+                continue;
+            }
+
+            $chat = $msg['chat'];
+            $cId = (string)$chat['id'];
+
+            if (!isset($chats[$cId])) {
+                $type = $chat['type'] ?? 'private';
+                $title = '';
+                if ($type === 'private') {
+                    $nameParts = array_filter([$chat['first_name'] ?? '', $chat['last_name'] ?? '']);
+                    $title = implode(' ', $nameParts) ?: ($chat['username'] ?? 'User');
+                    if (!empty($chat['username'])) {
+                        $title .= " (@{$chat['username']})";
+                    }
+                } else {
+                    $title = $chat['title'] ?? 'Group / Channel';
+                }
+
+                $chats[$cId] = [
+                    'id'    => $cId,
+                    'type'  => $type,
+                    'title' => $title,
+                    'date'  => !empty($msg['date']) ? date('d/m/Y H:i', $msg['date']) : '-'
+                ];
+            }
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Berhasil mengambil daftar chat.',
+            'chats'   => array_values($chats)
+        ];
+    }
+
+    /**
      * Eksekutor HTTP POST cURL dengan fallback ke stream_context
      */
     protected function postHttp($url, array $params)

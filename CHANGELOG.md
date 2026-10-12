@@ -18,6 +18,8 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
     - Pengaturan Switch Aktif/Nonaktif notifikasi, Token Bot API Telegram, dan Chat ID / ID Grup penerima.
     - Tombol *Toggle Visibility* untuk melihat atau menyembunyikan Bot Token.
     - Tombol interaktif **Kirim Pesan Uji Coba (Test Bot)** berbasis AJAX dan SweetAlert2 untuk memverifikasi sambungan token dan chat ID secara langsung tanpa harus menunggu kiriman usulan SKPD.
+    - Fitur **Deteksi Chat ID Otomatis** (`ajax_detect_chat` via Telegram `getUpdates` API) untuk memindai pesan masuk dan memasang Chat ID pengguna/grup ke form secara otomatis dalam satu klik.
+    - Penanganan cerdas error `Bad Request: chat not found` dengan penjelasan interaktif mengenai kewajiban mengklik tombol **START** di bot sebelum pesan dapat dikirim.
     - Dilengkapi panduan praktis 4 langkah pembuatan bot melalui `@BotFather` dan cara mendapatkan Chat ID pribadi (`@userinfobot`) maupun ID Grup Tim Verifikator (`@getidsbot`).
   - **Pemicu Otomatis pada Alur Usulan (`application/models/Ssh_model.php`):**
     - Notifikasi Telegram dipicu secara otomatis saat SKPD mengirimkan Surat Usulan SSH/SBU via `kirimSurat()`.
