@@ -92,7 +92,7 @@ Tabel referensi pengelompokan standar barang SIPD untuk pengusulan Standar Satua
 Tabel referensi ukuran dan satuan standar barang/jasa untuk modul SSH, SBU, dan RKBMD:
 - **392 Satuan Resmi Terintegrasi:** Diimpor dari berkas resmi `satuan.xlsx` memuat seluruh satuan fisik, kemasan, volume, bobot, durasi waktu kerja, dan paket kegiatan.
 - **Struktur Idempotent & Berkinerja Tinggi:** Tabel `ref_satuan` dilengkapi kunci unik (`nama_satuan`), indeks status aktif, dan Fulltext Index.
-- **Integrasi Otomatis ke Form Usulan:** Otomatis mengisi `<datalist id="listSatuan">` pada form pengusulan SSH & SBU tanpa menggantikan prioritas rekomendasi utama.
+- **Enforcement Penuh pada Form Usulan SKPD (Anti-Input Bebas):** Mengganti input teks bebas menjadi dropdown **Select2 Searchable** sehingga operator SKPD wajib memilih satuan dari tabel referensi `ref_satuan`, dilengkapi validasi sisi server (`Ssh_service.php`) dan auto-select saat memilih item katalog 2027.
 - **Manajemen Lengkap (CRUD):** Tambah, ubah, dan hapus satuan standar lengkap dengan audit logging dan validasi anti-duplikasi.
 - **Endpoint AJAX Autocomplete:** Terintegrasi di `/ajax/satuan/search`.
 

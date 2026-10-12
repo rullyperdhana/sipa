@@ -92,10 +92,27 @@ class Ssh_service
             $errors[] = 'Kategori wajib dipilih.';
         }
 
-        // Validasi Satuan
+        // Validasi Satuan (Wajib terdaftar dalam tabel referensi ref_satuan)
         $satuan = trim($postData['satuan'] ?? '');
         if (empty($satuan)) {
-            $errors[] = 'Satuan barang/jasa wajib diisi.';
+            $errors[] = 'Satuan barang/jasa standar wajib dipilih.';
+        } elseif ($this->CI->db->table_exists('ref_satuan')) {
+            $checkSatuan = $this->CI->db->where('nama_satuan', $satuan)
+                ->where('is_active', 1)
+                ->get('ref_satuan')
+                ->row();
+            if (!$checkSatuan) {
+                // Cek apakah ada kecocokan case-insensitive
+                $checkCase = $this->CI->db->where('LOWER(nama_satuan)', strtolower($satuan))
+                    ->where('is_active', 1)
+                    ->get('ref_satuan')
+                    ->row();
+                if ($checkCase) {
+                    $satuan = $checkCase->nama_satuan; // Normalisasi ke ejaan resmi
+                } else {
+                    $errors[] = "Satuan '<strong>" . htmlspecialchars($satuan) . "</strong>' tidak valid atau tidak terdaftar dalam referensi satuan standar.";
+                }
+            }
         }
 
         // Validasi Harga Usulan (Tidak boleh kosong, tidak boleh minus/nol)

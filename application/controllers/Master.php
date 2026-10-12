@@ -144,7 +144,8 @@ class Master extends Admin_Controller
             'perPage'    => $perPage,
             'offset'     => $offset,
             'totalRows'  => $totalRows,
-            'totalPages' => $totalPages
+            'totalPages' => $totalPages,
+            'satuanList' => $this->satuan_model->getAllActiveNames()
         ];
 
         $this->load->view('templates/header', $data);

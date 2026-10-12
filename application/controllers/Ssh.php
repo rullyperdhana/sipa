@@ -562,7 +562,7 @@ class Ssh extends Auth_Controller
             'suratInduk'  => $suratInduk,
             'suratId'     => $suratId,
             'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
-            'satuan'      => $this->ssh_model->getSatuanSsh(),
+            'satuan'      => $this->ssh_model->getSatuanList('SSH'),
             'masterItem'  => $masterItem,
             'jadwalAktif' => $jadwalAktif
         ];
@@ -670,7 +670,7 @@ class Ssh extends Auth_Controller
             'suratInduk'  => $suratInduk,
             'suratId'     => $item->surat_id,
             'kategori'    => $this->ssh_model->getKategoriList($this->tipe),
-            'satuan'      => $this->ssh_model->getSatuanSsh()
+            'satuan'      => $this->ssh_model->getSatuanList('SSH')
         ];
 
         $this->load->view('templates/header', $data);

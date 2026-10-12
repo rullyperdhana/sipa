@@ -298,17 +298,27 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                         <!-- Satuan -->
                         <div class="col-md-6">
                             <label for="satuan" class="form-label fw-semibold">
-                                Satuan <?= $isSbu ? '(Waktu / Orang / Kegiatan)' : '(Unit / Fisik)' ?> <span class="text-danger">*</span>
+                                Satuan Standar <?= $isSbu ? '(Waktu / Orang / Kegiatan)' : '(Unit / Fisik)' ?> <span class="text-danger">*</span>
                             </label>
-                            <input list="listSatuan" class="form-control" id="satuan" name="satuan" 
-                                   value="<?= $isEdit ? e($item->satuan) : ($isSbu ? 'Orang/Bulan (OB)' : 'Unit') ?>" 
-                                   placeholder="Pilih atau ketik satuan..." required>
-                            <datalist id="listSatuan">
-                                <?php foreach ($satuan as $sat): ?>
-                                <option value="<?= e($sat) ?>">
+                            <select class="form-select select2-satuan" id="satuan" name="satuan" required>
+                                <option value="">-- Pilih Satuan Standar --</option>
+                                <?php 
+                                $selectedSatuan = $isEdit ? ($item->satuan ?? '') : (!empty($masterItem) ? ($masterItem->satuan ?? '') : '');
+                                $foundInList = false;
+                                foreach ($satuan as $sat): 
+                                    $isSelected = (strcasecmp($selectedSatuan, $sat) === 0);
+                                    if ($isSelected) $foundInList = true;
+                                ?>
+                                <option value="<?= e($sat) ?>" <?= $isSelected ? 'selected' : '' ?>><?= e($sat) ?></option>
                                 <?php endforeach; ?>
-                            </datalist>
-                            <div class="invalid-feedback">Satuan wajib diisi.</div>
+                                <?php if ($isEdit && !empty($selectedSatuan) && !$foundInList): ?>
+                                <option value="<?= e($selectedSatuan) ?>" selected><?= e($selectedSatuan) ?> (Eksisting)</option>
+                                <?php endif; ?>
+                            </select>
+                            <div class="form-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>Pilih satuan resmi dari tabel referensi standar untuk menghindari perbedaan satuan.
+                            </div>
+                            <div class="invalid-feedback">Satuan standar wajib dipilih.</div>
                         </div>
 
                         <!-- Harga Usulan -->
@@ -680,7 +690,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
             document.getElementById('uraian').value = data.uraian || '';
             document.getElementById('spesifikasi').value = data.spesifikasi || '';
-            document.getElementById('satuan').value = data.satuan || '';
+
+            // Set Satuan Standar ke Dropdown Referensi
+            if (data.satuan) {
+                const $selectSatuan = $('#satuan');
+                let foundSatuan = null;
+                $selectSatuan.find('option').each(function() {
+                    if ($(this).val().toLowerCase() === data.satuan.toLowerCase()) {
+                        foundSatuan = $(this).val();
+                        return false;
+                    }
+                });
+                if (foundSatuan) {
+                    $selectSatuan.val(foundSatuan).trigger('change');
+                } else {
+                    const newSatOpt = new Option(data.satuan, data.satuan, true, true);
+                    $selectSatuan.append(newSatOpt).trigger('change');
+                }
+            }
 
             // Set kategori jika ada di opsi
             const selectKat = document.getElementById('kategori');
@@ -720,6 +747,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     ? '<i class="bi bi-journal-text me-1"></i>Rekening SIPD: <strong>' + data.kode_rekening + '</strong> &bull; ' + (data.nama_rekening || '') 
                     : '';
             }
+        });
+    }
+
+    // Inisialisasi Select2 untuk Satuan Standar (Mencegah input teks bebas)
+    if (typeof jQuery !== 'undefined' && $('#satuan').length) {
+        $('#satuan').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Cari & Pilih Satuan Standar --',
+            allowClear: false,
+            width: '100%'
         });
     }
 

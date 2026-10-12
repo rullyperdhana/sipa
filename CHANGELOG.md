@@ -18,7 +18,12 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
     - Paginasi pintar berbasis sliding window.
     - Modal interaktif Tambah dan Edit Satuan dengan validasi keunikan nama di sisi backend dan pencatatan audit log.
     - Modal konfirmasi hapus aman.
-  - **Integrasi Otomatis ke Form Usulan SSH & SBU (`Ssh_model.php`):** Method `getSatuanSsh()` dan `getSatuanSbu()` otomatis memuat 392 satuan standar dari tabel `ref_satuan` ke dalam `<datalist id="listSatuan">` pada formulir pengusulan harga tanpa menggeser posisi rekomendasi satuan utama.
+  - **Integrasi Penuh Form Usulan SKPD (Anti-Variasi Bebas Satuan):**
+    - Mengganti model input teks bebas (`<input list="listSatuan">`) menjadi elemen `<select>` berbasis **Select2 Searchable Dropdown** di [`usulan_form.php`](application/views/ssh/usulan_form.php), sehingga operator SKPD **wajib memilih dari tabel referensi `ref_satuan`** dan tidak dapat lagi mengetik sembarang variasi ejaan satuan.
+    - Dilengkapi pencarian cepat (searchable) dari 392 satuan standar dengan opsi yang paling sering digunakan diposisikan di urutan atas.
+    - Sinkronisasi otomatis satuan saat operator memilih barang/jasa dari Katalog Master 2027.
+    - Validasi sisi server pada [`Ssh_service.php`](application/libraries/Ssh_service.php) yang menolak satuan tidak terdaftar dan secara otomatis menormalisasi ejaan huruf kapital ke format resmi.
+  - **Standardisasi Master Data Barang BMD (`master/barang.php`):** Modal tambah/edit barang kini juga menggunakan dropdown satuan terintegrasi `ref_satuan`.
   - **Integrasi Navigasi Sidebar (`templates/header.php`):** Menambahkan menu navigasi *"Satuan Standar"* pada kelompok menu **Master Data** untuk pengguna dengan hak akses Administrator.
 
 ---

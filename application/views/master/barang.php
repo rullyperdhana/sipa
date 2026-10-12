@@ -359,8 +359,18 @@ $offset = $offset ?? (($page - 1) * $perPage);
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
-                            <label for="satuan_barang" class="form-label fw-semibold">Satuan <span class="text-danger">*</span></label>
-                            <input type="text" name="satuan" id="satuan_barang" class="form-control" required maxlength="30" value="Unit" placeholder="Unit, M2, Buah, Set...">
+                            <label for="satuan_barang" class="form-label fw-semibold">Satuan Standar <span class="text-danger">*</span></label>
+                            <select name="satuan" id="satuan_barang" class="form-select" required>
+                                <option value="">-- Pilih Satuan --</option>
+                                <?php if (!empty($satuanList)): foreach ($satuanList as $sat): ?>
+                                <option value="<?= e($sat) ?>"><?= e($sat) ?></option>
+                                <?php endforeach; else: ?>
+                                <option value="Unit" selected>Unit</option>
+                                <option value="Buah">Buah</option>
+                                <option value="Set">Set</option>
+                                <option value="M2">M2</option>
+                                <?php endif; ?>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label for="harga_standar_b" class="form-label fw-semibold">Harga Standar (Rp)</label>
@@ -481,7 +491,14 @@ function openEditModal(item) {
     document.getElementById('barang_id').value = item.id;
     document.getElementById('kode_barang').value = item.kode_barang;
     document.getElementById('nama_barang').value = item.nama_barang;
-    document.getElementById('satuan_barang').value = item.satuan || 'Unit';
+    const satSelect = document.getElementById('satuan_barang');
+    if (satSelect) {
+        satSelect.value = item.satuan || 'Unit';
+        if (item.satuan && satSelect.value !== item.satuan) {
+            satSelect.add(new Option(item.satuan, item.satuan, true, true));
+            satSelect.value = item.satuan;
+        }
+    }
     document.getElementById('kategori_barang').value = item.kategori || 'Peralatan dan Mesin';
     document.getElementById('harga_standar_b').value = item.harga_standar || 0;
     document.getElementById('ket_barang').value = item.keterangan || '';
