@@ -3,6 +3,23 @@ Semua perubahan penting pada proyek **SIPA (Sistem Informasi Pengelolaan Aset) -
 
 Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachangelog.com/id/1.0.0/) dan mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.7] - 2026-10-12
+
+### 🚀 Ditambahkan (Added)
+- **Tabel & Modul Referensi Master Kode Barang SIPD (`ref_kode_barang_sipd`):**
+  - **Dataset Resmi Terintegrasi (3.646 Baris Data Bersih):** Diimpor langsung dari sumber berkas resmi `KODE BARANG SIPD.xlsx`, terdiri atas **613 item kelompok SSH** (Standar Satuan Harga) dan **3.033 item kelompok SBU** (Standar Biaya Umum) tanpa duplikasi kode.
+  - **Skema Basis Data Modular & Idempotent (`database/migrations/create_ref_kode_barang_sipd.sql`):** Tabel `ref_kode_barang_sipd` dilengkapi indeks kunci unik (`kode_barang`), indeks kelompok & status aktif, serta Fulltext Index (`kode_barang`, `uraian`) untuk pencarian cepat. Batch insert 500 rows per blok menggunakan klausa `ON DUPLICATE KEY UPDATE` sehingga aman dieksekusi berulang kali baik di localhost maupun server produksi VPS.
+  - **Model CodeIgniter 3 Mandiri (`Kode_barang_sipd_model.php`):** Menyediakan fungsionalitas query filter (`getKodeBarang`), hitung data (`countKodeBarang`), kartu statistik KPI makro (`getStatistik`), live search autocomplete (`searchSelect2`), pencarian berdasarkan ID/Kode, dan operasi penyimpanan/penghapusan (`save`, `delete`).
+  - **Endpoint AJAX Terproteksi (`/ajax/kode_barang_sipd/search`):** Endpoint JSON berkecepatan tinggi untuk integrasi dropdown Select2 dengan dukungan filter kata kunci `q`, parameter kelompok `SSH|SBU`, dan pembatas `limit`.
+  - **Halaman Manajemen Master Data (`/master/kode_barang_sipd`):**
+    - 3 Kartu KPI: Total Kode Barang (3.646), Kelompok SSH (613), dan Kelompok SBU (3.033).
+    - Bilah pencarian cepat teks, filter kelompok, dan selektor kuota data per halaman (25, 50, 100 data).
+    - Tabel responsif lengkap dengan badge format kode, label warna kelompok (Hijau untuk SSH, Cyan untuk SBU), dan indikator status aktif.
+    - Paginasi pintar berbasis sliding window.
+    - Modal interaktif Tambah dan Edit data dengan validasi duplikasi kode di sisi server serta pencatatan audit log aktivitas.
+    - Modal konfirmasi hapus aman.
+  - **Integrasi Navigasi Sidebar (`templates/header.php`):** Menambahkan menu navigasi *"Kode Barang SIPD"* pada kelompok menu **Master Data** untuk pengguna dengan hak akses Administrator.
+
 ---
 
 ## [2.9.6] - 2026-10-12

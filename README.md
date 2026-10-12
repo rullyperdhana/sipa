@@ -1,7 +1,7 @@
 # SIPA - Sistem Informasi Pengelolaan Aset
 ### Pemerintah Kabupaten Tapin &bull; BKAD
 
-[![Version](https://img.shields.io/badge/version-2.9.4-blue.svg)](application/config/config.php)
+[![Version](https://img.shields.io/badge/version-2.9.7-blue.svg)](application/config/config.php)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Framework](https://img.shields.io/badge/Framework-CodeIgniter%203-EF4444.svg?logo=codeigniter&logoColor=white)](https://codeigniter.com/)
 [![Database](https://img.shields.io/badge/Database-MySQL%208.0%20%7C%20MariaDB-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -80,7 +80,15 @@ Referensi kodefikasi rekening belanja terintegrasi SIPD RI:
 - **Indikator Kesiapan Usulan:** Badge khusus akun yang berstatus *Siap Dianggarkan* (Sub Rincian Objek).
 - **Pencarian Cepat:** Dilengkapi B-Tree Index dan Fulltext Search.
 
-### 8. Modul Master Data Barang BMD (Kinerja Tinggi)
+### 8. Modul Master Referensi Kode Barang SIPD
+Tabel referensi pengelompokan standar barang SIPD untuk pengusulan Standar Satuan Harga (SSH) dan Standar Biaya Umum (SBU):
+- **3.646 Data Resmi Terintegrasi:** Memuat **613 item kelompok SSH** dan **3.033 item kelompok SBU** dari file resmi `KODE BARANG SIPD.xlsx`.
+- **Struktur Idempotent & Berkinerja Tinggi:** Tabel `ref_kode_barang_sipd` dilengkapi indeks kunci unik (`kode_barang`), indeks kelompok & status aktif, serta Fulltext Index (`kode_barang`, `uraian`) untuk pencarian kilat.
+- **Server-Side Pagination & Live Search:** Menampilkan ribuan data dengan konsumsi memori rendah, filter kelompok (SSH / SBU), dan filter pencarian teks.
+- **Manajemen Lengkap (CRUD):** Tambah, ubah, dan hapus kode barang dengan validasi anti-duplikasi di backend dan audit logging.
+- **Endpoint AJAX Select2:** Terintegrasi di `/ajax/kode_barang_sipd/search` untuk mempermudah pemilihan kode barang pada dropdown form usulan standar harga.
+
+### 9. Modul Master Data Barang BMD (Kinerja Tinggi)
 Katalog standarisasi kodefikasi barang daerah Kabupaten Tapin:
 - **Kapasitas Besar:** Mengelola **13.367 barang terdaftar**.
 - **Server-Side Pagination:** Menggunakan `LIMIT` dan `OFFSET` presisi sehingga respon halaman selalu instan (**< 50ms**) dan konsumsi RAM server **< 1 MB** (menghemat 99% memori dibandingkan client-side rendering).
@@ -366,13 +374,16 @@ sipa/
 
    # Migrasi v2.9.6 (Konfigurasi Auto-Logout Pengguna Saat Idle pada ex_settings)
    mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/add_idle_timeout_settings.sql
+
+   # Migrasi v2.9.7 (Tabel Referensi Kode Barang SIPD 3.646 data SSH & SBU)
+   mysql -u sql_sipa_bkadtapinkab_online -p sql_sipa_bkadtapinkab_online < database/migrations/create_ref_kode_barang_sipd.sql
    ```
    *(Masukkan password database VPS saat diminta).*
 
    > [!TIP]
    > Alternatif eksekusi migrasi otomatis tanpa password MySQL root VPS:
    > ```bash
-   > php -r 'define("BASEPATH",true);define("ENVIRONMENT","production");require "application/config/database.php";$cfg=$db["default"];$pdo=new PDO("mysql:host=".($cfg["hostname"]??"localhost").";port=".($cfg["port"]??3306).";dbname=".$cfg["database"],$cfg["username"],$cfg["password"]);$pdo->exec(file_get_contents("database/migrations/add_idle_timeout_settings.sql"));echo "Migrasi Berhasil!\n";'
+   > php -r 'define("BASEPATH",true);define("ENVIRONMENT","production");require "application/config/database.php";$cfg=$db["default"];$pdo=new PDO("mysql:host=".($cfg["hostname"]??"localhost").";port=".($cfg["port"]??3306).";dbname=".$cfg["database"],$cfg["username"],$cfg["password"]);$pdo->exec(file_get_contents("database/migrations/create_ref_kode_barang_sipd.sql"));echo "Migrasi Berhasil!\n";'
    > ```
 
 ---
@@ -381,6 +392,7 @@ sipa/
 
 | File Migrasi | Deskripsi & Tujuan |
 | :--- | :--- |
+| [`create_ref_kode_barang_sipd.sql`](database/migrations/create_ref_kode_barang_sipd.sql) | Membuat tabel `ref_kode_barang_sipd` lengkap dengan indeks unik, indeks kelompok & status aktif, Fulltext Index, dan 3.646 data kode kelompok barang SIPD (613 SSH & 3.033 SBU) idempotent. |
 | [`add_idle_timeout_settings.sql`](database/migrations/add_idle_timeout_settings.sql) | Menambahkan konfigurasi bawaan auto-logout pengguna saat tidak aktif (`idle_timeout_enabled`, `idle_timeout_minutes`, `idle_warning_seconds`) pada tabel `ex_settings`. |
 | [`create_standar_harga_surat_and_link_usulan.sql`](database/migrations/create_standar_harga_surat_and_link_usulan.sql) | Membuat tabel `standar_harga_surat` untuk menampung surat dinas pengantar resmi (upload scan PDF bertanda tangan Kepala SKPD) dan relasi `surat_id` pada tabel `standar_harga_usulan`. |
 | [`add_ditolak_status_to_ssh_sbu.sql`](database/migrations/add_ditolak_status_to_ssh_sbu.sql) | Menambahkan status `Ditolak` pada enum `status_proses` tabel `standar_harga_usulan` untuk modul SSH dan SBU. |
@@ -418,6 +430,12 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
   GET /ajax/barang/search?q={keyword}
   ```
   *Response:* `{"results": [{"id": 1, "text": "1.3.2... - Laptop", "kode": "1.3.2...", "nama": "Laptop", "satuan": "Unit", "harga": 0}]}`
+
+- **Pencarian Master Kode Barang SIPD (SSH & SBU):**
+  ```http
+  GET /ajax/kode_barang_sipd/search?q={keyword}&kelompok={SSH|SBU}&limit={30}
+  ```
+  *Response:* `{"results": [{"id": "1.1.12.01.03.0006", "text": "1.1.12.01.03.0006 - Bahan Komputer [SSH]", "kode": "1.1.12.01.03.0006", "uraian": "Bahan Komputer", "kelompok": "SSH"}]}`
 
 - **Pencarian Cerdas Akun Belanja SIPD RI (Berdasarkan Nama atau Kode):**
   ```http
@@ -476,6 +494,7 @@ Aplikasi menyediakan endpoint JSON terproteksi sesi untuk integrasi Select2 dan 
 
 Lihat rincian lengkap riwayat pembaruan sistem di file [CHANGELOG.md](CHANGELOG.md).
 
+- **v2.9.7 (2026-10-12):** Modul Master Referensi Kode Barang SIPD (`ref_kode_barang_sipd`) - Integrasi 3.646 data resmi kode kelompok barang SIPD (613 SSH & 3.033 SBU) dari file `KODE BARANG SIPD.xlsx`, skrip migrasi idempotent (`create_ref_kode_barang_sipd.sql`), model mandiri `Kode_barang_sipd_model`, endpoint AJAX Select2 autocomplete (`/ajax/kode_barang_sipd/search`), antarmuka manajemen master data `/master/kode_barang_sipd` lengkap dengan kartu KPI, filter kelompok, sliding window pagination, modal CRUD, dan menu navigasi sidebar.
 - **v2.9.6 (2026-10-12):** Fitur Auto-Logout Otomatis Pengguna saat Idle (Inactivity Auto-Logout System) - Pelacak aktivitas mouse, keyboard, touch, dan scroll dengan *throttling* performa, Sinkronisasi Multi-Tab Peramban via `localStorage` dan Storage Event, Dialog Peringatan Hitung Mundur Interaktif (SweetAlert2 Countdown Modal) dengan opsi *"Tetap Masuk"* (AJAX Heartbeat Ping) atau *"Logout Sekarang"*, Proteksi Ganda Sisi Server (`Auth.php`), Penanganan Otomatis Background Polling (`X-Background-Poll: 1`) & Jeda Polling saat idle > 2 menit, Global AJAX 401 Error Handler, Pengaturan Administrator Fleksibel di Master Data User, dan Migrasi Konfigurasi Database `add_idle_timeout_settings.sql`.
 - **v2.9.5 (2026-10-11):** Pembaruan Menyeluruh Fitur Cetak Katalog Master Data Standar Harga (SSH & SBU) - Lembar Dokumen Resmi Kedinasan (`cetak_master`) lengkap dengan Kop Surat Pemkab Tapin & BKAD, Judul Resmi, Ringkasan Parameter Filter, Tabel Landscape Berulang (*repeating thead*), dan Blok Tanda Tangan Kepala BKAD. Menu Dropdown Cetak Fleksibel (*Cetak Halaman Ini*, *Cetak 250 Data*, *Cetak 500 Data*, *Cetak Tampilan Web*), Toolbar Layar Interaktif (`.no-print-toolbar`), dan Global CSS Media Print (`@media print`) Anti-Sidebar/Navbar.
 - **v2.9.4 (2026-10-11):** Perbaikan Menyeluruh & Optimalisasi Fitur Notifikasi Aplikasi (In-App Notification System) - Autoload global `notifikasi_model`, helper notifikasi (`create`, `sendToRoles`, `sendToSkpd`), format waktu relatif (*"Baru saja"*, *"5 mnt lalu"*, *"2 jam lalu"*, *"Kemarin"*), normalisasi URL notifikasi anti-domain lama, tombol 1-klik "Tandai Semua Dibaca" (*Mark All as Read*), sinkronisasi CSRF token otomatis, integrasi alur SSH & SBU, registrasi & aktivasi akun, serta penanganan respon AJAX 401/403 JSON saat sesi berakhir.

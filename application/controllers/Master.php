@@ -6,7 +6,7 @@ class Master extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(['master_model', 'user_model', 'akun_model']);
+        $this->load->model(['master_model', 'user_model', 'akun_model', 'kode_barang_sipd_model']);
     }
 
     // ==================== SKPD ====================
@@ -561,4 +561,91 @@ class Master extends Admin_Controller
             }
         }
     }
+
+    // ==================== KODE BARANG SIPD ====================
+    public function kode_barang_sipd()
+    {
+        $action = $this->input->post('action', TRUE);
+        if ($this->input->method() === 'post' && $action) {
+            $this->_handleKodeBarangSipd($action);
+            redirect('master/kode_barang_sipd');
+        }
+
+        $filter = [];
+        if ($q = trim($this->input->get('q', TRUE) ?? '')) $filter['q'] = $q;
+        if ($kel = trim($this->input->get('kelompok', TRUE) ?? '')) $filter['kelompok'] = $kel;
+
+        $page = max(1, (int) $this->input->get('page'));
+        $perPage = (int) ($this->input->get('per_page') ?: 25);
+        if (!in_array($perPage, [25, 50, 100])) $perPage = 25;
+        $offset = ($page - 1) * $perPage;
+
+        $totalRows = $this->kode_barang_sipd_model->countKodeBarang($filter);
+        $list = $this->kode_barang_sipd_model->getKodeBarang($filter, $perPage, $offset);
+        $stats = $this->kode_barang_sipd_model->getStatistik();
+        $totalPages = ceil($totalRows / $perPage);
+
+        $data = [
+            'title'      => 'Master Data Kode Barang SIPD',
+            'list'       => $list,
+            'filter'     => $filter,
+            'stats'      => $stats,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'offset'     => $offset,
+            'totalRows'  => $totalRows,
+            'totalPages' => $totalPages
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('master/kode_barang_sipd', $data);
+        $this->load->view('templates/footer');
+    }
+
+    private function _handleKodeBarangSipd($action)
+    {
+        if ($action === 'save') {
+            $this->form_validation->set_rules('kode_barang', 'Kode Barang', 'required|max_length[50]');
+            $this->form_validation->set_rules('uraian', 'Uraian', 'required|max_length[255]');
+            $this->form_validation->set_rules('kelompok', 'Kelompok', 'required|in_list[SSH,SBU]');
+            if ($this->form_validation->run() === FALSE) {
+                $this->session->set_flashdata('danger', validation_errors());
+                return;
+            }
+
+            $id = (int) $this->input->post('id');
+            $kode = trim($this->input->post('kode_barang', TRUE));
+
+            // Cek duplikasi kode_barang
+            $check = $this->db->where('kode_barang', $kode);
+            if ($id) {
+                $check->where('id !=', $id);
+            }
+            $existing = $check->get('ref_kode_barang_sipd')->row();
+            if ($existing) {
+                $this->session->set_flashdata('danger', "Kode barang '<strong>" . htmlspecialchars($kode) . "</strong>' sudah digunakan oleh: \"<strong>" . htmlspecialchars($existing->uraian) . "</strong>\" (ID #{$existing->id}).");
+                return;
+            }
+
+            $data = [
+                'kode_barang' => $kode,
+                'uraian'      => trim($this->input->post('uraian', TRUE)),
+                'kelompok'    => strtoupper($this->input->post('kelompok', TRUE)),
+                'is_active'   => (int) $this->input->post('is_active')
+            ];
+
+            $this->kode_barang_sipd_model->save($data, $id ?: NULL);
+            $this->logger->record($id ? 'update' : 'create', 'kode_barang_sipd', "Kode Barang SIPD: {$data['kode_barang']} - {$data['uraian']} ({$data['kelompok']})");
+            $this->session->set_flashdata('success', 'Data Kode Barang SIPD berhasil disimpan.');
+        } elseif ($action === 'delete') {
+            $id = (int) $this->input->post('id');
+            $item = $this->kode_barang_sipd_model->findById($id);
+            if ($item) {
+                $this->kode_barang_sipd_model->delete($id);
+                $this->logger->record('delete', 'kode_barang_sipd', "Hapus Kode Barang SIPD: {$item->kode_barang} - {$item->uraian}");
+                $this->session->set_flashdata('success', 'Kode Barang SIPD berhasil dihapus.');
+            }
+        }
+    }
 }
+

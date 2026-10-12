@@ -81,6 +81,19 @@ class Ajax extends Auth_Controller
         return $this->output->set_output(json_encode(['item' => $item]));
     }
 
+    public function search_kode_barang_sipd()
+    {
+        $this->load->model('kode_barang_sipd_model');
+        $q = $this->input->get('q', TRUE);
+        $kelompok = $this->input->get('kelompok', TRUE);
+        $limit = (int) ($this->input->get('limit') ?: 30);
+
+        $results = $this->kode_barang_sipd_model->searchSelect2($q, $kelompok, $limit);
+
+        $this->output->set_content_type('application/json')
+            ->set_output(json_encode(['results' => $results]));
+    }
+
     public function notifikasi()
     {
         if (!$this->currentUser) {
