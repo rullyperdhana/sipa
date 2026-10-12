@@ -160,7 +160,21 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                                 <i class="bi bi-x-circle me-1"></i>Lepas Acuan
                             </button>
                             <?php endif; ?>
+                        </div>
                     </div>
+
+                    <!-- Banner Mode Input Item Baru -->
+                    <?php if (!$isEdit): ?>
+                    <div id="cardNoticeItemBaru" class="alert alert-info border-info d-none mb-4 shadow-sm">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-plus-circle-fill fs-5 text-info flex-shrink-0"></i>
+                            <div>
+                                <strong class="text-dark">Mode Input Item Baru (Non-Master):</strong>
+                                <span class="text-muted small d-block">Item usulan ini belum terdaftar di Katalog Master 2027. Silakan pilih <strong>Kode Barang SIPD</strong> resmi, tentukan kategori, spesifikasi teknis, satuan standar, dan rekening belanja SIPD secara mandiri.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
 
                     <!-- Pilihan Kode Barang SIPD RI (Standar Referensi SIPD) -->
                     <?php 
@@ -618,27 +632,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const modeManual = document.getElementById('modeManual');
     const secSearch = document.getElementById('sectionSearchMaster');
     const cardAcuan = document.getElementById('cardAcuanMaster');
+    const cardNoticeBaru = document.getElementById('cardNoticeItemBaru');
     const btnReset = document.getElementById('btnResetMaster');
 
     if (modeMaster && modeManual && secSearch) {
         modeMaster.addEventListener('change', function() {
             if (this.checked) {
                 secSearch.classList.remove('d-none');
+                if (cardNoticeBaru) cardNoticeBaru.classList.add('d-none');
             }
         });
         modeManual.addEventListener('change', function() {
             if (this.checked) {
                 secSearch.classList.add('d-none');
-                resetMasterAcuan();
+                if (cardNoticeBaru) cardNoticeBaru.classList.remove('d-none');
+                resetMasterAcuan(true);
             }
         });
     }
 
     if (btnReset) {
         btnReset.addEventListener('click', function() {
-            resetMasterAcuan();
+            resetMasterAcuan(true);
             if ($('#selectMasterStandar').length) {
                 $('#selectMasterStandar').val(null).trigger('change');
+            }
+            if (modeManual) {
+                modeManual.checked = true;
+                if (secSearch) secSearch.classList.add('d-none');
+                if (cardNoticeBaru) cardNoticeBaru.classList.remove('d-none');
             }
         });
     }
@@ -672,7 +694,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function resetMasterAcuan() {
+    function resetMasterAcuan(clearFields = false) {
         document.getElementById('master_standar_id').value = '';
         document.getElementById('harga_acuan_master').value = '';
         if ($('#kode_kelompok').length) {
@@ -680,6 +702,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (cardAcuan) cardAcuan.classList.add('d-none');
         clearRekeningBelanja();
+        if (clearFields) {
+            const inpUraian = document.getElementById('uraian');
+            const inpSpek = document.getElementById('spesifikasi');
+            const inpHarga = document.getElementById('harga_usulan');
+            if (inpUraian) inpUraian.value = '';
+            if (inpSpek) inpSpek.value = '';
+            if (inpHarga) inpHarga.value = '';
+            if ($('#satuan').length) $('#satuan').val(null).trigger('change');
+            const lblHargaSelisih = document.getElementById('lblHargaSelisih');
+            if (lblHargaSelisih) lblHargaSelisih.classList.add('d-none');
+        }
     }
 
     // Toggle Manual Rekening Input
@@ -876,6 +909,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('lblRekeningAcuan').innerHTML = data.kode_rekening 
                     ? '<i class="bi bi-journal-text me-1"></i>Rekening SIPD: <strong>' + data.kode_rekening + '</strong> &bull; ' + (data.nama_rekening || '') 
                     : '';
+            }
+            if (cardNoticeBaru) {
+                cardNoticeBaru.classList.add('d-none');
+            }
+            if (modeMaster) {
+                modeMaster.checked = true;
             }
         });
     }

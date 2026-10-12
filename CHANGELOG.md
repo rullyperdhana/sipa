@@ -33,6 +33,12 @@ Format changelog ini mengacu pada prinsip [Keep a Changelog](https://keepachange
 - **Pembaruan Tampilan Halaman Rincian Usulan ([`detail.php`](application/views/ssh/detail.php)):**
   - Menampilkan badge Kode Barang SIPD, rincian multi-rekening belanja, persentase TKDN, harga zona, dan keterangan SIPD.
 
+### 🐛 Perbaikan (Fixed)
+- **Perbaikan Mode Input Item Baru pada Form Usulan SSH & SBU ([`usulan_form.php`](application/views/ssh/usulan_form.php)):**
+  - Memperbaiki tag div penutup pada kartu acuan master (`#cardAcuanMaster`) yang sebelumnya tidak tertutup sempurna sehingga meng-engulf seluruh input form di bawahnya dengan kelas `d-none` saat mode manual dipilih.
+  - Menambahkan banner informatif *"Mode Input Item Baru (Non-Master)"* yang aktif ketika memilih opsi *"Input Item Baru (Item belum ada di Master)"*.
+  - Mengoptimalkan peralihan mode radio button untuk menyembunyikan pencarian katalog master dan membuka penuh seluruh input Kode Barang SIPD, Kategori, Rekening Belanja, Uraian, Spesifikasi, Satuan, dan Harga Usulan.
+
 ---
 
 ## [2.9.8] - 2026-10-12
