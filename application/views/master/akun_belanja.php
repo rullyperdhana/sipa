@@ -13,7 +13,19 @@ $offset = $offset ?? (($page - 1) * $perPage);
                 Tabel referensi kode rekening belanja daerah (Permendagri 90 & Kepmendagri 050) terintegrasi SIPD RI.
             </p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <?php if (($allow_manual_rekening ?? '1') === '1'): ?>
+                <span class="badge bg-warning-subtle text-dark border border-warning py-2 px-3 d-none d-md-inline-block" title="Operator SKPD diizinkan menginput kode rekening manual">
+                    <i class="bi bi-pencil-square text-warning me-1"></i>Input Manual Rekening: Aktif
+                </span>
+            <?php else: ?>
+                <span class="badge bg-success-subtle text-success border border-success py-2 px-3 d-none d-md-inline-block" title="Operator SKPD hanya dapat memilih dari katalog resmi SIPD">
+                    <i class="bi bi-shield-check text-success me-1"></i>Input Manual Rekening: Dinonaktifkan
+                </span>
+            <?php endif; ?>
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalManualRekeningSettings">
+                <i class="bi bi-sliders me-1"></i>Pengaturan Input Manual
+            </button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAkun" onclick="openAddModal()">
                 <i class="bi bi-plus-lg me-1"></i>Tambah Akun Belanja
             </button>
@@ -392,6 +404,59 @@ $offset = $offset ?? (($page - 1) * $perPage);
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-danger fw-semibold">
                         <i class="bi bi-trash-fill me-1"></i>Ya, Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pengaturan Input Manual Rekening SIPD -->
+<div class="modal fade" id="modalManualRekeningSettings" tabindex="-1" aria-labelledby="modalManualRekeningSettingsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form method="post" action="<?= site_url('master/akun_belanja') ?>">
+                <?= csrf_input() ?>
+                <input type="hidden" name="action" value="save_setting_manual">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="modalManualRekeningSettingsLabel">
+                        <i class="bi bi-sliders text-primary me-2"></i>Pengaturan Input Manual Rekening SIPD
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-secondary small mb-3">
+                        Tentukan apakah Operator SKPD diizinkan mengetik atau mengedit kode rekening belanja secara manual pada formulir usulan SSH & SBU, atau diwajibkan hanya memilih dari daftar referensi resmi SIPD RI.
+                    </p>
+
+                    <div class="card p-3 mb-3 border <?= (($allow_manual_rekening ?? '1') === '1') ? 'border-warning bg-warning-subtle' : 'border-success bg-success-subtle' ?>">
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input fs-5" type="checkbox" role="switch" name="allow_manual_rekening_sipd" id="switchManualRekening" value="1" <?= (($allow_manual_rekening ?? '1') === '1') ? 'checked' : '' ?>>
+                            <label class="form-check-label fw-bold ms-2 text-dark pt-1" for="switchManualRekening">
+                                Izinkan Input Kode Rekening Manual oleh Operator SKPD
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="vstack gap-2.5 small text-muted">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success flex-shrink-0 mt-0.5"></i>
+                            <div>
+                                <strong>Jika Dinonaktifkan (Rekomendasi):</strong> Tombol <code>[ Manual ]</code> pada form usulan disembunyikan. Operator SKPD wajib memilih rekening belanja dari katalog resmi SIPD RI (mencegah salah ketik dan menjamin validitas saat ekspor SIPD).
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-exclamation-triangle-fill text-warning flex-shrink-0 mt-0.5"></i>
+                            <div>
+                                <strong>Jika Diaktifkan:</strong> Operator SKPD dapat mengklik tombol <code>[ Manual ]</code> dan mengetik kode/nama rekening secara bebas atau multi-kode koma (berguna jika kode rekening belum terinput di database master).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary fw-semibold">
+                        <i class="bi bi-check2-circle me-1"></i>Simpan Pengaturan
                     </button>
                 </div>
             </form>

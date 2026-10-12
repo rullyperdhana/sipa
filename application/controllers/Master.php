@@ -488,15 +488,16 @@ class Master extends Admin_Controller
         $totalPages = ceil($totalRows / $perPage);
 
         $data = [
-            'title'      => 'Master Data Akun Belanja SIPD RI',
-            'list'       => $list,
-            'filter'     => $filter,
-            'stats'      => $stats,
-            'page'       => $page,
-            'perPage'    => $perPage,
-            'offset'     => $offset,
-            'totalRows'  => $totalRows,
-            'totalPages' => $totalPages
+            'title'                 => 'Master Data Akun Belanja SIPD RI',
+            'list'                  => $list,
+            'filter'                => $filter,
+            'stats'                 => $stats,
+            'page'                  => $page,
+            'perPage'               => $perPage,
+            'offset'                => $offset,
+            'totalRows'             => $totalRows,
+            'totalPages'            => $totalPages,
+            'allow_manual_rekening' => function_exists('get_setting') ? get_setting('allow_manual_rekening_sipd', '1') : '1'
         ];
 
         $this->load->view('templates/header', $data);
@@ -560,6 +561,12 @@ class Master extends Admin_Controller
                 $this->logger->record('delete', 'akun_belanja', "Hapus Akun Belanja: {$item->kode_akun}");
                 $this->session->set_flashdata('success', 'Akun Belanja berhasil dihapus.');
             }
+        } elseif ($action === 'save_setting_manual') {
+            $val = $this->input->post('allow_manual_rekening_sipd') ? '1' : '0';
+            set_setting('allow_manual_rekening_sipd', $val);
+            $statusText = ($val === '1') ? 'Diaktifkan (Operator dapat input kode manual)' : 'Dinonaktifkan (Wajib pilih katalog resmi SIPD)';
+            $this->logger->record('update', 'setting', "Pengaturan Input Manual Rekening Belanja SIPD diubah menjadi: {$statusText}");
+            $this->session->set_flashdata('success', "Pengaturan berhasil disimpan. Fitur input manual kode rekening belanja SIPD saat ini: <strong>{$statusText}</strong>.");
         }
     }
 

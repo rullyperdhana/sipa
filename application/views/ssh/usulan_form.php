@@ -10,6 +10,7 @@ $modName = $isSbu ? 'Standar Biaya Umum (SBU)' : 'Standar Satuan Harga (SSH)';
 $pageTitle = ($isEdit ? 'Edit Rincian Usulan ' : 'Tambah Rincian Usulan ') . $modName;
 $actionUrl = $isEdit ? site_url("{$prefixUrl}/edit/{$item->id}") : ($suratId ? site_url("{$prefixUrl}/tambah/{$suratId}") : site_url("{$prefixUrl}/tambah"));
 $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_url("{$prefixUrl}/usulan");
+$allowManualRekening = function_exists('get_setting') ? (get_setting('allow_manual_rekening_sipd', '1') === '1') : true;
 ?>
 
 <div class="page-header d-flex justify-content-between align-items-center mb-4">
@@ -277,9 +278,11 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                                     </div>
                                 </div>
                                 <div class="d-flex gap-1">
+                                    <?php if ($allowManualRekening): ?>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" id="btnToggleManualRek" title="Input / Edit Kode Manual">
                                         <i class="bi bi-pencil-square"></i> Manual
                                     </button>
+                                    <?php endif; ?>
                                     <button type="button" class="btn btn-sm btn-outline-danger" id="btnClearRekening" title="Hapus / Cari Ulang">
                                         <i class="bi bi-x-circle"></i> Hapus
                                     </button>
@@ -287,7 +290,8 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                             </div>
                         </div>
 
-                        <!-- Input Values yang dikirim ke backend (Bisa dibuka untuk input kode kustom) -->
+                        <!-- Input Values yang dikirim ke backend -->
+                        <?php if ($allowManualRekening): ?>
                         <div id="boxInputManualRekening" class="mt-2 d-none">
                             <label class="form-label small fw-semibold text-muted">Input Kode Rekening Manual:</label>
                             <div class="input-group input-group-sm">
@@ -300,6 +304,14 @@ $backUrl = $suratId ? site_url("{$prefixUrl}/surat/detail/{$suratId}") : site_ur
                             </div>
                             <div class="form-text small text-muted">Gunakan jika kode rekening belum ada di database referensi atau berupa multi-kode koma.</div>
                         </div>
+                        <?php else: ?>
+                        <!-- Input manual dinonaktifkan oleh Admin: kirim nilai via hidden input -->
+                        <input type="hidden" id="kode_rekening" name="kode_rekening" value="<?= e($curKodeRek) ?>">
+                        <input type="hidden" id="nama_rekening" name="nama_rekening" value="<?= e($curNamaRek) ?>">
+                        <div class="form-text small text-muted mt-1">
+                            <i class="bi bi-shield-lock text-success me-1"></i>Input manual kode rekening dinonaktifkan oleh Admin BKAD (Wajib memilih dari katalog referensi resmi SIPD RI).
+                        </div>
+                        <?php endif; ?>
 
                         <div class="small text-muted mt-1 d-none" id="lblNamaRekening"></div>
                     </div>
