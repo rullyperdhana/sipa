@@ -230,19 +230,24 @@ body::before {
     margin-bottom: 24px;
 }
 .banner-logo {
-    width: 68px;
-    height: 68px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
-    border-radius: 18px;
+    width: 74px;
+    height: 74px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 34px;
-    color: #ffffff;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35), inset 0 0 15px rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(12px);
     flex-shrink: 0;
+    padding: 7px;
+}
+.tapin-logo-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
 .brand-text-header .gov-title {
     font-size: 11px;
@@ -558,7 +563,8 @@ body::before {
                 <i class="bi bi-info-circle text-primary me-1"></i>
                 SKPD diimbau segera menyelesaikan usulan dan mengunggah berkas surat sebelum batas waktu berakhir.
             </div>
-            <div class="d-none d-md-block text-secondary fw-semibold">
+            <div class="d-none d-md-flex align-items-center text-secondary fw-semibold">
+                <img src="<?= base_url('assets/img/logo_tapin.png') ?>" alt="Logo Kabupaten Tapin" style="height: 20px; width: auto; margin-right: 6px;">
                 BKAD Kabupaten Tapin
             </div>
         </div>
@@ -573,7 +579,7 @@ body::before {
             <div>
                 <div class="brand-badge-wrapper">
                     <div class="banner-logo">
-                        <i class="bi bi-building-fill-check"></i>
+                        <img src="<?= base_url('assets/img/logo_tapin.png') ?>" alt="Lambang Kabupaten Tapin" class="tapin-logo-img">
                     </div>
                     <div class="brand-text-header">
                         <div class="gov-title">Pemerintah Kabupaten Tapin</div>
@@ -628,9 +634,12 @@ body::before {
         <!-- Right Form Panel -->
         <div class="login-form">
             <div>
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 mb-2 fw-semibold" style="font-size: 11px;">
-                    <i class="bi bi-shield-check me-1"></i>Portal Autentikasi Pengguna
-                </span>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 fw-semibold" style="font-size: 11px;">
+                        <i class="bi bi-shield-check me-1"></i>Portal Autentikasi Pengguna
+                    </span>
+                    <img src="<?= base_url('assets/img/logo_tapin.png') ?>" alt="Logo Tapin" class="d-lg-none" style="height: 32px; width: auto;" title="Pemerintah Kabupaten Tapin">
+                </div>
                 <h1 class="form-title">Masuk ke Sistem</h1>
                 <p class="form-subtitle">Silakan masuk dengan akun resmi yang telah terdaftar di BKAD Kabupaten Tapin.</p>
             </div>
@@ -753,8 +762,8 @@ body::before {
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="modal-header bg-primary text-white py-3 px-4">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-headset fs-4"></i>
+                <div class="d-flex align-items-center gap-2.5">
+                    <img src="<?= base_url('assets/img/logo_tapin.png') ?>" alt="Logo Tapin" style="height: 38px; width: auto;" class="p-1 bg-white rounded-2 shadow-sm me-1">
                     <div>
                         <h6 class="modal-title fw-bold mb-0" id="modalHelpdeskLabel">Layanan Bantuan Operator SKPD</h6>
                         <small class="opacity-75" style="font-size: 11px;">BKAD Kabupaten Tapin</small>
